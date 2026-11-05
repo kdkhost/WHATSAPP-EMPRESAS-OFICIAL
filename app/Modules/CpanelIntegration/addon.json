@@ -1,0 +1,22 @@
+{
+    "name": "Integração WHM/cPanel",
+    "slug": "cpanel",
+    "version": "1.0.0",
+    "author": "Sistema",
+    "description": "Conecte seus servidores WHM/cPanel para realizar suspensões automáticas de contas quando faturas atrasarem.",
+    "provider": "App\\Modules\\CpanelIntegration\\Providers\\CpanelServiceProvider",
+    "enabled": true,
+    "marketplace": {
+        "bundled": true,
+        "commercial": true,
+        "category": "Provedores",
+        "price": 0.00,
+        "billing_cycle": "monthly",
+        "audience": "Tenant"
+    },
+    "menu": {
+        "title": "Integração WHM/cPanel",
+        "icon": "bi-server",
+        "route": "tenant.cpanel.index"
+    }
+}

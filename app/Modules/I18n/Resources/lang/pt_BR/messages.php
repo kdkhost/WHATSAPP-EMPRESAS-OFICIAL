@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'welcome' => 'Bem-vindo',
+    'login' => 'Entrar',
+    'logout' => 'Sair',
+    'register' => 'Cadastro',
+    'dashboard' => 'Painel',
+    'invoices' => 'Faturas',
+    'customers' => 'Clientes',
+    'templates' => 'Templates',
+    'settings' => 'Configurações',
+    'save' => 'Salvar',
+    'cancel' => 'Cancelar',
+    'delete' => 'Excluir',
+    'confirm_delete' => 'Tem certeza que deseja excluir?',
+    'success' => 'Operação realizada com sucesso!',
+    'error' => 'Ocorreu um erro. Tente novamente.',
+    'pending' => 'Pendente',
+    'paid' => 'Pago',
+    'overdue' => 'Vencido',
+    'sent' => 'Enviado',
+    'billing' => 'Cobranças',
+    'whatsapp' => 'WhatsApp',
+    'email' => 'E-mail',
+];

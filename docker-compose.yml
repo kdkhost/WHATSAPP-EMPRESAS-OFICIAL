@@ -1,0 +1,99 @@
+version: '3.8'
+
+# ==============================================================================
+# Orquestração Docker Compose Completa - WHATSAPP-EMPRESAS-OFICIAL
+# Serviços: App (PHP 8.4-FPM), Nginx, MariaDB 10.11 e Redis 7
+# Desenvolvido por Marcelo Brad / KDKhost
+# ==============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kdkhost_whatsapp_app
+    restart: always
+    environment:
+      - APP_NAME=WHATSAPP-EMPRESAS-OFICIAL
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY:-base64:c7+Y5fDqKdkHostSecretKeyMetaWhatsApp2026=}
+      - APP_DEBUG=false
+      - APP_URL=${APP_URL:-http://localhost}
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-kdkhost_whatsapp}
+      - DB_USERNAME=${DB_USERNAME:-kdkhost_user}
+      - DB_PASSWORD=${DB_PASSWORD:-kdkhost_secret_password_2026}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GRAPH_API_VERSION=${GRAPH_API_VERSION:-v21.0}
+      - META_GRAPH_VERSION=${META_GRAPH_VERSION:-v21.0}
+      - META_PHONE_NUMBER_ID=${META_PHONE_NUMBER_ID}
+      - META_WABA_ID=${META_WABA_ID}
+      - META_ACCESS_TOKEN=${META_ACCESS_TOKEN}
+      - META_APP_SECRET=${META_APP_SECRET}
+      - META_VERIFY_TOKEN=${META_VERIFY_TOKEN:-kdkhost_meta_webhook_secret_2026}
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
+      - MERCADOPAGO_PUBLIC_KEY=${MERCADOPAGO_PUBLIC_KEY}
+      - MERCADOPAGO_WEBHOOK_SECRET=${MERCADOPAGO_WEBHOOK_SECRET}
+      - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN}
+      - MP_PUBLIC_KEY=${MP_PUBLIC_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - storage_data:/var/www/html/storage
+
+  nginx:
+    image: nginx:alpine
+    container_name: kdkhost_whatsapp_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  db:
+    image: mariadb:10.11
+    container_name: kdkhost_whatsapp_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_kdkhost_2026}
+      MYSQL_DATABASE: ${DB_DATABASE:-kdkhost_whatsapp}
+      MYSQL_USER: ${DB_USERNAME:-kdkhost_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-kdkhost_secret_password_2026}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kdkhost_whatsapp_redis
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+  redis_data:
+  storage_data:

@@ -1,0 +1,32 @@
+root = true
+
+# Regra Global: NUNCA usar UTF-8 com BOM neste projeto.
+# UTF-8 BOM causa problemas em PHP (headers já enviados), Laravel (csrf), 
+# e pode quebrar JSON, JS modules e concatenação de arquivos.
+# Use sempre UTF-8 SEM BOM (plain UTF-8).
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{tsx,ts,js,jsx}]
+indent_size = 4
+
+[*.{blade.php,php}]
+indent_size = 4
+
+[*.{json,yaml,yml}]
+indent_size = 2
+
+[*.{md,mdx}]
+trim_trailing_whitespace = false
+
+[*.{css,scss}]
+indent_size = 2
+
+[Makefile]
+indent_style = tab

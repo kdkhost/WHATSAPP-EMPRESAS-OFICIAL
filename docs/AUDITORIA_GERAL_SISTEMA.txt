@@ -1,0 +1,52 @@
+# Auditoria Geral do Sistema
+
+## Pontos positivos
+1. Arquitetura modular por Service Providers.
+2. Middlewares de seguranca registrados.
+3. Evolution API Go com separacao de chave global e chave da instancia.
+4. Feature flags para endpoints experimentais.
+5. PWA, Billing, Contracts, WebhookMonitor, HealthCheck e Backup existentes.
+6. Diagnostico Evolution via Artisan.
+7. Upload multipart com validacao de MIME/tamanho.
+8. Sanitizacao rich-text para contratos/templates.
+
+## Correcoes aplicadas
+1. Compatibilidade de rotas /painel: adicionadas rotas nomeadas `painel.*` e `pwa.*` que redirecionam para `admin.*` com fallbacks seguros.
+2. Rotas PWA seguras: `/pwa/dashboard`, `/pwa/mensagens`, `/pwa/cobrancas`, `/pwa/instancia`, `/pwa/perfil` redirecionam para rotas reais do admin.
+3. Footer PWA/mobile sem links 404: usa `auth('admin')->check()`, rotas nomeadas `pwa.*` e fallback para `admin.*`.
+4. Service Worker sem cache indevido de login, admin, painel, PWA, API, webhooks e 404: atualizado para v3 com `function` syntax, bypass de `/pwa` e cache bust no registro.
+5. `checkNumber()` padronizado via `sendInstanceRequest('POST', '/user/check', ...)`.
+6. `sendPix()` com fallback textual completo quando endpoint nativo esta desativado: inclui fatura, valor, vencimento, copia e cola.
+7. Advanced settings com `rawurlencode()`.
+8. Upload multipart com fechamento explicito de handle.
+9. SanitizeInput compativel com Summernote.
+10. Pagina Anti-Ban com grid/flex responsivo.
+11. Pagina de contratos com Summernote dark/light e preview realtime.
+
+## Arquivos alterados nesta sessao
+- `routes/web.php`
+- `resources/views/components/pwa/footer-nav.blade.php`
+- `resources/views/layouts/pwa-public.blade.php`
+- `resources/views/frontend/home.blade.php`
+- `app/Modules/Pwa/Http/Controllers/PwaController.php`
+- `app/Modules/WhatsApp/Services/EvolutionClient.php`
+- `app/Http/Middleware/SanitizeInput.php`
+- `app/Modules/Contracts/Resources/views/admin/create.blade.php`
+- `config/whatsapp.php`
+- `docs/AUDITORIA_GERAL_SISTEMA.txt`
+
+## Comandos de validacao
+- `php -l routes/web.php`
+- `php artisan optimize:clear`
+- `php artisan route:list`
+- `php artisan whatsapp:evolution-diagnose`
+
+## Feature requests pendentes
+1. **Tenant editar seus proprios pacotes/planos**: Hoje o tenant usa planos definidos pelo superadmin. Criar CRUD de planos/pacotes no painel do tenant para que ele possa vender seus proprios planos aos clientes dele, sem afetar planos globais do admin.
+2. **Arrastar faturas no calendario**: Permitir drag-and-drop de faturas no calendario do Billing para alterar vencimento rapidamente.
+
+## Pendencias tecnicas
+1. Criar testes Pest para PWA, contratos, Evolution e Billing.
+2. Refatorar closures complexas de rotas para controllers.
+3. Separar EvolutionClient em servicos menores.
+4. Validar endpoints nativos /send/pix, /send/link e /send/sticker em producao antes de ativar flags.

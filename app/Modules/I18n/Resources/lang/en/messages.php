@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'welcome' => 'Welcome',
+    'login' => 'Login',
+    'logout' => 'Logout',
+    'register' => 'Register',
+    'dashboard' => 'Dashboard',
+    'invoices' => 'Invoices',
+    'customers' => 'Customers',
+    'templates' => 'Templates',
+    'settings' => 'Settings',
+    'save' => 'Save',
+    'cancel' => 'Cancel',
+    'delete' => 'Delete',
+    'confirm_delete' => 'Are you sure you want to delete?',
+    'success' => 'Operation completed successfully!',
+    'error' => 'An error occurred. Please try again.',
+    'pending' => 'Pending',
+    'paid' => 'Paid',
+    'overdue' => 'Overdue',
+    'sent' => 'Sent',
+    'billing' => 'Billing',
+    'whatsapp' => 'WhatsApp',
+    'email' => 'Email',
+];

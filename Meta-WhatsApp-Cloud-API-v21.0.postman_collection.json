@@ -1,0 +1,127 @@
+{
+  "info": {
+    "_postman_id": "meta-whatsapp-cloud-api-v21",
+    "name": "Meta WhatsApp Cloud API v21.0 & Mercado Pago SaaS - KDKhost",
+    "description": "Coleção Oficial de Endpoints para Meta WhatsApp Cloud API (Graph API v21.0) e Mercado Pago SDK v2 para o ecossistema SaaS da KDKhost.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "WhatsApp Cloud API (Meta Oficial)",
+      "item": [
+        {
+          "name": "1. Handshake Webhook (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/v1/webhook?hub.mode=subscribe&hub.challenge=1158201444&hub.verify_token={{META_WEBHOOK_VERIFY_TOKEN}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "v1", "webhook"],
+              "query": [
+                { "key": "hub.mode", "value": "subscribe" },
+                { "key": "hub.challenge", "value": "1158201444" },
+                { "key": "hub.verify_token", "value": "{{META_WEBHOOK_VERIFY_TOKEN}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Envio de Template de Cobrança com Pix e Fatura (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{META_ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"5521981325441\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"aviso_fatura_pix\",\n    \"language\": { \"code\": \"pt_BR\" },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          { \"type\": \"text\", \"text\": \"João Silva\" },\n          { \"type\": \"text\", \"text\": \"R$ 149,90\" },\n          { \"type\": \"text\", \"text\": \"10/11/2026\" },\n          { \"type\": \"text\", \"text\": \"00020126580014br.gov.bcb.pix...\" },\n          { \"type\": \"text\", \"text\": \"https://sistema.kdkhost.com.br/fatura/uuid-exemplo\" }\n        ]\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "https://graph.facebook.com/v21.0/{{META_PHONE_NUMBER_ID}}/messages",
+              "protocol": "https",
+              "host": ["graph", "facebook", "com"],
+              "path": ["v21.0", "{{META_PHONE_NUMBER_ID}}", "messages"]
+            }
+          }
+        },
+        {
+          "name": "3. Envio de Mensagem de Sessão (Janela 24h)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{META_ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"5521981325441\",\n  \"type\": \"text\",\n  \"text\": {\n    \"preview_url\": true,\n    \"body\": \"Olá! Sua fatura foi confirmada com sucesso. Obrigado pela preferência!\"\n  }\n}"
+            },
+            "url": {
+              "raw": "https://graph.facebook.com/v21.0/{{META_PHONE_NUMBER_ID}}/messages",
+              "protocol": "https",
+              "host": ["graph", "facebook", "com"],
+              "path": ["v21.0", "{{META_PHONE_NUMBER_ID}}", "messages"]
+            }
+          }
+        },
+        {
+          "name": "4. Consulta Status e Qualidade do Número",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{META_ACCESS_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "https://graph.facebook.com/v21.0/{{META_PHONE_NUMBER_ID}}?fields=verified_name,display_phone_number,quality_rating,code_verification_status",
+              "protocol": "https",
+              "host": ["graph", "facebook", "com"],
+              "path": ["v21.0", "{{META_PHONE_NUMBER_ID}}"],
+              "query": [
+                { "key": "fields", "value": "verified_name,display_phone_number,quality_rating,code_verification_status" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mercado Pago & Checkout Transparente",
+      "item": [
+        {
+          "name": "1. Webhook Mercado Pago com Assinatura x-signature",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-signature", "value": "ts=1730000000,v1=abcdef0123456789..." }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"payment.created\",\n  \"api_version\": \"v1\",\n  \"data\": { \"id\": \"1234567890\" },\n  \"date_created\": \"2026-11-05T12:00:00Z\",\n  \"id\": 12345,\n  \"live_mode\": true,\n  \"type\": \"payment\",\n  \"user_id\": \"987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/v1/webhooks/mercadopago?token=webhook_token_dinamico",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "v1", "webhooks", "mercadopago"],
+              "query": [{ "key": "token", "value": "webhook_token_dinamico" }]
+            }
+          }
+        },
+        {
+          "name": "2. Consulta Fatura Pública (/fatura/{uuid})",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/fatura/uuid-exemplo",
+              "host": ["{{BASE_URL}}"],
+              "path": ["fatura", "uuid-exemplo"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

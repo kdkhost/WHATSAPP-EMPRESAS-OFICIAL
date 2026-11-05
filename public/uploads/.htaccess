@@ -1,0 +1,17 @@
+Options -ExecCGI -Indexes
+RemoveHandler .php .phtml .php3 .php4 .php5 .php6 .php7 .php8 .phar .cgi .pl .py .jsp .asp .aspx .sh .bash .bat .cmd .ps1 .rb .lua
+RemoveType .php .phtml .php3 .php4 .php5 .php6 .php7 .php8 .phar .cgi .pl .py .jsp .asp .aspx .sh .bash .bat .cmd .ps1 .rb .lua
+
+<FilesMatch "\.(php|php[0-9]?|phtml|phar|pht|cgi|pl|py|rb|lua|go|sh|bash|cmd|bat|ps1|asp|aspx|jsp|jspx|exe|com|dll|so)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+AddType text/plain .php .php3 .php4 .php5 .phtml .phar .pht .cgi .pl .py .rb .sh .bash .cmd .bat .ps1
+
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|pdf|txt|csv|xlsx|xls|docx|doc)$">
+    Require all granted
+</FilesMatch>

@@ -1,0 +1,297 @@
+/* admin.css - estilos globais do painel administrativo */
+
+/* Drag-drop upload */
+[data-upload] {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 18px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .15s ease-in-out;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--bs-primary) 8%, transparent), transparent 42%),
+        var(--bs-body-tertiary-bg, var(--bs-body-bg));
+}
+[data-upload]:hover,
+[data-upload].drag-over {
+    border-color: var(--bs-primary);
+    background: color-mix(in srgb, var(--bs-primary) 10%, var(--bs-body-bg));
+    box-shadow: 0 14px 35px rgba(15,23,42,.05);
+}
+.upload-item {
+    border-radius: 14px !important;
+    background: var(--bs-body-bg);
+}
+.upload-preview-grid,
+.upload-done-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .65rem;
+    text-align: left;
+}
+.upload-preview-card,
+.upload-done-card {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    min-width: 0;
+    padding: .65rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 14px;
+    background: var(--bs-body-bg);
+}
+.upload-preview-card > img,
+.upload-done-card > img {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.upload-preview-card > i,
+.upload-done-card > i {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.45rem;
+    background: var(--bs-tertiary-bg);
+}
+.upload-preview-card__body,
+.upload-done-card__body {
+    min-width: 0;
+    flex: 1;
+}
+.upload-preview-card__name,
+.upload-done-card__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: .84rem;
+}
+.upload-done-card code {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .72rem;
+}
+[data-bs-theme="dark"] [data-upload]:hover,
+[data-bs-theme="dark"] [data-upload].drag-over {
+    box-shadow: 0 14px 35px rgba(0,0,0,.22);
+}
+
+/* Bolha estilo WhatsApp para preview de templates */
+.whatsapp-bubble {
+    background: #dcf8c6;
+    border-radius: 12px;
+    padding: 10px 14px;
+    max-width: 90%;
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Sininho de notificacoes */
+.notification-bell {
+    position: relative;
+}
+.notification-bell__link {
+    position: relative;
+    min-width: 2.35rem;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+.notification-bell__badge {
+    position: absolute;
+    top: .18rem;
+    right: .1rem;
+    min-width: 1.08rem;
+    height: 1.08rem;
+    padding: .1rem .32rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .62rem;
+    line-height: 1;
+    transform: none;
+}
+.dropdown-menu .dropdown-item.unread {
+    background: rgba(13, 110, 253, .05);
+}
+.notification-bell-pulse > .nav-link {
+    animation: notificationPulse 1s ease-in-out 4;
+    color: var(--bs-warning) !important;
+}
+@keyframes notificationPulse {
+    0%, 100% { transform: scale(1); filter: none; }
+    50% { transform: scale(1.18); filter: drop-shadow(0 0 10px rgba(255, 193, 7, .65)); }
+}
+
+/* Kanban cards */
+.kanban-board { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: .5rem; }
+.kanban-column { min-width: 280px; flex: 0 0 280px; background: var(--bs-body-tertiary-bg); border-radius: .5rem; padding: .75rem; }
+.kanban-column h6 { font-size: .85rem; text-transform: uppercase; letter-spacing: .5px; }
+.kanban-card {
+    background: var(--bs-body-bg); border: 1px solid var(--bs-border-color);
+    border-radius: .375rem; padding: .75rem; margin-bottom: .5rem; cursor: grab;
+}
+.kanban-card.dragging { opacity: .5; }
+
+/* Voltar ao topo (frontend tambem) */
+.back-to-top {
+    position: fixed; bottom: 20px; right: 20px;
+    width: 44px; height: 44px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+    background: var(--bs-primary); color: #fff; border: none;
+    z-index: 1050; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+.back-to-top.visible { display: flex; }
+
+/* ============================================================
+   Padrao visual para paginas de modulos e addons
+   ============================================================ */
+.admin-module-shell,
+.addon-module-shell,
+.finance-addon-shell {
+    --module-bg: var(--bs-body-bg);
+    --module-surface: var(--bs-body-bg);
+    --module-surface-soft: var(--bs-tertiary-bg);
+    --module-border: var(--bs-border-color);
+    --module-text: var(--bs-body-color);
+    --module-muted: var(--bs-secondary-color);
+    --module-primary: var(--bs-primary);
+    --module-primary-soft: color-mix(in srgb, var(--bs-primary) 12%, var(--bs-body-bg));
+    --module-shadow: var(--app-shadow-premium, 0 14px 35px rgba(15,23,42,.05));
+    color: var(--module-text);
+}
+
+[data-bs-theme="dark"] .admin-module-shell,
+[data-bs-theme="dark"] .addon-module-shell,
+[data-bs-theme="dark"] .finance-addon-shell {
+    --module-bg: var(--bs-body-bg);
+    --module-surface: var(--bs-body-bg);
+    --module-surface-soft: var(--bs-tertiary-bg);
+    --module-border: rgba(255,255,255,.1);
+    --module-text: var(--bs-body-color);
+    --module-muted: var(--bs-secondary-color);
+    --module-primary-soft: color-mix(in srgb, var(--bs-primary) 18%, var(--bs-body-bg));
+    --module-shadow: 0 14px 35px rgba(0,0,0,.22);
+}
+
+[data-bs-theme="light"] .admin-module-shell,
+[data-bs-theme="light"] .addon-module-shell,
+[data-bs-theme="light"] .finance-addon-shell {
+    --module-bg: var(--bs-body-bg);
+    --module-surface: #fff;
+    --module-surface-soft: var(--bs-tertiary-bg);
+    --module-border: var(--bs-border-color);
+    --module-text: var(--bs-body-color);
+    --module-muted: var(--bs-secondary-color);
+    --module-primary-soft: color-mix(in srgb, var(--bs-primary) 10%, #fff);
+    --module-shadow: var(--app-shadow-premium, 0 14px 35px rgba(15,23,42,.05));
+}
+
+.admin-module-shell .card,
+.addon-module-shell .card {
+    background: var(--module-surface);
+    color: var(--module-text);
+    border-color: var(--module-border);
+}
+
+.admin-module-shell .text-muted,
+.addon-module-shell .text-muted,
+.finance-addon-shell .text-muted {
+    color: var(--module-muted) !important;
+}
+
+.admin-module-shell .table,
+.addon-module-shell .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--module-text);
+    --bs-table-border-color: var(--module-border);
+    color: var(--module-text);
+}
+
+.admin-module-shell .form-control,
+.admin-module-shell .form-select,
+.addon-module-shell .form-control,
+.addon-module-shell .form-select {
+    background-color: var(--module-surface);
+    border-color: var(--module-border);
+    color: var(--module-text);
+}
+
+.admin-module-shell .form-control:focus,
+.admin-module-shell .form-select:focus,
+.addon-module-shell .form-control:focus,
+.addon-module-shell .form-select:focus {
+    border-color: var(--module-primary);
+    box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--module-primary) 20%, transparent);
+}
+
+/* Addons nao devem criar uma paleta paralela ao painel. */
+.addon-module-shell .finance-addon-shell,
+.addon-module-shell .addon-surface {
+    background: transparent !important;
+    color: var(--bs-body-color) !important;
+    border-color: var(--bs-border-color) !important;
+    box-shadow: none !important;
+}
+
+.addon-module-shell :is(.glass-panel, .glass-card, .premium-panel, .admin-premium-panel),
+.addon-module-shell [class*="bg-slate-"],
+.addon-module-shell [class*="bg-zinc-"],
+.addon-module-shell [class*="bg-neutral-"],
+.addon-module-shell [class*="bg-gray-"] {
+    background-color: var(--module-surface) !important;
+    background-image: none !important;
+    color: var(--module-text) !important;
+    border-color: var(--module-border) !important;
+}
+
+.addon-module-shell :is([class*="from-"], [class*="via-"], [class*="to-"]) {
+    --tw-gradient-from: transparent !important;
+    --tw-gradient-via: transparent !important;
+    --tw-gradient-to: transparent !important;
+    background-image: none !important;
+}
+
+.addon-module-shell :is(.rounded-2xl, .rounded-xl, .rounded-lg) {
+    border-radius: var(--app-radius-premium, 18px) !important;
+}
+
+.addon-module-shell .glass-card,
+.addon-module-shell .premium-panel,
+.addon-module-shell .admin-premium-panel {
+    box-shadow: var(--app-shadow-premium) !important;
+}
+
+[data-bs-theme="dark"] .addon-module-shell :is(.glass-panel, .glass-card, .premium-panel, .admin-premium-panel),
+[data-bs-theme="dark"] .addon-module-shell [class*="bg-slate-"],
+[data-bs-theme="dark"] .addon-module-shell [class*="bg-zinc-"],
+[data-bs-theme="dark"] .addon-module-shell [class*="bg-neutral-"],
+[data-bs-theme="dark"] .addon-module-shell [class*="bg-gray-"] {
+    background-color: var(--module-surface) !important;
+}
+
+.addon-module-shell :is(.text-slate-100, .text-slate-200, .text-slate-300, .text-slate-700, .text-slate-800, .text-slate-900) {
+    color: var(--bs-body-color) !important;
+}
+
+.addon-module-shell :is(.text-slate-400, .text-slate-500, .text-slate-600, .text-gray-400, .text-gray-500, .text-gray-600) {
+    color: var(--bs-secondary-color) !important;
+}
+
+.addon-module-shell :is(.border-slate-700, .border-slate-800, .border-slate-900, [class*="border-slate-"]) {
+    border-color: var(--bs-border-color) !important;
+}

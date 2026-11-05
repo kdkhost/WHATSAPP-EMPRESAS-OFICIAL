@@ -1,0 +1,125 @@
+{
+    "name": "Gestão Financeira Completa",
+    "slug": "gestao-financeira",
+    "version": "1.0.0",
+    "author": "Marcelo Brad",
+    "email": "dev@kdkhost.com.br",
+    "website": "https://kdkhost.com.br",
+    "description": "Módulo financeiro completo para controle de fluxo de caixa, receitas, despesas, contas bancárias e relatórios de DRE.",
+    "provider": "App\\Addons\\gestao_financeira\\AddonServiceProvider",
+    "enabled": true,
+    "min_system_version": "1.0.0",
+    "permissions": [
+        {
+            "action": "view",
+            "label": "Visualizar painel financeiro"
+        },
+        {
+            "action": "create",
+            "label": "Lançar transações"
+        },
+        {
+            "action": "edit",
+            "label": "Editar transações"
+        },
+        {
+            "action": "delete",
+            "label": "Excluir transações"
+        },
+        {
+            "action": "manage",
+            "label": "Gerenciar configurações financeiras"
+        },
+        {
+            "action": "report",
+            "label": "Visualizar relatórios (DRE/Fluxo de Caixa)"
+        }
+    ],
+    "hooks": {
+        "install": "App\\Addons\\gestao_financeira\\Install::install",
+        "uninstall": "App\\Addons\\gestao_financeira\\Install::uninstall",
+        "enable": "App\\Addons\\gestao_financeira\\Install::enable",
+        "disable": "App\\Addons\\gestao_financeira\\Install::disable",
+        "update": "App\\Addons\\gestao_financeira\\Install::update"
+    },
+    "settings": {
+        "currency": "BRL",
+        "alerts_whatsapp_number": "",
+        "alerts_enabled": false
+    },
+    "menu": {
+        "title": "Gestão Financeira",
+        "icon": "bi-cash-coin",
+        "order": 55,
+        "items": [
+            {
+                "title": "Dashboard",
+                "icon": "bi-grid",
+                "route": "admin.gestao-financeira.index",
+                "order": 55
+            },
+            {
+                "title": "Lançamentos",
+                "icon": "bi-arrow-down-up",
+                "route": "admin.gestao-financeira.transactions.index",
+                "order": 56
+            },
+            {
+                "title": "Categorias",
+                "icon": "bi-tags",
+                "route": "admin.gestao-financeira.categories.index",
+                "order": 57
+            },
+            {
+                "title": "Contas",
+                "icon": "bi-bank",
+                "route": "admin.gestao-financeira.accounts.index",
+                "order": 58
+            },
+            {
+                "title": "Relatórios",
+                "icon": "bi-file-earmark-bar-graph",
+                "route": "admin.gestao-financeira.reports.index",
+                "order": 59
+            }
+        ]
+    },
+    "tenant_menu": {
+        "title": "Gestão Financeira",
+        "icon": "bi-cash-coin",
+        "route": "tenant.gestao-financeira.index",
+        "order": 55,
+        "items": [
+            {
+                "title": "Dashboard",
+                "icon": "bi-grid",
+                "route": "tenant.gestao-financeira.index",
+                "order": 55
+            },
+            {
+                "title": "Lançamentos",
+                "icon": "bi-arrow-down-up",
+                "route": "tenant.gestao-financeira.transactions.index",
+                "order": 56
+            },
+            {
+                "title": "Categorias",
+                "icon": "bi-tags",
+                "route": "tenant.gestao-financeira.categories.index",
+                "order": 57
+            },
+            {
+                "title": "Contas",
+                "icon": "bi-bank",
+                "route": "tenant.gestao-financeira.accounts.index",
+                "order": 58
+            },
+            {
+                "title": "Relatórios",
+                "icon": "bi-file-earmark-bar-graph",
+                "route": "tenant.gestao-financeira.reports.index",
+                "order": 59
+            }
+        ]
+    }
+}

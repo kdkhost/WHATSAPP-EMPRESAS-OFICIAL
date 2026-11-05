@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Auto Deploy SSH após Git Push",
+  "description": "Executa automaticamente o deploy no servidor remoto via SSH (node deploy_temp.js) sempre que o agente terminar de trabalhar, garantindo que o servidor esteja sempre atualizado sem precisar solicitar manualmente.",
+  "version": "1",
+  "when": {
+    "type": "preTaskExecution"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "cd /d \"g:\\Tudo\\MEU-SISTEMA\\whatsapp-main\" && node deploy_temp.js",
+    "timeout": 120
+  },
+  "workspaceFolderName": "whatsapp-main",
+  "shortName": "auto-deploy-ssh"
+}

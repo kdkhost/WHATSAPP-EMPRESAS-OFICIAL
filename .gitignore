@@ -1,0 +1,91 @@
+# Dependencias
+/vendor/
+/node_modules/
+/frontend/node_modules/
+/frontend/dist/
+
+# Ambiente
+/.env
+/.env.backup
+/.env.production
+.env.bak.*
+auth.json
+Homestead.json
+Homestead.yaml
+
+# Documentos Markdown (exceto principais)
+*.md
+!CHANGELOG.md
+!README.md
+
+# Storage gerado em runtime
+/storage/*.key
+/storage/installed.lock
+/storage/app/cron-state.json
+/storage/app/cron.lock
+/storage/app/audits/*
+!/storage/app/audits/.gitkeep
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/storage/framework/testing/*
+!/storage/framework/testing/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/debugbar/
+
+# Caches do Laravel
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitkeep
+
+# Composer/PHP
+/composer.phar
+/.phpunit.result.cache
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/.phpstan.cache
+
+# Logs do servidor (cPanel/PHP)
+error_log
+*.log
+
+# Editores e SO
+/.fleet
+/.idea
+/.vscode
+.DS_Store
+Thumbs.db
+
+# Documentacao local
+*.md
+!README.md
+!CHANGELOG.md
+!**/README.md
+!**/CHANGELOG.md
+AGENTS.md
+
+# Deploy local
+/.deploy.env
+
+# Temporarios criados por scripts/agentes
+/.tmp_*
+/scripts/.tmp_*
+/entregas/
+/.opencode/
+install_key_temp.js
+
+# Test artifacts
+/storage/app/tmp/
+
+# Graphify (knowledge graph local - nao versionar)
+/graphify-out/
+
+# Debug artifacts
+check_tenant_view.js
+clean_create.bak
+clear_opcache.js

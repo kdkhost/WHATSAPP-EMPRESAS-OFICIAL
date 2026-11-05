@@ -1,0 +1,22 @@
+{
+    "name": "Integração WHMCS",
+    "slug": "whmcs",
+    "version": "1.0.0",
+    "author": "Sistema",
+    "description": "Conecte o WHMCS ao sistema para importar clientes, sincronizar faturas e automatizar cobranças pelo WhatsApp.",
+    "provider": "App\\Modules\\WhmcsIntegration\\Providers\\WhmcsServiceProvider",
+    "enabled": true,
+    "marketplace": {
+        "bundled": true,
+        "commercial": true,
+        "category": "Integrações",
+        "price": 0.00,
+        "billing_cycle": "monthly",
+        "audience": "Tenant"
+    },
+    "menu": {
+        "title": "Integração WHMCS",
+        "icon": "bi-box-seam",
+        "route": "tenant.whmcs.index"
+    }
+}

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Tema personalizavel via CSS vars (valores vem do admin -> settings.app) */
+:root {
+    --color-primary: #0d6efd;
+    --color-primary-hover: #0b5ed7;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial; }
+body.pwa-mobile {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+.pwa-footer-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1040;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Botoes publicos: manter uma linha, altura consistente e icones alinhados */
+a[class*="rounded-full"],
+button[class*="rounded-full"] {
+    white-space: nowrap !important;
+    line-height: 1.05;
+}
+
+a[class*="rounded-full"] > svg,
+button[class*="rounded-full"] > svg,
+a[class*="rounded-full"] svg,
+button[class*="rounded-full"] svg {
+    flex-shrink: 0;
+}
+
+.public-cta-button {
+    white-space: nowrap !important;
+    line-height: 1 !important;
+    letter-spacing: 0;
+    font-size: clamp(0.78rem, 3.55vw, 1.125rem);
+}
+
+/* Header fixo ao rolar */
+.site-header { transition: all .2s ease-in-out; }
+.site-header.scrolled { @apply shadow-md; backdrop-filter: blur(10px); background-color: rgba(255,255,255,.92); }
+
+/* Voltar ao topo */
+.btn-top {
+    @apply fixed bottom-5 right-5 w-11 h-11 rounded-full text-white items-center justify-center shadow-lg transition-all;
+    background: var(--color-primary);
+    display: none;
+}
+.btn-top.visible { display: flex; }
