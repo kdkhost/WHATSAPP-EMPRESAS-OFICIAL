@@ -415,10 +415,10 @@
         subtitle="Histórico operacional de envios e recebimentos, com busca, reenvio e envio manual para soluções rápidas."
         eyebrow="Operação WhatsApp">
         <x-slot:actions>
-            <div class="d-flex flex-wrap gap-2 justify-content-end">
-                <button type="button" class="btn btn-outline-primary js-meta-help-trigger" data-help-topic="meta-templates">
-                    <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Templates Meta
-                </button>
+            <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center">
+                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted p-2 text-decoration-none d-flex align-items-center" data-help-topic="usage-delivery-tracking" title="Instruções sobre Rastreamento, Templates e Status">
+                    <i class="bi bi-question-circle fs-5"></i>
+                </a>
                 <button class="btn btn-success" id="btn-manual-send">
                     <i class="bi bi-send-fill me-1"></i> Nova mensagem manual
                 </button>

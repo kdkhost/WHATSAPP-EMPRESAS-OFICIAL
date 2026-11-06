@@ -15,9 +15,9 @@
                 <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
                     <i class="bi bi-check-circle-fill me-1"></i> WhatsApp Conectado
                 </span>
-                <button type="button" class="btn btn-outline-info btn-sm js-meta-help-trigger" data-help-topic="meta-templates" title="Regras de Mensagens & Templates da Meta">
-                    <i class="bi bi-question-circle me-1"></i> Ajuda & Templates
-                </button>
+                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted p-1 text-decoration-none" data-help-topic="meta-templates" title="Instruções sobre Modelos de Mensagem">
+                    <i class="bi bi-question-circle fs-5"></i>
+                </a>
             </div>
             <div class="small text-muted mt-2">
                 Instância: <strong>{{ $connectedInstance->name ?? $connectedInstance->instance_name ?? 'Padrão' }}</strong>
@@ -99,8 +99,8 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold d-flex justify-content-between align-items-center">
                             <span>2. Modelo de Mensagem (Template) <span class="text-danger">*</span></span>
-                            <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-templates" title="Ver regras oficiais de Templates da Meta">
-                                <i class="bi bi-question-circle-fill me-1"></i>Regras da Meta
+                            <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none" data-help-topic="meta-templates" title="Instruções sobre Templates">
+                                <i class="bi bi-question-circle"></i>
                             </a>
                         </label>
                         <select class="form-select" id="template-select" name="template_id" required>
@@ -116,7 +116,12 @@
 
                     {{-- 3. Número do Destinatário --}}
                     <div class="mb-3">
-                        <label class="form-label">3. Número do WhatsApp do Destinatário <span class="text-danger">*</span></label>
+                        <label class="form-label d-flex justify-content-between align-items-center">
+                            <span>3. Número do WhatsApp do Destinatário <span class="text-danger">*</span></span>
+                            <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none" data-help-topic="meta-phone-id" title="Formato oficial: DDD + Número (ex: 5511987654321)">
+                                <i class="bi bi-question-circle"></i>
+                            </a>
+                        </label>
                         <div class="input-group">
                             <span class="input-group-text bg-success-subtle text-success"><i class="bi bi-whatsapp"></i></span>
                             <input type="text" class="form-control" id="target-phone" name="to" placeholder="Ex: (11) 98765-4321 ou 5511987654321" required>
@@ -127,7 +132,12 @@
                     {{-- 4. Mensagem --}}
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label mb-0">4. Mensagem <span class="text-danger">*</span></label>
+                            <label class="form-label mb-0 d-flex align-items-center">
+                                <span>4. Mensagem <span class="text-danger">*</span></span>
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="topic-usage-manual-send" title="Instruções sobre Envio Manual">
+                                    <i class="bi bi-question-circle"></i>
+                                </a>
+                            </label>
                             <small class="text-muted" id="char-counter">0 caracteres</small>
                         </div>
 

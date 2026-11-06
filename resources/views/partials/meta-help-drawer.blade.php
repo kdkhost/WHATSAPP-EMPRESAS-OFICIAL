@@ -1,4 +1,4 @@
-{{-- Central de Ajuda & Configuração Passo a Passo da Meta WhatsApp Cloud API --}}
+{{-- Central de Ajuda & Passo a Passo: Personalização, Configuração, Utilização e Outros --}}
 {{-- Menu Deslizante da Direita para a Esquerda (Offcanvas) --}}
 
 <div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="metaHelpDrawer" aria-labelledby="metaHelpDrawerLabel" style="width: 660px; max-width: 95vw; z-index: 1085;">
@@ -9,10 +9,10 @@
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2">
-                    <h5 class="offcanvas-title mb-0 fw-bold" id="metaHelpDrawerLabel">Guia Oficial Meta WhatsApp</h5>
+                    <h5 class="offcanvas-title mb-0 fw-bold" id="metaHelpDrawerLabel">Guia do Sistema & Meta WhatsApp</h5>
                     <span class="badge bg-success-subtle text-success border border-success-subtle small">Graph API v21.0</span>
                 </div>
-                <small class="text-muted d-block mt-1">Manual interativo com instruções individuais passo a passo de cada configuração</small>
+                <small class="text-muted d-block mt-1">Instruções passo a passo de personalização, configuração, utilização e boas práticas</small>
             </div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
@@ -22,39 +22,32 @@
     <div class="px-4 pt-3 pb-2 border-bottom bg-body-tertiary">
         <div class="position-relative mb-2">
             <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-            <input type="text" id="metaHelpSearch" class="form-control form-control-sm ps-5 rounded-pill" placeholder="Buscar qualquer configuração (ex: token permanente, delay humano, webhook, waba, pix, cooldown)...">
+            <input type="text" id="metaHelpSearch" class="form-control form-control-sm ps-5 rounded-pill" placeholder="Buscar qualquer item (ex: perfil, token, delay, pix, white-label, envio manual)...">
         </div>
         
         <div class="d-flex gap-1 overflow-x-auto pb-1 meta-help-nav-pills" style="white-space: nowrap; scrollbar-width: thin;">
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active py-0 px-2" data-nav-topic="meta-overview">Geral</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-app-setup">Criar App</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-system-user-token">Token Permanente</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-phone-id">Phone ID</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-waba-id">WABA ID</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-app-secret">App Secret</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-webhook">Webhook</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-templates">Templates</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-quality-rating">Qualidade & Tiers</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-anti-ban">Painel Anti-Ban</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="tenant-instance-setup">Tenants</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active py-0 px-2" data-nav-topic="meta-overview">Visão Geral</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-customization">Personalização</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-configuration">Configuração</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-usage">Utilização</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-anti-ban">Anti-Ban</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2" data-nav-topic="meta-others">Outros & Dúvidas</button>
         </div>
     </div>
 
     <div class="offcanvas-body p-4" id="metaHelpDrawerBody" style="scroll-behavior: smooth;">
 
         {{-- ========================================================================= --}}
-        {{-- BLOCO 1: VISÃO GERAL & ONBOARDING OFICIAL META GRAPH API                  --}}
+        {{-- PILAR 1: VISÃO GERAL                                                      --}}
         {{-- ========================================================================= --}}
-
-        {{-- TOPIC 1: Visao Geral --}}
         <section class="meta-help-topic mb-4" id="topic-meta-overview" data-keywords="visao geral meta api oficial whatsapp graph v21 introducao beneficios sem qr code">
             <div class="d-flex align-items-center gap-2 mb-3">
                 <span class="badge bg-primary px-2 py-1"><i class="bi bi-stars me-1"></i>Visão Geral</span>
-                <h5 class="mb-0 fw-bold">Por que WhatsApp Cloud API Oficial da Meta?</h5>
+                <h5 class="mb-0 fw-bold">WhatsApp Cloud API Oficial da Meta</h5>
             </div>
             
             <p class="text-body-secondary small">
-                Nossa plataforma opera <strong>100% integrada à infraestrutura oficial da Meta</strong> através da <strong>Graph API v21.0</strong>. Este é o único canal corporativo homologado globalmente pelo WhatsApp, substituindo emuladores não oficiais (como Baileys, WPPConnect ou Chromium).
+                Nossa plataforma opera <strong>100% integrada à infraestrutura oficial da Meta</strong> através da <strong>Graph API v21.0</strong>. Este é o canal corporativo homologado globalmente pelo WhatsApp, sem uso de navegadores emulados ou bibliotecas não oficiais.
             </p>
 
             <div class="row g-2 mb-3">
@@ -63,7 +56,7 @@
                         <strong class="text-success d-flex align-items-center gap-1 small mb-1">
                             <i class="bi bi-shield-check"></i> Sem Risco de Banimento
                         </strong>
-                        <span class="text-muted small">Os envios utilizam a rota oficial autenticada por Bearer Token da Meta. Seu número não é derrubado por desconexões forçadas de navegadores headless.</span>
+                        <span class="text-muted small">Os envios utilizam a rota oficial autenticada por Bearer Token da Meta. Seu número não é derrubado por desconexões forçadas.</span>
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -87,341 +80,214 @@
 
         <hr class="my-4">
 
-        {{-- TOPIC 2: Passo a Passo Criar App no Meta Developer --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-app-setup" data-keywords="criar app aplicativo developers meta facebook registro onboarding painel">
+        {{-- ========================================================================= --}}
+        {{-- PILAR 2: PERSONALIZAÇÃO (PERFIL, FOTO, WHITE-LABEL, TEMPLATES)             --}}
+        {{-- ========================================================================= --}}
+        <section class="meta-help-topic mb-4" id="topic-meta-customization" data-keywords="personalizacao perfil foto avatar logotipo slogan white-label cores tema marca">
             <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-1-circle me-1"></i>Passo 1</span>
-                <h5 class="mb-0 fw-bold">Criar Aplicativo no Meta for Developers</h5>
+                <span class="badge bg-purple text-white px-2 py-1" style="background:#6f42c1;"><i class="bi bi-palette-fill me-1"></i>Personalização</span>
+                <h5 class="mb-0 fw-bold">Instruções de Personalização</h5>
             </div>
 
             <p class="text-body-secondary small">
-                Para ter acesso à API Oficial do WhatsApp, você precisa de um Aplicativo registrado no portal de desenvolvedores da Meta:
+                Aprenda a personalizar o perfil da sua linha de WhatsApp na Meta, a marca visual do sistema e os modelos de mensagens:
             </p>
 
-            <ol class="list-group list-group-numbered small mb-3">
-                <li class="list-group-item bg-transparent">
-                    Acesse o portal oficial: <a href="https://developers.facebook.com" target="_blank" rel="noopener" class="fw-semibold">developers.facebook.com <i class="bi bi-box-arrow-up-right"></i></a> e faça login com sua conta do Facebook associada à sua empresa.
-                </li>
-                <li class="list-group-item bg-transparent">
-                    No canto superior direito, clique em <strong>Meus Aplicativos</strong> (My Apps) &gt; <strong>Criar Aplicativo</strong> (Create App).
-                </li>
-                <li class="list-group-item bg-transparent">
-                    Na seleção de tipo de aplicativo, escolha <strong>Outro</strong> (Other) ou <strong>Empresa</strong> (Business).
-                </li>
-                <li class="list-group-item bg-transparent">
-                    Dê um nome ao aplicativo (ex: <code>WhatsApp Cobranças SaaS</code>), insira seu e-mail de contato e selecione seu <strong>Gerenciador de Negócios (Meta Business Manager)</strong>.
-                </li>
-                <li class="list-group-item bg-transparent">
-                    No painel inicial de produtos, localize o cartão do produto <strong>WhatsApp</strong> e clique em <strong>Configurar</strong> (Set Up).
-                </li>
-                <li class="list-group-item bg-transparent">
-                    Pronto! O produto WhatsApp estará ativo no menu lateral esquerdo em <strong>WhatsApp &gt; Configuração da API</strong> (API Setup).
-                </li>
-            </ol>
-        </section>
-
-        <hr class="my-4">
-
-        {{-- ========================================================================= --}}
-        {{-- BLOCO 2: CREDENCIAIS DA META (PHONE ID, WABA ID, TOKEN, APP SECRET)       --}}
-        {{-- ========================================================================= --}}
-
-        {{-- TOPIC 3: Token Permanente de Usuario de Sistema --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-system-user-token" data-keywords="token permanente system user usuario de sistema acesso eaag expiracao 24h nunca expira meta_access_token">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-key-fill me-1"></i>Essencial</span>
-                <h5 class="mb-0 fw-bold">Token Permanente de Sistema (System User Token)</h5>
-            </div>
-
-            <div class="alert alert-danger small py-2 px-3 mb-3 d-flex align-items-center gap-2">
-                <i class="bi bi-exclamation-octagon-fill fs-5"></i>
-                <div>
-                    <strong>Atenção Crítica:</strong> O token temporário exibido na tela inicial do Developer Portal expira em apenas <strong>24 horas</strong>. Para sua plataforma funcionar continuamente sem interrupções, você DEVE gerar um <strong>Token de Usuário do Sistema</strong> que nunca expira!
+            {{-- 1. Perfil Oficial da Linha (Avatar, Nome, Slogan) --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-customization-profile">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-person-badge me-1"></i>1. Perfil da Linha de WhatsApp (Foto, Nome e Bio)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Meta Manager</span>
+                </div>
+                <p class="small text-muted mb-2"><strong>Como personalizar a foto e descrição comercial que o cliente vê no WhatsApp:</strong></p>
+                <ol class="small ps-3 mb-2">
+                    <li>Acesse o <a href="https://business.facebook.com/wa/manage/" target="_blank" rel="noopener">WhatsApp Manager (Gerenciador do WhatsApp)</a>.</li>
+                    <li>No menu lateral esquerdo, clique em <strong>Ferramentas da conta</strong> &gt; <strong>Números de telefone</strong>.</li>
+                    <li>Clique no ícone de <strong>Configurações (engrenagem)</strong> ao lado do seu número e acesse a aba <strong>Perfil</strong>.</li>
+                    <li><strong>Foto de Perfil:</strong> Faça upload do logotipo da sua empresa (quadrado, mínimo 640x640px, PNG ou JPG).</li>
+                    <li><strong>Descrição/Slogan:</strong> Insira a biografia da sua empresa (ex: <em>"Canal oficial de atendimento e faturamento KDKHost"</em>).</li>
+                    <li><strong>Categoria e Site:</strong> Selecione o ramo da empresa e insira a URL do seu site. Clique em <strong>Salvar</strong>.</li>
+                </ol>
+                <div class="alert alert-info py-1 px-2 small mb-0">
+                    <i class="bi bi-info-circle me-1"></i> No nosso painel, a foto e o nome sincronizam automaticamente ao salvar e testar a conexão!
                 </div>
             </div>
 
-            <div class="card border bg-body-tertiary p-3 mb-3 small">
-                <h6 class="fw-bold text-primary mb-2">Instruções Passo a Passo no Meta Business Suite:</h6>
-                <ol class="mb-0 ps-3">
-                    <li class="mb-2">Acesse: <a href="https://business.facebook.com/settings/system-users" target="_blank" rel="noopener" class="fw-semibold">Configurações do Negócio &gt; Usuários do Sistema <i class="bi bi-box-arrow-up-right"></i></a>.</li>
-                    <li class="mb-2">Clique em <strong>Adicionar</strong> (Add), defina o nome <code>WhatsApp Integracao SaaS</code> e selecione a função <strong>Administrador</strong> (Admin).</li>
-                    <li class="mb-2">Selecione o usuário criado e clique no botão <strong>Atribuir Ativos</strong> (Assign Assets):
-                        <ul class="mt-1 ps-3">
-                            <li>Em <strong>Aplicativos</strong>, selecione seu App e marque a permissão <strong>Controle Total (Gerenciar Aplicativo)</strong>.</li>
-                            <li>Em <strong>Contas do WhatsApp</strong>, selecione sua WABA e marque a permissão <strong>Controle Total</strong>.</li>
-                        </ul>
-                    </li>
-                    <li class="mb-2">Clique no botão <strong>Gerar Novo Token</strong> (Generate New Token):
-                        <ul class="mt-1 ps-3">
-                            <li>Selecione o seu Aplicativo criado anteriormente.</li>
-                            <li>Em expiração do token, selecione obrigatoriamente: <strong>Nunca (Never)</strong>.</li>
-                            <li>Marque as duas permissões obrigatórias:
-                                <div class="mt-1">
-                                    <span class="badge bg-primary me-1">whatsapp_business_management</span>
-                                    <span class="badge bg-success">whatsapp_business_messaging</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>Clique em <strong>Gerar Token</strong>. Copie imediatamente o código longo (iniciado por <code>EAAG...</code>) e cole no campo <strong>Token Permanente de Sistema</strong> do painel. O sistema salva com criptografia AES-256.</li>
-                </ol>
-            </div>
-        </section>
-
-        <hr class="my-4">
-
-        {{-- TOPIC 4: Phone Number ID --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-phone-id" data-keywords="phone number id identificador numero telefone celular api setup meta_phone_number_id">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-primary px-2 py-1"><i class="bi bi-telephone-fill me-1"></i>Identificador</span>
-                <h5 class="mb-0 fw-bold">Phone Number ID da Meta (meta_phone_number_id)</h5>
-            </div>
-
-            <p class="text-body-secondary small">
-                O <strong>Phone Number ID</strong> é o identificador numérico interno único de 15 a 17 dígitos que os servidores da Meta atribuem à linha de WhatsApp. <strong>Não confunda com o número do telefone</strong> (ex: 5511999999999). É esse ID que compõe as rotas de envio da Graph API.
-            </p>
-
-            <div class="border rounded p-3 bg-body-tertiary small mb-3">
-                <strong class="d-block mb-1 text-primary"><i class="bi bi-search me-1"></i>Onde localizar no Meta Developer Portal:</strong>
-                <ol class="mb-0 ps-3">
-                    <li class="mb-1">Abra seu aplicativo no <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Meta Developer Portal</a>.</li>
-                    <li class="mb-1">No menu lateral esquerdo, navegue até <strong>WhatsApp</strong> &gt; <strong>Configuração da API</strong> (API Setup).</li>
-                    <li class="mb-1">Em <strong>"Etapa 1: Selecionar números de telefone"</strong>, localize a caixa:
-                        <div class="p-2 my-1 rounded bg-body border font-monospace text-primary">
-                            Identificador do número de telefone (Phone number ID)
-                        </div>
-                    </li>
-                    <li>Copie o valor numérico (ex: <code>109283746592817</code>) e cole no campo correspondente no painel.</li>
-                </ol>
-            </div>
-
-            <div class="alert alert-info py-2 px-3 small mb-0">
-                <i class="bi bi-info-circle-fill me-1"></i> Se você for registrar um número próprio real, adicione o número em <em>Configuração da API &gt; Adicionar número de telefone</em>, confirme o PIN recebido por SMS/Ligação e use o Phone Number ID gerado para essa linha.
-            </div>
-        </section>
-
-        <hr class="my-4">
-
-        {{-- TOPIC 5: WABA ID --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-waba-id" data-keywords="waba id whatsapp business account conta comercial identificador gerenciador meta_waba_id">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-primary px-2 py-1"><i class="bi bi-briefcase-fill me-1"></i>Conta Comercial</span>
-                <h5 class="mb-0 fw-bold">WhatsApp Business Account ID - WABA ID (meta_waba_id)</h5>
-            </div>
-
-            <p class="text-body-secondary small">
-                O <strong>WABA ID</strong> é o identificador da sua Conta Comercial do WhatsApp Business na Meta. É nela que residem os Message Templates aprovados, a forma de pagamento oficial da Meta e as políticas corporativas.
-            </p>
-
-            <div class="border rounded p-3 bg-body-tertiary small mb-3">
-                <strong class="d-block mb-1 text-primary"><i class="bi bi-search me-1"></i>Onde localizar no painel da Meta:</strong>
-                <ol class="mb-0 ps-3">
-                    <li class="mb-1">Na mesma tela de <strong>API Setup</strong> do Meta Developer, diretamente abaixo do Phone Number ID:
-                        <div class="p-2 my-1 rounded bg-body border font-monospace text-success">
-                            Identificador da conta do WhatsApp Business (WABA ID)
-                        </div>
-                    </li>
-                    <li class="mb-1">Ou acesse diretamente o <a href="https://business.facebook.com/wa/manage/" target="_blank" rel="noopener">WhatsApp Manager (Gerenciador do WhatsApp) <i class="bi bi-box-arrow-up-right"></i></a> e veja o número da conta no canto superior.</li>
-                    <li>Copie o número e cole no campo <strong>WhatsApp Business Account ID</strong>.</li>
-                </ol>
-            </div>
-        </section>
-
-        <hr class="my-4">
-
-        {{-- TOPIC 6: App Secret --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-app-secret" data-keywords="app secret chave secreta aplicativo hmac sha256 assinatura seguranca meta_app_secret">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-dark px-2 py-1"><i class="bi bi-lock-fill me-1"></i>Segurança Criptográfica</span>
-                <h5 class="mb-0 fw-bold">Meta App Secret - HMAC-SHA256 (meta_app_secret)</h5>
-            </div>
-
-            <p class="text-body-secondary small">
-                O <strong>App Secret (Chave Secreta do Aplicativo)</strong> é usado pelo webhook para validar a assinatura criptográfica <code>X-Hub-Signature-256</code> em cada notificação de entrega ou resposta. Isso garante 100% de autenticidade, impedindo que terceiros enviem requisições falsas para seu servidor.
-            </p>
-
-            <div class="border rounded p-3 bg-body-tertiary small mb-3">
-                <strong class="d-block mb-1 text-primary"><i class="bi bi-search me-1"></i>Onde obter:</strong>
-                <ol class="mb-0 ps-3">
-                    <li class="mb-1">No Meta Developer Portal, clique no menu lateral esquerdo em <strong>Configurações do aplicativo</strong> &gt; <strong>Básico</strong> (App settings &gt; Basic).</li>
-                    <li class="mb-1">Localize o campo <strong>Chave Secreta do Aplicativo</strong> (App Secret).</li>
-                    <li class="mb-1">Clique em <strong>Mostrar</strong> (Show) e confirme sua senha do Facebook se solicitado.</li>
-                    <li>Copie a chave hexadecimal gerada e cole no campo <strong>Meta App Secret</strong>.</li>
-                </ol>
-            </div>
-        </section>
-
-        <hr class="my-4">
-
-        {{-- TOPIC 7: Webhook Oficial --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-webhook" data-keywords="webhook url callback verify token handshake retorno mensagens entregas meta_webhook_verify_token">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-success px-2 py-1"><i class="bi bi-arrow-repeat me-1"></i>Tempo Real</span>
-                <h5 class="mb-0 fw-bold">Configurar o Webhook Oficial na Meta</h5>
-            </div>
-
-            <p class="text-body-secondary small">
-                O Webhook é o canal bidirecional pelo qual a Meta notifica nosso sistema sobre o status das mensagens enviadas (se foi entregue, lida pelo cliente ou se houve erro) e entrega as respostas enviadas pelos clientes (como comprovantes e comandos de pagamento Pix).
-            </p>
-
-            <div class="card border mb-3 small">
-                <div class="card-header bg-body-tertiary py-2">
-                    <strong>Parâmetros para preencher na Meta:</strong>
+            {{-- 2. Identidade Visual White-Label --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-customization-whitelabel">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-brush me-1"></i>2. Identidade Visual & White-Label do Painel</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Painel / Tenant</span>
                 </div>
-                <div class="card-body">
-                    <div class="mb-2">
-                        <label class="form-label text-muted small fw-bold mb-1">URL de Retorno de Chamada (Callback URL):</label>
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control font-monospace" value="{{ url('/api/v1/webhook') }}" readonly id="meta-help-webhook-url">
-                            <button class="btn btn-outline-secondary btn-copy-meta-text" data-copy="{{ url('/api/v1/webhook') }}">Copiar</button>
-                        </div>
-                        <small class="text-muted">No portal da Meta, cole no campo <strong>URL de retorno de chamada</strong>.</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold mb-1">Verificar Token (Verify Token):</label>
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control font-monospace" value="{{ config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026')) }}" readonly>
-                            <button class="btn btn-outline-secondary btn-copy-meta-text" data-copy="{{ config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026')) }}">Copiar</button>
-                        </div>
-                        <small class="text-muted">No portal da Meta, cole no campo <strong>Verificar token</strong>.</small>
-                    </div>
-
-                    <h6 class="fw-bold mb-2">Campos para Assinar no Webhook (Manage Webhook Fields):</h6>
-                    <p class="text-muted mb-2">Após verificar e salvar o webhook, clique em <strong>Gerenciar campos</strong> (Manage fields) e assine:</p>
-                    <div class="d-flex flex-wrap gap-2 mb-2">
-                        <span class="badge bg-primary p-2"><i class="bi bi-check-circle me-1"></i>messages (obrigatório: status e conversas)</span>
-                        <span class="badge bg-success p-2"><i class="bi bi-check-circle me-1"></i>message_template_status_update (aprovação de modelos)</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <hr class="my-4">
-
-        {{-- ========================================================================= --}}
-        {{-- BLOCO 3: MESSAGE TEMPLATES, VARIÁVEIS, BOTÕES PIX E STATUS WAMID           --}}
-        {{-- ========================================================================= --}}
-
-        {{-- TOPIC 8: Templates de Mensagens Meta --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-templates" data-keywords="templates message templates modelos aprovacao utility marketing botoes pix variaveis">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-file-earmark-text-fill me-1"></i>Regras Oficiais</span>
-                <h5 class="mb-0 fw-bold">Message Templates & Regras de Disparo</h5>
-            </div>
-
-            <p class="text-body-secondary small">
-                Para iniciar conversas com clientes fora da janela de 24 horas (como cobranças de faturas, avisos de vencimento ou confirmações de pedido), a Meta <strong>exige o uso de Message Templates pré-aprovados</strong>.
-            </p>
-
-            <div class="border rounded p-3 bg-body-tertiary small mb-3">
-                <h6 class="fw-bold text-success mb-2"><i class="bi bi-check-all me-1"></i>Categorias Homologadas:</h6>
-                <ul class="mb-3 ps-3">
-                    <li><strong>UTILIDADE (Utility)</strong>: Faturas, avisos de vencimento, cobranças Pix, comprovantes e confirmações de serviço. Tem aprovação prioritária pela inteligência artificial da Meta (1 a 5 minutos) e o menor custo por conversa.</li>
-                    <li><strong>MARKETING</strong>: Novidades, ofertas, promoções e reengajamento comercial.</li>
-                    <li><strong>AUTENTICAÇÃO (Authentication)</strong>: Códigos de verificação (OTP) em duas etapas.</li>
+                <p class="small text-muted mb-2"><strong>Como personalizar as cores e marca do sistema:</strong></p>
+                <ul class="small ps-3 mb-0">
+                    <li><strong>Logotipo e Favicon:</strong> No painel administrativo em <em>Configurações &gt; White-Label</em>, você pode fazer upload do logo da sua marca que aparecerá no topo do menu e na tela de login.</li>
+                    <li><strong>Tema Claro / Escuro:</strong> O sistema possui alternador automático de modo escuro (Dark Mode) respeitando a preferência do operador.</li>
+                    <li><strong>Domínio Próprio:</strong> Inquilinos corporativos podem apontar um subdomínio próprio (ex: <code>faturas.suaempresa.com.br</code>) com certificado SSL automático.</li>
                 </ul>
-
-                <h6 class="fw-bold text-primary mb-2" id="topic-meta-template-variables"><i class="bi bi-braces me-1"></i>Variáveis Dinâmicas ({nome}, {valor}, {vencimento}):</h6>
-                <p class="mb-2">Na Meta, as variáveis dinâmicas utilizam o formato posicional <code>&#123;&#123;1&#125;&#125;</code>, <code>&#123;&#123;2&#125;&#125;</code>, <code>&#123;&#123;3&#125;&#125;</code>. Nosso sistema traduz automaticamente as tags amigáveis:</p>
-                <div class="table-responsive mb-3">
-                    <table class="table table-sm table-bordered bg-body mb-0">
-                        <thead>
-                            <tr>
-                                <th>Tag no Sistema</th>
-                                <th>Posição Meta</th>
-                                <th>Exemplo de Saída</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>{nome}</code></td><td><code>&#123;&#123;1&#125;&#125;</code></td><td>João da Silva</td></tr>
-                            <tr><td><code>{valor}</code></td><td><code>&#123;&#123;2&#125;&#125;</code></td><td>R$ 149,90</td></tr>
-                            <tr><td><code>{vencimento}</code></td><td><code>&#123;&#123;3&#125;&#125;</code></td><td>15/11/2026</td></tr>
-                            <tr><td><code>{pix_copia_cola}</code></td><td>Botão Copiar Código</td><td>00020126580014br.gov.bcb.pix...</td></tr>
-                            <tr><td><code>{link_pagamento}</code></td><td>Botão de URL</td><td>https://fatura.link/f/abc123</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h6 class="fw-bold text-dark mb-2" id="topic-meta-pix-button"><i class="bi bi-qr-code me-1"></i>Botão Copiar Código Pix (Recomendação Meta):</h6>
-                <p class="mb-0">
-                    Ao criar seu template no WhatsApp Manager, adicione um botão do tipo <strong>Copiar código (Copy code)</strong> com o tipo <code>DYNAMIC</code>. Quando o cliente recebe a mensagem de cobrança, aparece um botão destacado <em>"Copiar Chave Pix"</em> que copia o código Pix Copia e Cola diretamente para a área de transferência do celular dele com 1 único toque!
-                </p>
             </div>
 
-            <div class="border rounded p-3 bg-body-tertiary small" id="topic-meta-wamid-tracking">
-                <h6 class="fw-bold text-primary mb-2"><i class="bi bi-check2-all me-1"></i>Rastreamento WAMID e Ciclo de Vida da Mensagem:</h6>
-                <p class="mb-2">Cada disparo realizado recebe um <strong>WAMID (WhatsApp Message ID)</strong> único da Meta (ex: <code>wamid.HBgL...</code>). Os status evoluem via Webhook:</p>
-                <div class="d-flex flex-column gap-1">
-                    <div><span class="badge bg-secondary me-1">sent</span> Mensagem processada e aceita pelos servidores da Meta.</div>
-                    <div><span class="badge bg-info text-dark me-1">delivered</span> Mensagem entregue com sucesso no aparelho do destinatário (dois tracinhos cinzas).</div>
-                    <div><span class="badge bg-success me-1">read</span> Mensagem visualizada pelo cliente (dois tracinhos azuis).</div>
-                    <div><span class="badge bg-danger me-1">failed</span> Falha no envio (ex: número inexistente, opt-out ou restrição). O motivo exato é salvo no log.</div>
+            {{-- 3. Personalização de Message Templates --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-customization-templates">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-card-text me-1"></i>3. Personalização de Modelos de Mensagem (Templates)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Templates</span>
                 </div>
+                <p class="small text-muted mb-2"><strong>Como deixar as mensagens de cobrança com a cara da sua empresa:</strong></p>
+                <ul class="small ps-3 mb-0">
+                    <li><strong>Cabeçalho com Imagem:</strong> Ao criar templates de cobrança na Meta, você pode definir cabeçalho do tipo <code>MÍDIA (Imagem)</code> para exibir a logomarca da sua empresa no topo da mensagem.</li>
+                    <li><strong>Rodapé Institucional:</strong> Adicione uma linha de rodapé elegante como: <em>"Atendimento automático KDKHost &bull; Responda PARAR para sair"</em>.</li>
+                    <li><strong>Saudação e Tom de Voz:</strong> Configure o texto como formal ou descontraído utilizando tags <code>{nome}</code> e <code>{primeiro_nome}</code>.</li>
+                </ul>
             </div>
         </section>
 
         <hr class="my-4">
 
-        {{-- TOPIC 9: Qualidade do Numero & Tiers --}}
-        <section class="meta-help-topic mb-4" id="topic-meta-quality-rating" data-keywords="qualidade quality rating tiers limites 1k 10k 100k escala warm up aquecimento meta-quality-rating">
+        {{-- ========================================================================= --}}
+        {{-- PILAR 3: CONFIGURAÇÃO (API META, WABA, TOKEN, WEBHOOK)                    --}}
+        {{-- ========================================================================= --}}
+        <section class="meta-help-topic mb-4" id="topic-meta-configuration" data-keywords="configuracao meta waba phone id token permanente secret webhook setup api">
             <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-success px-2 py-1"><i class="bi bi-speedometer2 me-1"></i>Escala</span>
-                <h5 class="mb-0 fw-bold">Classificação de Qualidade & Limites de Envio (Tiers)</h5>
+                <span class="badge bg-primary px-2 py-1"><i class="bi bi-gear-fill me-1"></i>Configuração</span>
+                <h5 class="mb-0 fw-bold">Instruções de Configuração da Meta API</h5>
             </div>
 
             <p class="text-body-secondary small">
-                A Meta monitora em tempo real a reputação do seu número de telefone e ajusta seu limite diário automaticamente com base no feedback dos destinatários (bloqueios e denúncias de spam):
+                Passo a passo individual para preencher cada campo de credencial da Meta WhatsApp Cloud API:
             </p>
 
-            <div class="table-responsive small mb-3">
-                <table class="table table-bordered table-sm align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Nível (Tier)</th>
-                            <th>Capacidade Diária</th>
-                            <th>Critério de Progressão</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="badge bg-secondary">Tier 1</span></td>
-                            <td><strong>1.000 clientes/24h</strong></td>
-                            <td>Limite padrão inicial de qualquer número verificado na Meta.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-primary">Tier 2</span></td>
-                            <td><strong>10.000 clientes/24h</strong></td>
-                            <td>Dispare metade do Tier 1 em uma janela de 7 dias mantendo Qualidade Verde.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-success">Tier 3</span></td>
-                            <td><strong>100.000 clientes/24h</strong></td>
-                            <td>Escalonado automaticamente conforme a base de clientes cresce.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge bg-dark">Tier 4</span></td>
-                            <td><strong>Ilimitado</strong></td>
-                            <td>Grandes operações corporativas com verificação avançada.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            {{-- 1. Criar App --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-meta-app-setup">
+                <strong class="text-primary small d-block mb-1"><i class="bi bi-1-circle me-1"></i>1. Criar Aplicativo no Meta for Developers</strong>
+                <p class="small text-muted mb-2">Acesse <a href="https://developers.facebook.com" target="_blank" rel="noopener">developers.facebook.com</a> &gt; <em>Meus Aplicativos &gt; Criar Aplicativo</em> &gt; Tipo <strong>Empresa / Outro</strong> &gt; Adicione o produto <strong>WhatsApp</strong>.</p>
             </div>
 
-            <div class="border rounded p-3 bg-body-tertiary small">
-                <strong class="d-block mb-1">Cores da Qualidade (Quality Rating):</strong>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-success px-2 py-1">ALTA (GREEN)</span>
-                        <span>Reputação excelente. O número pode escalar para o próximo Tier.</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-warning text-dark px-2 py-1">MÉDIA (YELLOW)</span>
-                        <span>Alerta. Alguns clientes reportaram a mensagem. O sistema recomenda aumentar os intervalos e manter o modo seguro.</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-danger px-2 py-1">BAIXA (RED)</span>
-                        <span>Risco de restrição. Se permanecer em vermelho por 7 dias, a Meta reduz o Tier.</span>
-                    </div>
+            {{-- 2. Token Permanente --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-meta-system-user-token">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-warning-emphasis small"><i class="bi bi-key-fill me-1"></i>2. Token Permanente (System User Token)</strong>
+                    <span class="badge bg-warning text-dark border small">Vital</span>
+                </div>
+                <div class="alert alert-danger py-1 px-2 small mb-2">
+                    <strong>Importante:</strong> Nunca use o token temporário da tela inicial (ele expira em 24h).
+                </div>
+                <p class="small text-muted mb-2"><strong>Como gerar token que nunca expira:</strong></p>
+                <ol class="small ps-3 mb-0">
+                    <li>No <a href="https://business.facebook.com/settings/system-users" target="_blank" rel="noopener">Meta Business Suite &gt; Usuários do Sistema</a>, clique em <strong>Adicionar</strong> com perfil <strong>Administrador</strong>.</li>
+                    <li>Clique em <strong>Atribuir Ativos</strong> e marque seu <em>Aplicativo</em> e sua <em>Conta do WhatsApp (WABA)</em> com <strong>Controle Total</strong>.</li>
+                    <li>Clique em <strong>Gerar Novo Token</strong>, marque <em>Expiração: Nunca</em> e selecione as permissões <code>whatsapp_business_management</code> e <code>whatsapp_business_messaging</code>.</li>
+                    <li>Copie o token longo (começa com <code>EAAG...</code>) e cole no campo <strong>Token Permanente</strong>.</li>
+                </ol>
+            </div>
+
+            {{-- 3. Phone ID --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-meta-phone-id">
+                <strong class="text-primary small d-block mb-1"><i class="bi bi-telephone me-1"></i>3. Phone Number ID da Meta</strong>
+                <p class="small text-muted mb-2">Código numérico de 15 a 17 dígitos fornecido pela Meta para a linha. No portal do desenvolvedor, vá em <em>WhatsApp &gt; Configuração da API &gt; Identificador do número de telefone (Phone number ID)</em> e copie o valor.</p>
+            </div>
+
+            {{-- 4. WABA ID --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-meta-waba-id">
+                <strong class="text-primary small d-block mb-1"><i class="bi bi-briefcase me-1"></i>4. WhatsApp Business Account ID (WABA ID)</strong>
+                <p class="small text-muted mb-2">Identificador da sua conta comercial na Meta. Fica localizado diretamente abaixo do Phone Number ID na mesma tela de configuração da API, ou no topo do WhatsApp Manager.</p>
+            </div>
+
+            {{-- 5. App Secret --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-meta-app-secret">
+                <strong class="text-primary small d-block mb-1"><i class="bi bi-lock me-1"></i>5. Meta App Secret (HMAC-SHA256)</strong>
+                <p class="small text-muted mb-2">Chave secreta para validação do cabeçalho de segurança <code>X-Hub-Signature-256</code> do webhook. Obtenha no Meta Developer em <em>Configurações do aplicativo &gt; Básico &gt; Chave Secreta do Aplicativo &gt; Mostrar</em>.</p>
+            </div>
+
+            {{-- 6. Webhook --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-meta-webhook">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-success small"><i class="bi bi-arrow-repeat me-1"></i>6. Webhook Oficial & Verify Token</strong>
+                    <span class="badge bg-success-subtle text-success border small">Tempo Real</span>
+                </div>
+                <p class="small text-muted mb-2">No menu do aplicativo da Meta em <em>WhatsApp &gt; Configuração &gt; Webhook</em>:</p>
+                <ul class="small ps-3 mb-2">
+                    <li><strong>URL de Retorno de Chamada:</strong> Cole <code>{{ url('/api/v1/webhook') }}</code></li>
+                    <li><strong>Verificar Token:</strong> Cole <code>{{ config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026')) }}</code></li>
+                    <li>Clique em <strong>Verificar e Salvar</strong>.</li>
+                    <li>Clique em <strong>Gerenciar campos</strong> e assine obrigatoriamente <code>messages</code> e <code>message_template_status_update</code>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr class="my-4">
+
+        {{-- ========================================================================= --}}
+        {{-- PILAR 4: UTILIZAÇÃO (COBRANÇAS, ENVIO MANUAL, PIX, STATUS)                --}}
+        {{-- ========================================================================= --}}
+        <section class="meta-help-topic mb-4" id="topic-meta-usage" data-keywords="utilizacao como usar cobranca manual disparo fatura pix copia e cola wamid historico">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <span class="badge bg-success px-2 py-1"><i class="bi bi-play-circle-fill me-1"></i>Utilização</span>
+                <h5 class="mb-0 fw-bold">Instruções de Utilização no Dia a Dia</h5>
+            </div>
+
+            <p class="text-body-secondary small">
+                Como utilizar as funcionalidades de cobrança e atendimento da plataforma na prática:
+            </p>
+
+            {{-- 1. Cobrança Automática com Pix --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-usage-automatic-billing">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-cash-coin me-1"></i>1. Disparo Automático de Cobrança com Pix</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Automação</span>
+                </div>
+                <p class="small text-muted mb-2"><strong>Como o sistema cobra os clientes:</strong></p>
+                <div class="small text-body-secondary mb-2">
+                    Quando uma fatura é gerada pelo sistema (avulsa, recorrente ou via integração WHMCS):
+                    <ol class="ps-3 mt-1 mb-0">
+                        <li>O disparador seleciona o <strong>Message Template de Utilidade</strong> homologado.</li>
+                        <li>Substitui automaticamente o nome do cliente, o valor e o vencimento da fatura.</li>
+                        <li>Anexa a chave <strong>Pix Copia e Cola</strong> e o botão de acesso rápido à fatura.</li>
+                        <li>Dispara respeitando a fila de cadência anti-ban e a janela comercial (08:00 às 20:00).</li>
+                    </ol>
+                </div>
+            </div>
+
+            {{-- 2. Envio Manual de Mensagem --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-usage-manual-send">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-send-plus me-1"></i>2. Envio Manual de Mensagens (Solução Rápida)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Operador</span>
+                </div>
+                <p class="small text-muted mb-2"><strong>Como disparar mensagem avulsa pelo painel:</strong></p>
+                <ol class="small ps-3 mb-0">
+                    <li>Acesse a tela <em>Envio Manual</em> ou clique no botão verde <em>"Nova mensagem manual"</em>.</li>
+                    <li>Busque o cliente pelo nome, CPF ou WhatsApp para preencher os dados automaticamente.</li>
+                    <li>Selecione o <strong>Modelo de Mensagem (Template)</strong> obrigatório.</li>
+                    <li>Confira a pré-visualização no <strong>Simulador Realista de Smartphone</strong> na coluna direita.</li>
+                    <li>Clique em <strong>Enviar Mensagem Oficial</strong>. A mensagem é enviada via Graph API com retorno do ID WAMID em tempo real.</li>
+                </ol>
+            </div>
+
+            {{-- 3. Botão Copiar Chave Pix --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-usage-pix-copy-paste">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-qr-code me-1"></i>3. Botão "Copiar Chave Pix" no WhatsApp do Cliente</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Experiência Pix</span>
+                </div>
+                <p class="small text-muted mb-2"><strong>Como o cliente realiza o pagamento:</strong></p>
+                <div class="small text-body-secondary mb-0">
+                    Ao receber a notificação no WhatsApp, o cliente vê um botão destacado <strong>"Copiar código"</strong>. Ao tocar nele, o código Pix Copia e Cola é copiado para a memória do celular. O cliente só precisa abrir o aplicativo do banco dele, clicar em <em>"Pix Copia e Cola"</em> e confirmar o pagamento. O webhook do gateway confirma e baixa a fatura automaticamente!
+                </div>
+            </div>
+
+            {{-- 4. Status de Entrega WAMID --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-usage-delivery-tracking">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-check2-all me-1"></i>4. Status de Entrega & Auditoria (sent, delivered, read, failed)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Rastreamento</span>
+                </div>
+                <p class="small text-muted mb-2">Na tabela de histórico, acompanhe a evolução de cada mensagem pelo código <strong>WAMID</strong>:</p>
+                <div class="d-flex flex-column gap-1 small">
+                    <div><span class="badge bg-secondary me-1">sent</span> Mensagem recebida e processada pela infraestrutura da Meta.</div>
+                    <div><span class="badge bg-info text-dark me-1">delivered</span> Entregue no celular do cliente (dois tracinhos cinzas).</div>
+                    <div><span class="badge bg-success me-1">read</span> Mensagem lida e visualizada (dois tracinhos azuis).</div>
+                    <div><span class="badge bg-danger me-1">failed</span> Falha no envio. Clique no ícone de detalhes para ler a mensagem de erro exata retornada pela Meta.</div>
                 </div>
             </div>
         </section>
@@ -429,243 +295,141 @@
         <hr class="my-4">
 
         {{-- ========================================================================= --}}
-        {{-- BLOCO 4: INSTRUÇÕES INDIVIDUAIS DE CADA CAMPO DO PAINEL ANTI-BAN           --}}
+        {{-- PILAR 5: PAINEL ANTI-BAN & CADÊNCIA CAMPO A CAMPO                         --}}
         {{-- ========================================================================= --}}
-
-        <section class="meta-help-topic mb-4" id="topic-meta-anti-ban" data-keywords="anti-ban antiban politicas seguranca janela 24h opt in opt out descadastro safety">
+        <section class="meta-help-topic mb-4" id="topic-meta-anti-ban" data-keywords="anti-ban antiban politicas seguranca janela 24h opt in opt out descadastro safety delay cooldown">
             <div class="d-flex align-items-center gap-2 mb-3">
                 <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-shield-lock-fill me-1"></i>Painel Anti-Ban</span>
-                <h5 class="mb-0 fw-bold">Guia Individual de Cada Campo Anti-Ban</h5>
+                <h5 class="mb-0 fw-bold">Instruções Individuais dos Campos Anti-Ban</h5>
             </div>
 
             <p class="text-body-secondary small">
-                Abaixo estão as instruções detalhadas de <strong>cada item e configuração</strong> do painel de segurança. Clique em qualquer um para conferir seu funcionamento e recomendações:
+                Instruções detalhadas de cada campo e regra do painel de segurança operacional:
             </p>
 
-            {{-- 1. enabled --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-enabled">
+            {{-- enabled --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-enabled">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <strong class="text-primary small"><i class="bi bi-shield-check me-1"></i>Proteção ativa (enabled)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Política Geral</span>
+                    <span class="badge bg-secondary-subtle text-body border small">Chave Geral</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Interruptor mestre que ativa ou desativa o motor de inteligência anti-ban em todo o sistema.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Como funciona:</strong> Quando ativo, todas as mensagens passam pelas verificações de horário comercial, limites de disparo, cooldowns entre contatos e detecção de opt-out. Desligue apenas temporariamente para testes de laboratório controlados.
-                </div>
-                <div class="alert alert-success py-1 px-2 small mb-0">
-                    <i class="bi bi-check-circle me-1"></i><strong>Recomendação:</strong> Mantenha sempre <code>Sim</code> em produção.
-                </div>
+                <p class="small text-muted mb-0">Liga ou desliga todas as validações de segurança (janela comercial, delays e limites). Mantenha sempre <code>Sim</code> em produção.</p>
             </div>
 
-            {{-- 2. timezone --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-timezone">
+            {{-- timezone --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-timezone">
                 <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-clock me-1"></i>Timezone (timezone)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Fuso Horário</span>
+                    <strong class="text-primary small"><i class="bi bi-clock me-1"></i>Timezone operacional (timezone)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Horário</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Fuso horário oficial utilizado para determinar o horário comercial, controle diário e rotação dos tetos de envio.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Como funciona:</strong> Garante que os limites diários reiniciem exatamente à meia-noite local da sua operação e que os disparos só ocorram no horário permitido no fuso horário dos seus clientes.
-                </div>
-                <div class="alert alert-info py-1 px-2 small mb-0">
-                    <i class="bi bi-info-circle me-1"></i><strong>Padrão Brasil:</strong> <code>America/Sao_Paulo (Horário de Brasília)</code>.
-                </div>
+                <p class="small text-muted mb-0">Fuso horário de referência para a janela comercial e reinício dos tetos diários. Padrão Brasil: <code>America/Sao_Paulo</code>.</p>
             </div>
 
-            {{-- 3, 4, 5. business_hours --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-business_hours_enabled">
+            {{-- business hours --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-business_hours_enabled">
                 <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-calendar-check me-1"></i>Janela comercial (business_hours_enabled / start / end)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Horário de Atendimento</span>
+                    <strong class="text-primary small"><i class="bi bi-calendar-check me-1"></i>Janela Comercial (business_hours_enabled / start / end)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">08:00 às 20:00</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Bloqueia disparos automáticos de cobrança fora do horário de expediente comercial.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Como funciona na prática:</strong> Se configurado das <code>08:00</code> às <code>20:00</code>, uma fatura gerada às 22h não acordará o cliente de madrugada (o que é a causa número 1 de denúncias de spam). A mensagem fica salva na fila e é despachada automaticamente na manhã seguinte às 08:00.
-                </div>
-                <div class="d-flex gap-2">
-                    <span class="badge bg-dark" id="topic-safety-business_hours_start">Início: 08:00</span>
-                    <span class="badge bg-dark" id="topic-safety-business_hours_end">Fim: 20:00</span>
-                </div>
+                <p class="small text-muted mb-0">Impede que cobranças automáticas sejam enviadas no meio da noite. Mensagens fora de horário são retidas na fila e disparadas no dia seguinte a partir das 08:00.</p>
             </div>
 
-            {{-- 6. block_groups --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-block_groups">
+            {{-- stop keywords --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-stop_keywords">
                 <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-people me-1"></i>Bloquear grupos (block_groups)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Destino</span>
+                    <strong class="text-danger small"><i class="bi bi-slash-circle me-1"></i>Palavras de Parada / Opt-Out (stop_keywords)</strong>
+                    <span class="badge bg-danger text-white border small">Regra Estrita</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Impede o envio de notificações em grupos do WhatsApp.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Motivo:</strong> Cobranças e mensagens financeiras contêm dados pessoais (LGPD). O envio oficial deve ser sempre 1:1 diretamente no privado do cliente.
-                </div>
+                <p class="small text-muted mb-0">Se o cliente responder <code>PARAR</code>, <code>SAIR</code>, <code>CANCELAR</code> ou <code>STOP</code>, o sistema desativa novos envios automáticos para respeitar as políticas da Meta e evitar denúncias de spam.</p>
             </div>
 
-            {{-- 7. minimum_message_chars --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-minimum_message_chars">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-chat-text me-1"></i>Caracteres mínimos (minimum_message_chars)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Validação</span>
-                </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Tamanho mínimo exigido para mensagens de texto livre.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Motivo:</strong> Mensagens curtas demais (ex: "oi", "ola") disparam filtros heurísticos de robôs de spam na Meta. Mantenha em pelo menos <code>10</code> a <code>15</code> caracteres.
-                </div>
-            </div>
-
-            {{-- 8. stop_keywords --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-stop_keywords">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-danger small"><i class="bi bi-slash-circle me-1"></i>Palavras de parada / Opt-Out (stop_keywords)</strong>
-                    <span class="badge bg-danger text-white border small">Regra Estrita Meta</span>
-                </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Termos que ativam o descadastro automático imediato do cliente.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Como funciona:</strong> Se um cliente responder <code>PARAR</code>, <code>SAIR</code>, <code>CANCELAR</code>, <code>STOP</code> ou <code>NAO QUERO</code>, o sistema registra o opt-out no banco de dados e bloqueia preventivamente qualquer disparo automático futuro para esse número.
-                </div>
-                <div class="alert alert-warning py-1 px-2 small mb-0">
-                    <i class="bi bi-exclamation-triangle me-1"></i> Esta é uma exigência expressa dos Termos de Serviço da Meta para manter a linha em Qualidade Verde.
-                </div>
-            </div>
-
-            {{-- 9, 10, 11. limits per minute, hour, day --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-limit_per_minute">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-speedometer2 me-1"></i>Limites de Envio (limit_per_minute / hour / day)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Controle de Fluxo</span>
-                </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Tetos máximos de disparos em diferentes janelas temporais para evitar rajadas.</p>
-                <ul class="small ps-3 mb-2">
-                    <li id="topic-safety-limit_per_minute"><strong>Limite por minuto (limit_per_minute):</strong> Evita picos instantâneos (rajadas). Recomendado: <code>5</code> a <code>15</code> msgs/min.</li>
-                    <li id="topic-safety-limit_per_hour"><strong>Limite por hora (limit_per_hour):</strong> Distribui as campanhas suavemente. Recomendado: <code>100</code> a <code>250</code> msgs/hora.</li>
-                    <li id="topic-safety-limit_per_day"><strong>Limite por dia (limit_per_day):</strong> Teto diário total da linha. Novos números devem respeitar o Tier da Meta (Tier 1: 1.000 msgs/dia).</li>
-                </ul>
-            </div>
-
-            {{-- 12, 13, 14. cooldowns --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-recipient_cooldown_minutes">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-hourglass-split me-1"></i>Cooldowns (recipient / message / campaign)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Espaçamento Inteligente</span>
-                </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Tempo de descanso obrigatório para evitar insistência ou disparos repetidos acidentais.</p>
-                <ul class="small ps-3 mb-0">
-                    <li id="topic-safety-recipient_cooldown_minutes"><strong>Cooldown do Destinatário (recipient_cooldown_minutes):</strong> Intervalo mínimo para o mesmo cliente receber outra notificação (ex: <code>30</code> a <code>120</code> minutos).</li>
-                    <li id="topic-safety-message_cooldown_minutes"><strong>Cooldown da Mensagem (message_cooldown_minutes):</strong> Evita reenviar o mesmo texto exato em menos de X minutos.</li>
-                    <li id="topic-safety-campaign_cooldown_minutes"><strong>Cooldown de Campanha (campaign_cooldown_minutes):</strong> Espaçamento entre lotes de disparos em massa.</li>
-                </ul>
-            </div>
-
-            {{-- 16, 17, 18. human delay --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-human_delay_enabled">
+            {{-- human delay --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-human_delay_enabled">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <strong class="text-success small"><i class="bi bi-person-walking me-1"></i>Delay Humano Randômico (human_delay_min / max)</strong>
-                    <span class="badge bg-success-subtle text-success border small">Anti-Detecção</span>
+                    <span class="badge bg-success-subtle text-success border small">Anti-Bot</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Adiciona pequenos atrasos variáveis entre cada mensagem disparada pela fila.</p>
-                <div class="small text-body-secondary mb-2">
-                    <strong>Como funciona:</strong> Em vez de disparar a cada 1 segundo exato (comportamento típico de bot), o disparador sorteia um atraso entre o mínimo (<code id="topic-safety-human_delay_min_seconds">12s</code>) e o máximo (<code id="topic-safety-human_delay_max_seconds">32s</code>), tornando o tráfego indistinguível de um operador humano real.
-                </div>
+                <p class="small text-muted mb-0">Sorteia um intervalo variável (ex: de 12 a 32 segundos) entre mensagens para simular digitação humana e evitar detecção por periodicidade fixa.</p>
             </div>
 
-            {{-- 19, 20. send delay ms --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-send_delay_min_ms">
+            {{-- warmup --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-warmup_enabled">
                 <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-primary small"><i class="bi bi-cpu me-1"></i>Jitter de Chamada da API (send_delay_min_ms / max_ms)</strong>
-                    <span class="badge bg-secondary-subtle text-body border small">Microlatência</span>
+                    <strong class="text-warning-emphasis small"><i class="bi bi-thermometer-half me-1"></i>Aquecimento Progressivo de Linhas Novas (Warm-up)</strong>
+                    <span class="badge bg-warning text-dark border small">Números Novos</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Atraso em milissegundos entre requisições HTTP enviadas aos servidores da Meta (Graph API).</p>
-                <div class="small text-body-secondary mb-0">
-                    Evita concorrência excessiva de sockets e suaviza a carga sobre a API da Meta. Padrão: <code>250ms</code> a <code>850ms</code>.
-                </div>
+                <p class="small text-muted mb-0">Para linhas novas, escalona o volume diário (até 30 msgs/dia nos dias 1 a 3; até 80 msgs/dia nos dias 4 a 7; até 150 msgs/dia até o 15º dia) até atingir o limite pleno do Tier 1 oficial.</p>
             </div>
 
-            {{-- 21, 22, 23, 24. warmup --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-warmup_enabled">
+            {{-- cooldowns --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-recipient_cooldown_minutes">
                 <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-warning-emphasis small"><i class="bi bi-thermometer-half me-1"></i>Aquecimento Progressivo de Números Novos (Warm-up)</strong>
-                    <span class="badge bg-warning text-dark border small">Números Recentes</span>
+                    <strong class="text-primary small"><i class="bi bi-hourglass-split me-1"></i>Cooldowns (Destinatário, Mensagem e Campanha)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Espaçamento</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Escalonamento progressivo automático do volume diário para chips ou linhas recém-cadastradas na Meta.</p>
-                <div class="small text-body-secondary mb-2">
-                    Quando você ativa uma linha nova, disparar 1.000 mensagens no primeiro dia pode gerar choque de volume nos filtros da Meta. O warmup limita automaticamente:
-                </div>
-                <ul class="small ps-3 mb-0">
-                    <li id="topic-safety-warmup_limit_days_1_3"><strong>Dias 1 a 3:</strong> até <code>30</code> mensagens/dia.</li>
-                    <li id="topic-safety-warmup_limit_days_4_7"><strong>Dias 4 a 7:</strong> até <code>80</code> mensagens/dia.</li>
-                    <li id="topic-safety-warmup_limit_days_8_15"><strong>Dias 8 a 15:</strong> até <code>150</code> mensagens/dia.</li>
-                    <li><strong>Após 15 dias:</strong> volume liberado para o limite total do Tier 1 oficial (1.000 msgs/dia).</li>
-                </ul>
+                <p class="small text-muted mb-0">Garante um intervalo mínimo (ex: 60 minutos) para que o mesmo cliente não receba avisos repetidos no mesmo dia.</p>
             </div>
 
-            {{-- 25, 26, 27, 28. risk score --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-risk_medium">
+            {{-- limits --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-limit_per_minute">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-speedometer2 me-1"></i>Limites de Envio (Por minuto, hora e dia)</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Tetos</span>
+                </div>
+                <p class="small text-muted mb-0">Controla a vazão máxima de mensagens por minuto (burst), por hora e por dia para manter a linha protegida dentro do Tier da Meta.</p>
+            </div>
+
+            {{-- risk score --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-risk_medium">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <strong class="text-danger small"><i class="bi bi-activity me-1"></i>Score de Risco & Bloqueio Preventivo (risk_block_above)</strong>
-                    <span class="badge bg-danger-subtle text-danger border small">Proteção Ativa</span>
+                    <span class="badge bg-danger-subtle text-danger border small">Autoproteção</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Algoritmo em tempo real que calcula a pontuação de risco da linha (0 a 100).</p>
-                <div class="small text-body-secondary mb-2">
-                    O cálculo considera: taxa de erros 4xx/5xx da Meta, clientes bloqueando, rejeições de mensagens e velocidade anormal. Se o score atingir a nota configurada em <code id="topic-safety-risk_block_above">risk_block_above (ex: 85)</code>, o sistema pausa os disparos automaticamente antes que a Meta penalize a conta!
-                </div>
+                <p class="small text-muted mb-0">Se o score de risco ultrapassar o valor limite estipulado (ex: 85), o sistema pausa os disparos automaticamente para salvar a linha antes que ocorra restrição na Meta.</p>
             </div>
 
-            {{-- 36. send_pix_qrcode_image --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-send_pix_qrcode_image">
+            {{-- qr code pix image --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-safety-send_pix_qrcode_image">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <strong class="text-primary small"><i class="bi bi-qr-code me-1"></i>Enviar imagem do QR Code Pix (send_pix_qrcode_image)</strong>
-                    <span class="badge bg-primary-subtle text-primary border small">Mídia Financeira</span>
+                    <span class="badge bg-primary-subtle text-primary border small">Mídia Pix</span>
                 </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Define se o sistema deve gerar e anexar a imagem do QR Code Pix além do código Copia e Cola em texto.</p>
-                <div class="small text-body-secondary mb-0">
-                    Se marcado como <code>Sim</code>, o cliente que abre o WhatsApp no computador ou tablet pode simplesmente apontar a câmera do celular bancário para a imagem da tela e pagar imediatamente.
-                </div>
-            </div>
-
-            {{-- 32, 33, 34, 35. tenant custom limits --}}
-            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-safety-tenant_allow_custom_limits">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <strong class="text-info small"><i class="bi bi-sliders2 me-1"></i>Permissões para Inquilinos (tenant_allow_custom_limits)</strong>
-                    <span class="badge bg-info-subtle text-info border small">SaaS Multi-Tenant</span>
-                </div>
-                <p class="small text-muted mb-2"><strong>O que é:</strong> Permite que inquilinos/tenants ajustem o ritmo de suas próprias linhas em seus painéis (Modo Seguro, Moderado ou Acelerado).</p>
-                <div class="small text-body-secondary mb-0">
-                    O Superadmin pode estipular um teto máximo inultrapassável em <code id="topic-safety-tenant_max_limit_per_day">tenant_max_limit_per_day</code> (ex: 500 msgs/dia), garantindo que nenhum cliente comprometa os recursos do servidor.
-                </div>
+                <p class="small text-muted mb-0">Gera e anexa a imagem do QR Code Pix além do código Copia e Cola em texto, facilitando o pagamento via câmera do celular.</p>
             </div>
         </section>
 
         <hr class="my-4">
 
         {{-- ========================================================================= --}}
-        {{-- BLOCO 5: CONFIGURAÇÃO DE INSTÂNCIAS DE INQUILINOS (TENANTS)               --}}
+        {{-- PILAR 6: OUTROS, RESOLUÇÃO DE DÚVIDAS & TENANTS                           --}}
         {{-- ========================================================================= --}}
-
-        {{-- TOPIC 11: Instancias de Tenants --}}
-        <section class="meta-help-topic mb-3" id="topic-tenant-instance-setup" data-keywords="tenant instancia cliente multi-tenant waba propria linha empresa">
+        <section class="meta-help-topic mb-3" id="topic-meta-others" data-keywords="outros duvidas tenant instancia multi-tenant waba propria linha empresa erros resolucao">
             <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="badge bg-primary px-2 py-1"><i class="bi bi-buildings-fill me-1"></i>Multi-Tenant</span>
-                <h5 class="mb-0 fw-bold">Instâncias de Inquilinos (Tenants)</h5>
+                <span class="badge bg-secondary px-2 py-1"><i class="bi bi-question-diamond-fill me-1"></i>Outros & Dúvidas</span>
+                <h5 class="mb-0 fw-bold">Multi-Tenant & Dúvidas Frequentes</h5>
             </div>
 
-            <p class="text-body-secondary small">
-                Cada empresa ou cliente cadastrado na plataforma pode operar de duas formas conforme a sua preferência:
-            </p>
+            {{-- Multi-Tenant --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-3 bg-body-tertiary" id="topic-tenant-instance-setup">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <strong class="text-primary small"><i class="bi bi-buildings me-1"></i>Configuração de Instância para Tenants</strong>
+                    <span class="badge bg-secondary-subtle text-body border small">Empresas</span>
+                </div>
+                <p class="small text-muted mb-2">Cada empresa cadastrada no SaaS pode optar por:</p>
+                <ul class="small ps-3 mb-0">
+                    <li><strong>Linha Própria:</strong> Cadastra suas credenciais oficiais da Meta para ter seu próprio nome e logotipo verificado.</li>
+                    <li><strong>Linha Compartilhada:</strong> Se deixar os campos em branco, o sistema usa a linha master do Superadmin automaticamente.</li>
+                </ul>
+            </div>
 
-            <div class="row g-2 small mb-3">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-body-tertiary">
-                        <strong class="text-primary d-block mb-1"><i class="bi bi-check2-circle me-1"></i>1. Linha Própria Oficial do Tenant (Recomendado para Empresas):</strong>
-                        O inquilino insere seu próprio <strong>Phone Number ID</strong>, <strong>WABA ID</strong> e <strong>Token Permanente</strong> gerados no Meta Business Suite dele.
-                        <div class="text-muted mt-1">Benefícios: A linha exibe o nome, logotipo e perfil oficial da empresa dele no WhatsApp, e as conversas pertencem exclusivamente à conta comercial dele.</div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-body-tertiary">
-                        <strong class="text-success d-block mb-1"><i class="bi bi-cloud-check me-1"></i>2. Linha Compartilhada do Sistema (Onboarding Instantâneo):</strong>
-                        Se o inquilino deixar os campos de credenciais em branco, o sistema utiliza automaticamente a linha master da Meta configurada pelo Superadmin no painel principal.
-                        <div class="text-muted mt-1">Benefícios: O cliente começa a disparar cobranças no mesmo instante em que se cadastra, sem precisar criar conta de desenvolvedor na Meta.</div>
-                    </div>
-                </div>
+            {{-- Resolução de Erros Comuns --}}
+            <div class="meta-help-subtopic border rounded p-3 mb-2 bg-body-tertiary" id="topic-others-troubleshooting">
+                <strong class="text-primary small d-block mb-1"><i class="bi bi-wrench me-1"></i>Resolução de Erros Frequentes da Meta</strong>
+                <ul class="small ps-3 mb-0">
+                    <li><strong>Erro 190 (Token Expired):</strong> O token de acesso expirou. Gere um novo <em>Token de Usuário do Sistema</em> com expiração *"Nunca"*.</li>
+                    <li><strong>Erro 131030 (Recipient not registered):</strong> O número do cliente não tem conta ativa no WhatsApp.</li>
+                    <li><strong>Erro 132000 (Template not found):</strong> O nome do template informado no sistema não bate com o nome exato aprovado no WhatsApp Manager.</li>
+                </ul>
             </div>
         </section>
 
@@ -697,16 +461,25 @@
     border-color: var(--bs-primary) !important;
     transform: scale(1.01);
 }
+.js-meta-help-trigger {
+    cursor: pointer;
+    transition: color 0.18s ease, transform 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.js-meta-help-trigger:hover {
+    color: var(--bs-primary) !important;
+    transform: scale(1.2);
+}
 </style>
 
 <script>
 (function() {
-    // Função global para abrir o Drawer no tópico desejado
     window.openHelpDrawer = function(topicId) {
         const offcanvasEl = document.getElementById('metaHelpDrawer');
         if (!offcanvasEl) return;
 
-        // Se bootstrap estiver disponível
         let offcanvas = null;
         if (typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
             offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
@@ -715,7 +488,6 @@
         if (offcanvas) {
             offcanvas.show();
         } else {
-            // Fallback nativo
             offcanvasEl.classList.add('show');
             offcanvasEl.style.visibility = 'visible';
             document.body.classList.add('modal-open');
@@ -733,15 +505,18 @@
         const cleanId = topicId.replace(/^#/, '').replace(/^topic-/, '');
         let target = document.getElementById('topic-' + cleanId) || document.getElementById(cleanId);
         
-        // Se nao encontrou exato e comeca com safety-, tenta achar container geral
         if (!target && cleanId.startsWith('safety-')) {
             target = document.getElementById('topic-meta-anti-ban');
         }
 
-        // Atualiza os pills no topo
+        // Atualiza pílulas do topo
         document.querySelectorAll('.meta-help-nav-pills [data-nav-topic]').forEach(function(pill) {
             const navTopic = pill.getAttribute('data-nav-topic');
-            if (navTopic === cleanId || (cleanId.startsWith('safety-') && navTopic === 'meta-anti-ban')) {
+            if (navTopic === cleanId || 
+                (cleanId.startsWith('safety-') && navTopic === 'meta-anti-ban') ||
+                (cleanId.startsWith('customization-') && navTopic === 'meta-customization') ||
+                (cleanId.startsWith('usage-') && navTopic === 'meta-usage')
+            ) {
                 pill.classList.add('active');
             } else {
                 pill.classList.remove('active');
@@ -758,7 +533,6 @@
     };
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Event delegation para cliques em qualquer gatilho de ajuda
         document.addEventListener('click', function(e) {
             const trigger = e.target.closest('.js-meta-help-trigger, [data-help-topic]');
             if (!trigger) return;
@@ -768,7 +542,6 @@
             window.openHelpDrawer(topic);
         });
 
-        // Clique nos pills do Drawer
         document.querySelectorAll('.meta-help-nav-pills [data-nav-topic]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const topic = this.getAttribute('data-nav-topic');
@@ -776,7 +549,6 @@
             });
         });
 
-        // Busca em tempo real nos tópicos e sub-tópicos
         const searchInput = document.getElementById('metaHelpSearch');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
@@ -799,7 +571,6 @@
             });
         }
 
-        // Botões de copiar texto com 1 clique dentro do drawer
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('.btn-copy-meta-text');
             if (!btn) return;

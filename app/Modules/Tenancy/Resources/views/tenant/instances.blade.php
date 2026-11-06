@@ -68,10 +68,10 @@
                     @endif
                 </p>
             </div>
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-info btn-sm js-meta-help-trigger" data-help-topic="tenant-instance-setup" title="Instruções de Configuração Meta">
-                    <i class="bi bi-question-circle me-1"></i> Ajuda & Passo a Passo Meta
-                </button>
+            <div class="d-flex align-items-center gap-2">
+                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted p-1 text-decoration-none" data-help-topic="tenant-instance-setup" title="Instruções de Personalização, Configuração e Utilização">
+                    <i class="bi bi-question-circle fs-5"></i>
+                </a>
                 <button class="btn btn-outline-warning btn-sm" id="btn-open-safety-modal" onclick="openSafetyModal()">
                     <i class="bi bi-shield-check me-1"></i> Proteção Anti-Ban
                 </button>
@@ -344,9 +344,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary js-meta-help-trigger" data-help-topic="tenant-instance-setup" title="Instruções de Configuração da Instância Meta">
-                        <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Passo a Passo Meta
-                    </button>
+                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none p-1" data-help-topic="tenant-instance-setup" title="Instruções da Instância Meta">
+                        <i class="bi bi-question-circle fs-5"></i>
+                    </a>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
             </div>
@@ -369,10 +369,10 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold d-flex align-items-center mb-1">
                                 <span>Número de Telefone</span>
-                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-phone-id" title="Passo a passo sobre registro de número">
-                                    <i class="bi bi-question-circle-fill me-1"></i>Ajuda
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-phone-id" title="Instruções sobre registro de número">
+                                    <i class="bi bi-question-circle"></i>
                                 </a>
                             </label>
                             <input type="text" class="form-control" name="phone" placeholder="Ex: 5511999999999" maxlength="30">
@@ -380,10 +380,10 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold d-flex align-items-center mb-1">
                                 <span>Phone Number ID da Meta</span>
-                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-phone-id" title="Como obter o Phone Number ID">
-                                    <i class="bi bi-question-circle-fill me-1"></i>Como obter?
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-phone-id" title="Como obter o Phone Number ID">
+                                    <i class="bi bi-question-circle"></i>
                                 </a>
                             </label>
                             <input type="text" class="form-control font-monospace" name="meta_phone_number_id" placeholder="Ex: 109283746592817" maxlength="64">
@@ -391,10 +391,10 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold d-flex align-items-center mb-1">
                                 <span>WABA ID (Conta Comercial)</span>
-                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-waba-id" title="Como obter o WABA ID">
-                                    <i class="bi bi-question-circle-fill me-1"></i>Como obter?
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-waba-id" title="Como obter o WABA ID">
+                                    <i class="bi bi-question-circle"></i>
                                 </a>
                             </label>
                             <input type="text" class="form-control font-monospace" name="meta_waba_id" placeholder="Ex: 192837465019283" maxlength="64">
@@ -402,10 +402,10 @@
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold d-flex align-items-center mb-1">
                                 <span>Token de Acesso Permanente (System User Token)</span>
-                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-system-user-token" title="Como gerar token permanente sem expiração de 24h">
-                                    <i class="bi bi-question-circle-fill me-1"></i>Como gerar token permanente?
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-system-user-token" title="Como gerar token permanente sem expiração">
+                                    <i class="bi bi-question-circle"></i>
                                 </a>
                             </label>
                             <input type="password" class="form-control font-monospace" name="meta_access_token" autocomplete="new-password" placeholder="EAAG... (deixe em branco para manter o token atual)">
@@ -418,9 +418,9 @@
                             <div class="border rounded p-3 bg-body-tertiary">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="fw-bold mb-0"><i class="bi bi-arrow-repeat me-1"></i> Webhook Oficial da Meta</h6>
-                                    <button type="button" class="btn btn-xs btn-outline-info js-meta-help-trigger" data-help-topic="meta-webhook">
-                                        <i class="bi bi-question-circle me-1"></i>Passo a passo Webhook
-                                    </button>
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none p-1" data-help-topic="meta-webhook" title="Instruções do Webhook">
+                                        <i class="bi bi-question-circle"></i>
+                                    </a>
                                 </div>
                                 <p class="small text-muted mb-2">Cadastre este webhook no Meta Developer Portal para receber status de entrega e mensagens:</p>
                                 

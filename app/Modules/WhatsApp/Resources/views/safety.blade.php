@@ -337,9 +337,9 @@
         subtitle="Central de risco, limites, cooldowns, warmup e segurança operacional dos envios."
         eyebrow="WhatsApp Safety">
         <x-slot:actions>
-            <button type="button" class="btn btn-outline-primary js-meta-help-trigger" data-help-topic="meta-anti-ban">
-                <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Políticas Meta Anti-Ban
-            </button>
+            <a href="javascript:void(0)" class="js-meta-help-trigger text-muted p-2 text-decoration-none d-flex align-items-center" data-help-topic="meta-anti-ban" title="Instruções sobre o Painel Anti-Ban">
+                <i class="bi bi-question-circle fs-5"></i>
+            </a>
         </x-slot:actions>
         <x-slot:aside>
             <div class="dashboard-note">
@@ -510,8 +510,8 @@
                                                         <label class="safety-field__label" for="safety-{{ $field['name'] }}">
                                                             <span class="safety-field__icon"><i class="bi {{ $help['icon'] }}"></i></span>
                                                             <span>{{ $field['label'] }}</span>
-                                                            <a href="javascript:void(0)" class="js-meta-help-trigger text-info ms-auto" data-help-topic="safety-{{ $field['name'] }}" title="Ver instruções passo a passo de: {{ $field['label'] }}">
-                                                                <i class="bi bi-question-circle-fill"></i>
+                                                            <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-auto text-decoration-none" data-help-topic="safety-{{ $field['name'] }}" title="Instruções de: {{ $field['label'] }}">
+                                                                <i class="bi bi-question-circle"></i>
                                                             </a>
                                                         </label>
                                                         @if($field['type'] === 'select')

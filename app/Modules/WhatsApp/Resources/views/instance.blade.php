@@ -354,9 +354,9 @@
             <button type="button" id="wa-btn-refresh-status" class="btn btn-sm btn-primary">
                 Testar conexão Meta
             </button>
-            <button type="button" class="btn btn-sm btn-outline-primary js-meta-help-trigger" data-help-topic="meta-overview" title="Guia Passo a Passo Oficial Meta">
-                <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Passo a Passo Meta
-            </button>
+            <a href="javascript:void(0)" class="js-meta-help-trigger text-muted p-1 text-decoration-none" data-help-topic="meta-overview" title="Instruções de Personalização, Configuração e Utilização">
+                <i class="bi bi-question-circle fs-5"></i>
+            </a>
         </div>
     </div>
 
@@ -374,10 +374,10 @@
 
                         <div class="wa-basic-config-grid">
                             <div class="mb-3">
-                                <label for="wa-meta-phone-id" class="form-label d-flex align-items-center justify-content-between">
+                                <label for="wa-meta-phone-id" class="form-label d-flex align-items-center mb-1">
                                     <span>Phone Number ID da Meta</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-phone-id" title="Ver passo a passo de como obter o Phone Number ID">
-                                        <i class="bi bi-question-circle-fill me-1"></i>Como obter?
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-phone-id" title="Instruções sobre Phone Number ID">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </label>
                                 <input type="text" class="form-control" id="wa-meta-phone-id" name="meta_phone_number_id" value="{{ config('whatsapp.meta_phone_number_id', env('META_PHONE_NUMBER_ID', '')) }}" placeholder="Ex: 109283746592817" required>
@@ -385,10 +385,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="wa-meta-waba-id" class="form-label d-flex align-items-center justify-content-between">
+                                <label for="wa-meta-waba-id" class="form-label d-flex align-items-center mb-1">
                                     <span>WhatsApp Business Account ID (WABA)</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-waba-id" title="Ver passo a passo do WABA ID">
-                                        <i class="bi bi-question-circle-fill me-1"></i>Como obter?
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-waba-id" title="Instruções sobre WABA ID">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </label>
                                 <input type="text" class="form-control" id="wa-meta-waba-id" name="meta_waba_id" value="{{ config('whatsapp.meta_waba_id', env('META_WABA_ID', '')) }}" placeholder="Ex: 192837465019283" required>
@@ -396,10 +396,10 @@
                             </div>
 
                             <div class="mb-3 wa-field-span-2">
-                                <label for="wa-meta-access-token" class="form-label d-flex align-items-center justify-content-between">
+                                <label for="wa-meta-access-token" class="form-label d-flex align-items-center mb-1">
                                     <span>Token Permanente de Sistema (System User Token)</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-system-user-token" title="Ver passo a passo para gerar token permanente sem expiração de 24h">
-                                        <i class="bi bi-question-circle-fill me-1"></i>Como gerar token permanente?
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-system-user-token" title="Instruções para gerar token permanente sem expiração">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </label>
                                 <input type="password" class="form-control" id="wa-meta-access-token" name="meta_access_token" value="{{ config('whatsapp.meta_access_token', env('META_ACCESS_TOKEN', '')) }}" placeholder="EAAG..." autocomplete="off" spellcheck="false" required>
@@ -407,10 +407,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="wa-meta-app-secret" class="form-label d-flex align-items-center justify-content-between">
+                                <label for="wa-meta-app-secret" class="form-label d-flex align-items-center mb-1">
                                     <span>Meta App Secret (HMAC-SHA256)</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-app-secret" title="Ver passo a passo do App Secret">
-                                        <i class="bi bi-question-circle-fill me-1"></i>Onde encontrar?
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-app-secret" title="Instruções sobre App Secret">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </label>
                                 <input type="password" class="form-control" id="wa-meta-app-secret" name="meta_app_secret" value="{{ config('whatsapp.meta_app_secret', env('META_APP_SECRET', '')) }}" placeholder="Chave secreta do App" autocomplete="off" spellcheck="false">
@@ -418,10 +418,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="wa-meta-verify-token" class="form-label d-flex align-items-center justify-content-between">
+                                <label for="wa-meta-verify-token" class="form-label d-flex align-items-center mb-1">
                                     <span>Token de Verificação do Webhook</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-webhook" title="Ver passo a passo da configuração do Webhook">
-                                        <i class="bi bi-question-circle-fill me-1"></i>Como configurar?
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted ms-2 text-decoration-none" data-help-topic="meta-webhook" title="Instruções de configuração do Webhook">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </label>
                                 <input type="text" class="form-control" id="wa-meta-verify-token" name="meta_webhook_verify_token" value="{{ config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_token')) }}">
@@ -436,9 +436,9 @@
                                         <strong>Webhook Oficial Meta Cloud API</strong>
                                         <small class="text-muted d-block">Configure este endpoint no painel Meta for Developers para receber status de entrega e interações.</small>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-info js-meta-help-trigger" data-help-topic="meta-webhook">
-                                        <i class="bi bi-question-circle me-1"></i>Instruções do Webhook
-                                    </button>
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none p-1" data-help-topic="meta-webhook" title="Instruções do Webhook">
+                                        <i class="bi bi-question-circle"></i>
+                                    </a>
                                 </div>
 
                                 <div class="mb-3">
@@ -485,9 +485,9 @@
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <strong>Ações da API Oficial Meta</strong>
-                    <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2 py-0 js-meta-help-trigger" data-help-topic="meta-overview">
-                        <i class="bi bi-question-circle"></i> Ajuda & Ações Meta
-                    </button>
+                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none p-1" data-help-topic="meta-overview" title="Instruções sobre Ações da API">
+                        <i class="bi bi-question-circle"></i>
+                    </a>
                 </div>
 
                 <div class="card-body wa-actions">
@@ -540,8 +540,8 @@
                                 <span class="text-muted">Qualidade do Número:</span>
                                 <div class="d-flex align-items-center gap-1">
                                     <span class="badge bg-success" id="wa-meta-quality-badge">ALTA (GREEN)</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-success" data-help-topic="meta-quality-rating" title="Ver regras de Qualidade e Limites de Envio (Tiers)">
-                                        <i class="bi bi-question-circle-fill"></i>
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none" data-help-topic="meta-quality-rating" title="Regras de Qualidade e Limites de Envio (Tiers)">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </div>
                             </li>
@@ -549,8 +549,8 @@
                                 <span class="text-muted">Janela de Interação:</span>
                                 <div class="d-flex align-items-center gap-1">
                                     <span class="badge bg-info text-dark">Regra 24h Ativa</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-info" data-help-topic="meta-anti-ban" title="Entenda a janela de 24 horas e envio de templates">
-                                        <i class="bi bi-question-circle-fill"></i>
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none" data-help-topic="meta-anti-ban" title="Janela de 24 horas e envio de templates">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </div>
                             </li>
@@ -558,8 +558,8 @@
                                 <span class="text-muted">Segurança Webhook:</span>
                                 <div class="d-flex align-items-center gap-1">
                                     <span class="badge bg-dark"><i class="bi bi-lock-fill"></i> HMAC-SHA256</span>
-                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-secondary" data-help-topic="meta-app-secret" title="Entenda a validação de assinatura criptográfica">
-                                        <i class="bi bi-question-circle-fill"></i>
+                                    <a href="javascript:void(0)" class="js-meta-help-trigger text-muted text-decoration-none" data-help-topic="meta-app-secret" title="Validação de assinatura criptográfica">
+                                        <i class="bi bi-question-circle"></i>
                                     </a>
                                 </div>
                             </li>
