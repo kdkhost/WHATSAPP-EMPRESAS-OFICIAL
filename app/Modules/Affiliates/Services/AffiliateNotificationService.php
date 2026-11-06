@@ -5,7 +5,7 @@ namespace App\Modules\Affiliates\Services;
 use App\Modules\Affiliates\Models\Affiliate;
 use App\Modules\Notifications\Services\NotificationDispatcher;
 use App\Modules\Settings\Services\SettingsManager;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use Illuminate\Support\Facades\Log;
 
 class AffiliateNotificationService
@@ -194,7 +194,7 @@ class AffiliateNotificationService
     }
 
     /**
-     * Envia mensagem no WhatsApp do usuário/tenant via EvolutionClient.
+     * Envia mensagem no WhatsApp do usuário/tenant via WhatsAppMetaClient (Meta Cloud API Oficial).
      */
     protected function sendDirectWhatsApp(Affiliate $affiliate, string $message): void
     {
@@ -205,13 +205,13 @@ class AffiliateNotificationService
         }
 
         try {
-            $evolution = app(EvolutionClient::class);
-            if (! $evolution->isConfigured()) {
-                Log::info("[AffiliateNotification] EvolutionClient não configurado para envio de WhatsApp.");
+            $client = app(WhatsAppMetaClient::class);
+            if (! $client->isConfigured()) {
+                Log::info("[AffiliateNotification] WhatsAppMetaClient não configurado para envio de WhatsApp.");
                 return;
             }
 
-            $evolution->sendText($phone, $message, [
+            $client->sendText($phone, $message, [
                 'tenant_id' => $affiliate->tenant_id,
                 'user_id'   => $affiliate->user_id,
                 'origin'    => 'affiliate_notification',

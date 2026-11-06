@@ -101,7 +101,7 @@ it('exibe histórico centralizado de mensagens de cobrança por WhatsApp e e-mai
         'message' => "Olá {$customer->name}, sua fatura {$invoice->number} vence em breve.\nPix copia e cola disponível.",
         'direction' => 'out',
         'status' => 'sent',
-        'evolution_id' => 'WA-HIST-1',
+        'meta_message_id' => 'WA-HIST-1',
         'media_type' => 'text',
         'sent_at' => now(),
     ]);
@@ -196,7 +196,7 @@ it('filtra histórico por canal específico na origem otimizando a consulta', fu
         'message' => 'Cobrança teste WhatsApp exclusivo',
         'direction' => 'out',
         'status' => 'sent',
-        'evolution_id' => 'WA-CH-ONLY-1',
+        'meta_message_id' => 'WA-CH-ONLY-1',
         'sent_at' => now(),
     ]);
 
@@ -245,7 +245,7 @@ it('permite ao tenant visualizar no painel seu historico de cobrancas com regua 
         'message' => 'Comprovante de pagamento da sua fatura recebido com sucesso!',
         'direction' => 'out',
         'status' => 'sent',
-        'evolution_id' => 'WA-DIRECT-MSG-1',
+        'meta_message_id' => 'WA-DIRECT-MSG-1',
         'sent_at' => now(),
     ]);
 

@@ -13,7 +13,7 @@ use Illuminate\Http\UploadedFile;
  *  - CSV (delimiter , ou ; auto-detectado)
  *  - Mapeamento flexivel de colunas (case-insensitive)
  *  - Validacao + dedup por documento/email
- *  - Sanitizacao de telefones para formato Evolution
+ *  - Sanitizacao de telefones para formato WhatsApp Meta
  */
 class CsvImporter
 {

@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\ViaCepController;
-use App\Http\Controllers\Api\EvolutionGoWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,8 +37,6 @@ Route::post('/webhook', [\App\Modules\WhatsApp\Http\Controllers\MetaWebhookContr
 // Alias para Webhook do Mercado Pago
 Route::match(['get', 'post'], '/webhooks/mercadopago', [\App\Modules\MercadoPago\Http\Controllers\MercadoPagoWebhookController::class, 'handle']);
 
-Route::post('/webhooks/evolution-go', EvolutionGoWebhookController::class)
-    ->name('api.webhooks.evolution-go');
 
 // Webhook do Addon Gestao Financeira (Open Finance / Pluggy)
 Route::match(['get', 'post', 'head'], '/gestao-financeira/open-finance-webhook', [\App\Addons\gestao_financeira\Http\Controllers\OpenFinanceWebhookController::class, 'handle'])

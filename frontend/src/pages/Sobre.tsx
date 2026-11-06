@@ -8,7 +8,7 @@ import { Shield, Zap, HeartHandshake, Target, Rocket, Trophy, Users, Building2, 
 
 const timeline = [
     { ano: '2021', titulo: 'A Faísca', desc: 'Após ver dezenas de empresas fecharem as portas por inadimplência, decidimos construir algo diferente. Nascemos com um problema claro a resolver.', icon: <Target className="w-5 h-5" />, gradient: 'from-blue-500 to-indigo-600' },
-    { ano: '2022', titulo: 'Primeiro Produto', desc: 'Lançamos o MVP com integração à Evolution API. Os primeiros 50 clientes relataram redução de inadimplência de até 38% no primeiro mês.', icon: <Rocket className="w-5 h-5" />, gradient: 'from-violet-500 to-purple-600' },
+    { ano: '2022', titulo: 'Primeiro Produto', desc: 'Lançamos o MVP com integração oficial ao WhatsApp Cloud API. Os primeiros 50 clientes relataram redução de inadimplência de até 38% no primeiro mês.', icon: <Rocket className="w-5 h-5" />, gradient: 'from-violet-500 to-purple-600' },
     { ano: '2023', titulo: 'Escala Nacional', desc: 'Cruzamos 500 empresas ativas e lançamos o módulo de PIX com baixa automática — hoje o mais usado, processando milhões por mês.', icon: <Trophy className="w-5 h-5" />, gradient: 'from-amber-500 to-orange-600' },
     { ano: '2024', titulo: 'Plataforma Completa', desc: 'WAF próprio, Analytics em tempo real, Backup automático e White Label. A plataforma virou a espinha dorsal financeira de ISPs, clínicas e e-commerces.', icon: <Building2 className="w-5 h-5" />, gradient: 'from-emerald-500 to-teal-600' },
     { ano: '2025', titulo: 'Hoje', desc: 'Mais de 3.500 empresas ativas. Mais de 2,5 milhões de mensagens enviadas por mês. Operação monitorada continuamente e evolução constante da plataforma.', icon: <Globe2 className="w-5 h-5" />, gradient: 'from-pink-500 to-rose-600' },

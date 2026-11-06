@@ -83,7 +83,9 @@ class MetaCloudApiClient
     public function isWithin24HourWindow(string $phoneNumber): array
     {
         $cleanPhone = Format::whatsappNumber($phoneNumber);
-        $customer = Customer::where('phone', $cleanPhone)
+        $customer = Customer::where('whatsapp', $cleanPhone)
+            ->orWhere('whatsapp', 'like', "%{$cleanPhone}%")
+            ->orWhere('phone', $cleanPhone)
             ->orWhere('phone', 'like', "%{$cleanPhone}%")
             ->first();
 
@@ -110,7 +112,9 @@ class MetaCloudApiClient
     public function recordInteraction(string $phoneNumber): void
     {
         $cleanPhone = Format::whatsappNumber($phoneNumber);
-        Customer::where('phone', $cleanPhone)
+        Customer::where('whatsapp', $cleanPhone)
+            ->orWhere('whatsapp', 'like', "%{$cleanPhone}%")
+            ->orWhere('phone', $cleanPhone)
             ->orWhere('phone', 'like', "%{$cleanPhone}%")
             ->update(['last_interaction_at' => now()]);
     }

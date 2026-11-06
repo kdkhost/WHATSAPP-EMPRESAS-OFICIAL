@@ -269,7 +269,7 @@ class AddonSecurityService
             }
 
             $content = $file->getContents();
-            if (preg_match('/APP_KEY|DB_PASSWORD|EVOLUTION_API_KEY|MERCADOPAGO_ACCESS_TOKEN/i', $content)) {
+            if (preg_match('/APP_KEY|DB_PASSWORD|META_ACCESS_TOKEN|MERCADOPAGO_ACCESS_TOKEN/i', $content)) {
                 Log::warning('[AddonSecurity] Possivel vazamento de credenciais', [
                     'file' => $file->getPathname(),
                 ]);

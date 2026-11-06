@@ -72,39 +72,31 @@ Artisan::command('app:audit-routes {--json : Imprime o relatorio completo em JSO
 })->purpose('Audita rotas, controllers, middlewares, sidebar e menus de addons');
 
 Artisan::command('whatsapp:health-check', function () {
-    $this->info('Iniciando verificacao da Evolution API Go...');
+    $this->info('Iniciando verificacao da WhatsApp Cloud API Oficial da Meta...');
     $this->newLine();
 
     try {
-        $client = app(\App\Modules\WhatsApp\Services\EvolutionClient::class);
-        $diagnosis = $client->diagnoseConnection();
-        $tests = $diagnosis['tests'] ?? [];
+        $client = app(\App\Modules\WhatsApp\Services\WhatsAppMetaClient::class);
+        $status = $client->status();
 
-        foreach ($tests as $test) {
-            $status = ($test['ok'] ?? false) ? 'OK' : 'FALHA';
-            $this->line(sprintf(
-                '[%s] %s | HTTP: %s | Estado: %s | Tempo: %sms',
-                $status,
-                $test['endpoint'] ?? '-',
-                $test['http_status'] ?? '-',
-                $test['normalized_state'] ?? '-',
-                $test['response_time_ms'] ?? '-'
-            ));
-        }
+        $connected = !empty($status['connected']);
+        $this->line(sprintf(
+            '[%s] Status: %s | Numero: %s | Qualidade: %s | Nome: %s',
+            $connected ? 'OK' : 'FALHA',
+            $status['status_label'] ?? '-',
+            $status['number'] ?? '-',
+            $status['quality'] ?? '-',
+            $status['verified_name'] ?? '-'
+        ));
 
         $this->newLine();
-        $this->info('Diagnostico finalizado.');
+        $this->info('Checagem finalizada.');
+        return $connected ? 0 : 1;
     } catch (\Throwable $e) {
-        $this->error('Erro ao executar diagnostico: '.$e->getMessage());
-        \Log::channel('daily')->error('Erro whatsapp:health-check', [
-            'message' => $e->getMessage(),
-        ]);
-
+        $this->error('Erro ao executar checagem Meta API: '.$e->getMessage());
         return 1;
     }
-
-    return 0;
-})->purpose('Verifica conectividade da Evolution API Go');
+})->purpose('Verifica conectividade da WhatsApp Cloud API Oficial da Meta');
 
 Artisan::command('system:safe-clear', function () {
     $this->info('Limpando caches do sistema...');
@@ -114,41 +106,39 @@ Artisan::command('system:safe-clear', function () {
 })->purpose('Limpeza segura do sistema');
 
 Artisan::command('whatsapp:full-diagnose', function () {
-    $this->info('==============================');
-    $this->info('DIAGNOSTICO COMPLETO WHATSAPP');
-    $this->info('==============================');
+    $this->info('=============================================');
+    $this->info('DIAGNOSTICO COMPLETO WHATSAPP CLOUD API (META)');
+    $this->info('=============================================');
 
     try {
-        $client = app(\App\Modules\WhatsApp\Services\EvolutionClient::class);
+        $client = app(\App\Modules\WhatsApp\Services\WhatsAppMetaClient::class);
         $diagnosis = $client->diagnoseConnection();
 
         $this->newLine();
-        $this->line('Base URL: '.($diagnosis['base_url'] ?? 'N/A'));
-        $this->line('Instancia: '.($diagnosis['instance'] ?? 'N/A'));
-        $this->line('Global Key: '.(($diagnosis['has_global_key'] ?? false) ? 'CONFIGURADA' : 'NAO CONFIGURADA'));
-        $this->line('Instance Key: '.(($diagnosis['has_instance_key'] ?? false) ? 'CONFIGURADA' : 'NAO CONFIGURADA'));
+        $this->line('Versao Graph API: '.($diagnosis['graph_version'] ?? 'v21.0'));
+        $this->line('Phone Number ID: '.($diagnosis['phone_number_id'] ?? 'pendente'));
+        $this->line('WABA ID: '.($diagnosis['waba_id'] ?? 'pendente'));
+        $this->line('Token Permanente: '.($diagnosis['token'] ?? 'ausente'));
         $this->newLine();
 
-        foreach (($diagnosis['tests'] ?? []) as $test) {
-            $this->line(str_repeat('-', 60));
-            $this->line('Teste: '.($test['name'] ?? '-'));
-            $this->line('Endpoint: '.($test['endpoint'] ?? '-'));
-            $this->line('Resultado: '.(($test['ok'] ?? false) ? 'OK' : 'FALHA'));
-            $this->line('HTTP: '.($test['http_status'] ?? '-'));
-            $this->line('Estado: '.($test['normalized_state'] ?? '-'));
-            $this->line('Mensagem: '.($test['message'] ?? '-'));
+        $conn = $diagnosis['connection'] ?? [];
+        $this->line('Resultado Conexao Meta: ' . (!empty($conn['ok']) ? 'OK / CONECTADO' : 'PENDENTE / FALHA'));
+        if (!empty($conn['verified_name'])) {
+            $this->line('Nome Verificado: '.$conn['verified_name']);
+        }
+        if (!empty($conn['display_phone_number'])) {
+            $this->line('Numero Exibicao: '.$conn['display_phone_number']);
+        }
+        if (!empty($conn['message'])) {
+            $this->line('Mensagem: '.$conn['message']);
         }
 
         $this->newLine();
         $this->info('Diagnostico concluido.');
     } catch (\Throwable $e) {
         $this->error('Falha critica: '.$e->getMessage());
-        \Log::channel('daily')->critical('Falha diagnostico Evolution API', [
-            'message' => $e->getMessage(),
-        ]);
-
         return 1;
     }
 
     return 0;
-})->purpose('Diagnostico completo da Evolution API Go');
+})->purpose('Diagnostico completo da WhatsApp Cloud API Oficial da Meta');

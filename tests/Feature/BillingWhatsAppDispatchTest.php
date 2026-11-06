@@ -54,7 +54,7 @@ function billingWhatsAppTenant(): array
         'display_name' => 'Cobranca',
         'status' => 'connected',
         'is_default' => true,
-        'api_base_url' => 'https://evo.test',
+        'api_base_url' => 'https://graph.facebook.com/v21.0',
         'api_key' => 'tenant-token',
         'webhook_secret' => 'secret-token',
     ]);
@@ -89,16 +89,15 @@ function billingWhatsAppTemplate(?int $tenantId = null): WhatsAppTemplate
     ]);
 }
 
-it('envia cobranca manual por whatsapp usando template padrao e id nested da evolution', function () {
+it('envia cobranca manual por whatsapp usando template padrao e id de mensagem', function () {
     config()->set('whatsapp_anti_ban.business_hours.enabled', false);
     config()->set('whatsapp_anti_ban.recipient_cooldown_minutes', 0);
     config()->set('whatsapp_anti_ban.cooldowns.message_minutes', 0);
     config()->set('whatsapp_anti_ban.cooldowns.campaign_minutes', 0);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0TESTBILLING']],
-            'message' => 'success',
+        'https://graph.facebook.com/*' => Http::response([
+            'messages' => [['id' => '3EB0TESTBILLING']],
         ], 200),
     ]);
 
@@ -110,6 +109,7 @@ it('envia cobranca manual por whatsapp usando template padrao e id nested da evo
         'name' => 'Cliente Cobranca',
         'email' => 'cliente-cobranca@example.com',
         'whatsapp' => '21999990000',
+        'last_interaction_at' => now(),
         'active' => true,
     ]);
 
@@ -132,7 +132,7 @@ it('envia cobranca manual por whatsapp usando template padrao e id nested da evo
 
     expect(DB::table('billing_dispatches')->where('invoice_id', $invoice->id)->where('status', 'sent')->exists())->toBeTrue()
         ->and(WhatsAppMessage::where('dispatch_id', DB::table('billing_dispatches')->where('invoice_id', $invoice->id)->value('id'))
-            ->where('evolution_id', '3EB0TESTBILLING')
+            ->where(fn ($q) => $q->where('meta_message_id', '3EB0TESTBILLING')->orWhere('evolution_id', '3EB0TESTBILLING'))
             ->where('status', 'sent')
             ->exists())->toBeTrue();
 });
@@ -146,13 +146,8 @@ it('envia cobranca com servico parcelas link e qr code pelo whatsapp', function 
     config()->set('whatsapp_anti_ban.cooldowns.campaign_minutes', 0);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0TEXTQR']],
-            'message' => 'success',
-        ], 200),
-        'https://evo.test/send/media' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0IMAGEQR']],
-            'message' => 'success',
+        'https://graph.facebook.com/*' => Http::response([
+            'messages' => [['id' => '3EB0IMAGEQR']],
         ], 200),
     ]);
 
@@ -175,6 +170,7 @@ it('envia cobranca com servico parcelas link e qr code pelo whatsapp', function 
         'name' => 'Cliente Parcelado',
         'email' => 'cliente-parcelado@example.com',
         'whatsapp' => '21999990003',
+        'last_interaction_at' => now(),
         'active' => true,
     ]);
 
@@ -249,16 +245,16 @@ it('envia cobranca com servico parcelas link e qr code pelo whatsapp', function 
         ->assertJsonPath('ok', true)
         ->assertJsonPath('status', 'sent');
 
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/send/media')
+    Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'graph.facebook.com')
         && ($request['type'] ?? null) === 'image'
-        && str_contains((string) $request['url'], 'api.qrserver.com')
-        && str_contains((string) $request['caption'], 'Plano Premium')
-        && str_contains((string) $request['caption'], 'Parcela 2/6')
-        && str_contains((string) $request['caption'], 'https://pagar.exemplo.com/fatura/qr-123'));
+        && str_contains((string) data_get($request->data(), 'image.link'), 'api.qrserver.com')
+        && str_contains((string) data_get($request->data(), 'image.caption'), 'Plano Premium')
+        && str_contains((string) data_get($request->data(), 'image.caption'), 'Parcela 2/6')
+        && str_contains((string) data_get($request->data(), 'image.caption'), 'https://pagar.exemplo.com/fatura/qr-123'));
 
     $dispatchId = DB::table('billing_dispatches')->where('invoice_id', $invoice->id)->value('id');
 
-    expect(WhatsAppMessage::where('dispatch_id', $dispatchId)->where('evolution_id', '3EB0IMAGEQR')->exists())->toBeTrue();
+    expect(WhatsAppMessage::where('dispatch_id', $dispatchId)->where(fn ($q) => $q->where('meta_message_id', '3EB0IMAGEQR')->orWhere('evolution_id', '3EB0IMAGEQR'))->exists())->toBeTrue();
 });
 
 it('anexa boleto no email e envia documento no whatsapp quando a cobranca usa boleto', function () {
@@ -270,13 +266,8 @@ it('anexa boleto no email e envia documento no whatsapp quando a cobranca usa bo
     config()->set('whatsapp_anti_ban.cooldowns.campaign_minutes', 0);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0TEXTBOLETO']],
-            'message' => 'success',
-        ], 200),
-        'https://evo.test/send/media' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0DOCBOLETO']],
-            'message' => 'success',
+        'https://graph.facebook.com/*' => Http::response([
+            'messages' => [['id' => '3EB0DOCBOLETO']],
         ], 200),
         'https://files.test/boleto-123.pdf' => Http::response('%PDF-1.4 boleto fake%', 200, ['Content-Type' => 'application/pdf']),
     ]);
@@ -326,6 +317,7 @@ it('anexa boleto no email e envia documento no whatsapp quando a cobranca usa bo
         'name' => 'Cliente Boleto',
         'email' => 'cliente-boleto@example.com',
         'whatsapp' => '21999990009',
+        'last_interaction_at' => now(),
         'active' => true,
     ]);
 
@@ -369,9 +361,9 @@ it('anexa boleto no email e envia documento no whatsapp quando a cobranca usa bo
 
     expect($attachments)->toHaveCount(2);
 
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/send/media')
+    Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'graph.facebook.com')
         && ($request['type'] ?? null) === 'document'
-        && (string) ($request['filename'] ?? '') === 'boleto-'.$invoice->number.'.pdf');
+        && data_get($request->data(), 'document.filename') === 'boleto-'.$invoice->number.'.pdf');
 });
 
 it('reagenda cobranca manual quando o anti ban limita o envio temporariamente', function () {
@@ -468,9 +460,8 @@ it('envia cobranca em mensagem unica consolidada com pix copia e cola sem dispar
     config()->set('whatsapp_anti_ban.cooldowns.campaign_minutes', 0);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0SINGLEMSG']],
-            'message' => 'success',
+        'https://graph.facebook.com/*' => Http::response([
+            'messages' => [['id' => '3EB0SINGLEMSG']],
         ], 200),
     ]);
 
@@ -493,6 +484,7 @@ it('envia cobranca em mensagem unica consolidada com pix copia e cola sem dispar
         'name' => 'Cliente Mensagem Unica',
         'email' => 'cliente-single@example.com',
         'whatsapp' => '21999990005',
+        'last_interaction_at' => now(),
         'active' => true,
     ]);
 
@@ -520,14 +512,16 @@ it('envia cobranca em mensagem unica consolidada com pix copia e cola sem dispar
         ->assertJsonPath('ok', true)
         ->assertJsonPath('status', 'sent');
 
-    // Verifica que enviou exatamente 1 requisicao /send/text contendo o link E o Pix Copia e Cola
+    // Verifica que enviou exatamente 1 requisicao oficial para a Meta sem disparos extras de midia
     Http::assertSentCount(1);
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/send/text')
-        && str_contains((string) $request['text'], 'https://pagar.exemplo.com/fatura/single-123')
-        && str_contains((string) $request['text'], $pixCode));
+    Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'graph.facebook.com')
+        && $request['to'] === '5521999990005');
 
     // Nenhuma requisicao de midia deve ter sido disparada
-    Http::assertNotSent(fn ($request) => str_contains($request->url(), '/send/media'));
+    Http::assertNotSent(fn ($request) => ($request['type'] ?? null) === 'image');
+
+    // Nenhuma requisicao de midia deve ter sido disparada
+    Http::assertNotSent(fn ($request) => ($request['type'] ?? null) === 'image');
 });
 
 it('envia cobranca com imagem do qrcode do pix quando send_pix_qrcode_image esta ativo por padrao', function () {
@@ -539,13 +533,8 @@ it('envia cobranca com imagem do qrcode do pix quando send_pix_qrcode_image esta
     config()->set('whatsapp_anti_ban.cooldowns.campaign_minutes', 0);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0TEXTPIXQR']],
-            'message' => 'success',
-        ], 200),
-        'https://evo.test/send/media' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0IMAGEPIXQR']],
-            'message' => 'success',
+        'https://graph.facebook.com/*' => Http::response([
+            'messages' => [['id' => '3EB0IMAGEPIXQR']],
         ], 200),
     ]);
 
@@ -568,6 +557,7 @@ it('envia cobranca com imagem do qrcode do pix quando send_pix_qrcode_image esta
         'name' => 'Cliente Pix QR',
         'email' => 'cliente-pix-qr@example.com',
         'whatsapp' => '21999990008',
+        'last_interaction_at' => now(),
         'active' => true,
     ]);
 
@@ -596,10 +586,10 @@ it('envia cobranca com imagem do qrcode do pix quando send_pix_qrcode_image esta
         ->assertJsonPath('status', 'sent');
 
     // Verifica que enviou a imagem do QR Code em mensagem unica com a legenda contendo o Copia e Cola e dados da fatura
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/send/media')
+    Http::assertSent(fn ($request) => str_contains((string) $request->url(), 'graph.facebook.com')
         && ($request['type'] ?? null) === 'image'
-        && str_contains((string) $request['url'], 'api.qrserver.com')
-        && str_contains((string) $request['caption'], $invoice->number)
-        && str_contains((string) $request['caption'], $pixCode));
+        && str_contains((string) data_get($request->data(), 'image.link'), 'api.qrserver.com')
+        && str_contains((string) data_get($request->data(), 'image.caption'), $invoice->number)
+        && str_contains((string) data_get($request->data(), 'image.caption'), $pixCode));
 });
 

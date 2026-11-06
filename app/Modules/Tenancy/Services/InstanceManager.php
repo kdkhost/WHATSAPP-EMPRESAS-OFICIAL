@@ -6,7 +6,7 @@ use App\Modules\Settings\Services\SettingsManager;
 use App\Modules\Tenancy\Models\Tenant;
 use App\Modules\Tenancy\Models\TenantInstance;
 use App\Modules\WhmcsIntegration\Models\WhmcsService;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Repositories\WhatsAppInstanceRepository;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
@@ -613,9 +613,7 @@ class InstanceManager
         }
 
         $delay = (int) ($context['delay_seconds'] ?? 0);
-
-        $apiKey = (string) ($instance->api_key ?: $this->apiKey);
-        $client = new EvolutionClient($instance->evolution_base_url, $apiKey, $instance->instance_name, $this->timeout);
+        $client = app(WhatsAppMetaClient::class);
 
         $context = array_merge($context, $inspection ?: [], [
             'tenant_id' => $instance->tenant_id,
@@ -635,7 +633,7 @@ class InstanceManager
                 'meta' => [
                     'origin' => $context['origin'],
                     'delay_seconds' => $delay,
-                    'evolution_id' => $id,
+                    'meta_message_id' => $id,
                 ],
             ]);
         }
@@ -672,8 +670,7 @@ class InstanceManager
             }
         }
 
-        $apiKey = (string) ($instance->api_key ?: $this->apiKey);
-        $client = new EvolutionClient($instance->evolution_base_url, $apiKey, $instance->instance_name, $this->timeout);
+        $client = app(WhatsAppMetaClient::class);
 
         $context = array_merge($context, $inspection ?: [], [
             'tenant_id' => $instance->tenant_id,
@@ -692,7 +689,7 @@ class InstanceManager
                 'meta' => [
                     'origin' => $context['origin'],
                     'media_type' => 'image',
-                    'evolution_id' => $id,
+                    'meta_message_id' => $id,
                 ],
             ]);
         }
@@ -708,7 +705,7 @@ class InstanceManager
             '[audio]',
             'audio',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendAudio($to, $audio, $ptt, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendAudio($to, $audio, $ptt, $safeContext)
         );
     }
 
@@ -720,7 +717,7 @@ class InstanceManager
             '[documento: '.$filename.']',
             'document',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendDocument($to, $file, $filename, $caption, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendDocument($to, $file, $filename, $caption, $safeContext)
         );
     }
 
@@ -732,7 +729,7 @@ class InstanceManager
             $caption ?: '[video]',
             'video',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendVideo($to, $video, $caption, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendVideo($to, $video, $caption, $safeContext)
         );
     }
 
@@ -744,7 +741,7 @@ class InstanceManager
             '[contato: '.$contactName.']',
             'contact',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendContact($to, $contactName, $contactPhone, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendContact($to, $contactName, $contactPhone, $safeContext)
         );
     }
 
@@ -756,7 +753,7 @@ class InstanceManager
             '[localizacao: '.($name ?: $latitude.','.$longitude).']',
             'location',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendLocation($to, $latitude, $longitude, $name, $address, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendLocation($to, $latitude, $longitude, $name, $address, $safeContext)
         );
     }
 
@@ -768,7 +765,7 @@ class InstanceManager
             $title."\n".$description,
             'buttons',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendButtons($to, $title, $description, $buttons, $footer, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendButtons($to, $title, $description, $buttons, $footer, $safeContext)
         );
     }
 
@@ -780,7 +777,7 @@ class InstanceManager
             $title."\n".$description,
             'list',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendList($to, $title, $description, $buttonText, $sections, $footer, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendList($to, $title, $description, $buttonText, $sections, $footer, $safeContext)
         );
     }
 
@@ -792,7 +789,7 @@ class InstanceManager
             '[enquete: '.$name.']',
             'poll',
             $context,
-            fn (EvolutionClient $client, array $safeContext) => $client->sendPoll($to, $name, $options, $selectableCount, $safeContext)
+            fn (WhatsAppMetaClient $client, array $safeContext) => $client->sendPoll($to, $name, $options, $selectableCount, $safeContext)
         );
     }
 
@@ -836,8 +833,7 @@ class InstanceManager
             }
         }
 
-        $apiKey = (string) ($instance->api_key ?: $this->apiKey);
-        $client = new EvolutionClient($instance->evolution_base_url, $apiKey, $instance->instance_name, $this->timeout);
+        $client = app(WhatsAppMetaClient::class);
 
         $safeContext = array_merge($context, $inspection ?: [], [
             'tenant_id' => $instance->tenant_id,
@@ -856,7 +852,7 @@ class InstanceManager
                 'meta' => [
                     'origin' => $safeContext['origin'],
                     'media_type' => $mediaType,
-                    'evolution_id' => $id,
+                    'meta_message_id' => $id,
                 ],
             ]);
         }

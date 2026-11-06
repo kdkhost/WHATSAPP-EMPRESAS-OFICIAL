@@ -15,7 +15,7 @@ use App\Modules\Templates\Models\WhatsAppTemplate;
 use App\Modules\Templates\Services\TemplateRenderer;
 use App\Modules\Tenancy\Models\TenantInstance;
 use App\Modules\Tenancy\Services\InstanceManager;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppQuarantineService;
 use App\Modules\WhatsApp\Services\WhatsAppQueuePlanner;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
@@ -213,6 +213,7 @@ class WhatsAppAdminController extends Controller
             $query->where(function ($qb) use ($q) {
                 $qb->where('to', 'like', "%{$q}%")
                    ->orWhere('message', 'like', "%{$q}%")
+                   ->orWhere('meta_message_id', 'like', "%{$q}%")
                    ->orWhere('evolution_id', 'like', "%{$q}%");
             });
         }
@@ -408,13 +409,13 @@ class WhatsAppAdminController extends Controller
 
             if (! $config['api_key'] || ! $config['base_url']) {
                 return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, 'Evolution API não configurada.'),
-                    'Evolution API não configurada.',
+                    $this->mainInstanceStatusPayload($config, 'Meta WhatsApp Cloud API não configurada.'),
+                    'Meta WhatsApp Cloud API não configurada.',
                     false
                 ), 422);
             }
 
-            $client = app(EvolutionClient::class);
+            $client = app(WhatsAppMetaClient::class);
             $normalized = $client->getNormalizedInstanceStatus();
             $normalized['_source'] = $this->normalizeMainSourceLabel($normalized['_source'] ?? $normalized['source'] ?? '');
             $normalized['source'] = $normalized['_source'];
@@ -568,7 +569,7 @@ class WhatsAppAdminController extends Controller
         if (! $globalApiKey || ! $instanceApiKey) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Informe ou preserve as chaves da Evolution API antes de salvar.',
+                'message' => 'Informe ou preserve as credenciais da Meta WhatsApp API antes de salvar.',
             ], 422);
         }
 
@@ -618,8 +619,8 @@ class WhatsAppAdminController extends Controller
             $s->set('whatsapp.event_producers', $webhookConfig['producers'], 'json');
             $s->set('whatsapp.advanced_settings', $advancedSettings, 'json');
 
-            app()->forgetInstance(EvolutionClient::class);
-            $remoteApply = $this->applyMainEvolutionConfig(app(EvolutionClient::class), $s, $this->whatsappRuntimeConfig($s), $webhookConfig, $advancedSettings);
+            app()->forgetInstance(WhatsAppMetaClient::class);
+            $remoteApply = $this->applyMainEvolutionConfig(app(WhatsAppMetaClient::class), $s, $this->whatsappRuntimeConfig($s), $webhookConfig, $advancedSettings);
             $remoteErrors = collect($remoteApply)
                 ->filter(fn ($item) => is_array($item) && ($item['ok'] ?? true) === false)
                 ->map(fn ($item) => $item['message'] ?? 'Falha desconhecida na Evolution.')
@@ -629,7 +630,7 @@ class WhatsAppAdminController extends Controller
         }
 
         // Recria o singleton com as novas configuracoes
-        app()->forgetInstance(EvolutionClient::class);
+        app()->forgetInstance(WhatsAppMetaClient::class);
 
         $this->persistMainInstanceStatus($this->whatsappRuntimeConfig($s), [
             'state' => 'nao_verificado',
@@ -714,7 +715,7 @@ class WhatsAppAdminController extends Controller
     }
 
     protected function applyMainEvolutionConfig(
-        EvolutionClient $client,
+        WhatsAppMetaClient $client,
         SettingsManager $settings,
         array $config,
         array $webhookConfig,
@@ -767,7 +768,7 @@ class WhatsAppAdminController extends Controller
             $settings->set('whatsapp.webhook_token', $token);
         }
 
-        return url('/webhooks/evolution/messages').'?'.http_build_query(array_filter([
+        return url('/webhooks/whatsapp/messages').'?'.http_build_query(array_filter([
             'token' => $token,
             'instance' => $config['instance'] ?? '',
             'scope' => 'admin',
@@ -822,8 +823,8 @@ class WhatsAppAdminController extends Controller
             return $result;
         }
 
-        app()->forgetInstance(EvolutionClient::class);
-        $client = app(EvolutionClient::class);
+        app()->forgetInstance(WhatsAppMetaClient::class);
+        $client = app(WhatsAppMetaClient::class);
         $remote = $client->listInstances();
         $row = null;
 
@@ -857,7 +858,7 @@ class WhatsAppAdminController extends Controller
                 $result['qrcode'] = $this->extractQrCode($row);
                 $this->storeMainInstanceApiKey($settings, $token);
                 $result['config'] = $this->whatsappRuntimeConfig($settings);
-                app()->forgetInstance(EvolutionClient::class);
+                app()->forgetInstance(WhatsAppMetaClient::class);
 
                 return $result;
             }
@@ -882,7 +883,7 @@ class WhatsAppAdminController extends Controller
         if ($remoteKey !== '' && $remoteKey !== ($config['api_key'] ?? '')) {
             $this->storeMainInstanceApiKey($settings, $remoteKey);
             $result['config'] = $this->whatsappRuntimeConfig($settings);
-            app()->forgetInstance(EvolutionClient::class);
+            app()->forgetInstance(WhatsAppMetaClient::class);
         }
 
         $result['remote'] = $row;
@@ -906,7 +907,7 @@ class WhatsAppAdminController extends Controller
         return ! $connected && ! $qrCode && $jid !== '';
     }
 
-    protected function recoverMainRemoteInstanceQr(EvolutionClient $client, SettingsManager $settings, array $config, array $row): array
+    protected function recoverMainRemoteInstanceQr(WhatsAppMetaClient $client, SettingsManager $settings, array $config, array $row): array
     {
         $instanceName = trim((string) ($config['instance'] ?? ''));
         $result = ['config' => $config, 'qrcode' => null, 'remote' => null];
@@ -979,11 +980,11 @@ class WhatsAppAdminController extends Controller
         if ($remoteKey !== '') {
             $this->storeMainInstanceApiKey($settings, $remoteKey);
             $result['config'] = $this->whatsappRuntimeConfig($settings);
-            app()->forgetInstance(EvolutionClient::class);
+            app()->forgetInstance(WhatsAppMetaClient::class);
         } elseif ($token !== '') {
             $this->storeMainInstanceApiKey($settings, $token);
             $result['config'] = $this->whatsappRuntimeConfig($settings);
-            app()->forgetInstance(EvolutionClient::class);
+            app()->forgetInstance(WhatsAppMetaClient::class);
         }
 
         $result['remote'] = $row;
@@ -1070,7 +1071,7 @@ class WhatsAppAdminController extends Controller
     {
         return response()->json([
             'ok' => true,
-            'data' => app(EvolutionClient::class)->diagnoseConnection(),
+            'data' => app(WhatsAppMetaClient::class)->diagnoseConnection(),
         ]);
     }
 
@@ -1081,13 +1082,13 @@ class WhatsAppAdminController extends Controller
 
             if (! $config['api_key'] || ! $config['base_url']) {
                 return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, 'Evolution API não configurada.'),
-                    'Evolution API não configurada.',
+                    $this->mainInstanceStatusPayload($config, 'Meta WhatsApp Cloud API não configurada.'),
+                    'Meta WhatsApp Cloud API não configurada.',
                     false
                 ), 422);
             }
 
-            $normalized = app(EvolutionClient::class)->getNormalizedInstanceStatus();
+            $normalized = app(WhatsAppMetaClient::class)->getNormalizedInstanceStatus();
             $normalized['_source'] = $this->normalizeMainSourceLabel($normalized['_source'] ?? $normalized['source'] ?? '');
             $normalized['source'] = $normalized['_source'];
             $this->persistMainInstanceStatus($config, $normalized, ['test' => $normalized]);
@@ -1126,7 +1127,7 @@ class WhatsAppAdminController extends Controller
             $config = $prepared['config'];
             $preparedQrCode = $prepared['qrcode'];
 
-            $client = app(EvolutionClient::class);
+            $client = app(WhatsAppMetaClient::class);
             $before = $client->getNormalizedInstanceStatus();
             $directStatusBefore = $client->status();
             $directStateBefore = [];
@@ -1305,13 +1306,13 @@ class WhatsAppAdminController extends Controller
 
             if (! $config['api_key'] || ! $config['base_url']) {
                 return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, 'Evolution API não configurada.'),
-                    'Evolution API não configurada.',
+                    $this->mainInstanceStatusPayload($config, 'Meta WhatsApp Cloud API não configurada.'),
+                    'Meta WhatsApp Cloud API não configurada.',
                     false
                 ), 422);
             }
 
-            $client = app(EvolutionClient::class);
+            $client = app(WhatsAppMetaClient::class);
             $result = $client->disconnect();
             $after = $client->getNormalizedInstanceStatus();
 
@@ -1417,8 +1418,8 @@ class WhatsAppAdminController extends Controller
 
             if (! $config['api_key'] || ! $config['base_url']) {
                 return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, 'Evolution API não configurada.'),
-                    'Evolution API não configurada.',
+                    $this->mainInstanceStatusPayload($config, 'Meta WhatsApp Cloud API não configurada.'),
+                    'Meta WhatsApp Cloud API não configurada.',
                     false
                 ), 422);
             }
@@ -1428,7 +1429,7 @@ class WhatsAppAdminController extends Controller
             $config = $prepared['config'];
             $qrCode = $prepared['qrcode'];
 
-            $client = app(EvolutionClient::class);
+            $client = app(WhatsAppMetaClient::class);
             $result = $client->reconnect();
             $restartError = mb_strtolower((string) ($result['error'] ?? ''));
             $softDisconnected = str_contains($restartError, 'client disconnected');
@@ -1560,7 +1561,7 @@ class WhatsAppAdminController extends Controller
                 return response()->json(['ok' => false, 'message' => 'Envio bloqueado: '.$inspection['reason']], 422);
             }
 
-            $client = app(EvolutionClient::class);
+            $client = app(WhatsAppMetaClient::class);
             $id = $client->sendText($data['to'], $data['message'], array_merge($inspection, [
                 'origin' => 'admin_send_test',
                 'is_manual' => true,
@@ -1635,7 +1636,7 @@ class WhatsAppAdminController extends Controller
                     'delay_seconds' => 0,
                 ]));
             } else {
-                $client = app(EvolutionClient::class);
+                $client = app(WhatsAppMetaClient::class);
                 $id = $client->sendText($cleanTo, $data['message'], array_merge($context, $inspection, [
                     'skip_safety' => true,
                     'is_manual' => true,
@@ -1677,7 +1678,7 @@ class WhatsAppAdminController extends Controller
                                 if ($instance) {
                                     app(InstanceManager::class)->sendImage($instance, $cleanTo, $qrImage, $qrCaption, array_merge($context, ['media_type' => 'image', 'origin' => 'admin_manual_qrcode']));
                                 } else {
-                                    app(EvolutionClient::class)->sendImage($cleanTo, $qrImage, $qrCaption, array_merge($context, ['media_type' => 'image', 'origin' => 'admin_manual_qrcode']));
+                                    app(WhatsAppMetaClient::class)->sendImage($cleanTo, $qrImage, $qrCaption, array_merge($context, ['media_type' => 'image', 'origin' => 'admin_manual_qrcode']));
                                 }
                             } catch (\Throwable $e) {
                                 Log::warning('Erro ao enviar imagem do QR Code em envio manual admin: ' . $e->getMessage());
@@ -1902,7 +1903,7 @@ class WhatsAppAdminController extends Controller
                     return response()->json(['ok' => false, 'message' => 'Reenvio bloqueado: '.$inspection['reason']], 422);
                 }
 
-                $client = app(EvolutionClient::class);
+                $client = app(WhatsAppMetaClient::class);
                 $newId = $client->sendText($msg->to, $msg->message, array_merge($context, $inspection));
             }
 
@@ -1998,7 +1999,8 @@ class WhatsAppAdminController extends Controller
                     'formatted_to' => $formattedTo,
                     'direction' => $msg->direction,
                     'status' => $msg->status,
-                    'evolution_id' => $msg->evolution_id ?: 'Sem Evolution ID',
+                    'meta_message_id' => $msg->meta_message_id ?? $msg->evolution_id ?? 'Sem ID',
+                    'evolution_id' => $msg->meta_message_id ?? $msg->evolution_id ?? 'Sem ID',
                     'content' => $msg->message,
                     'created_at' => $createdAt?->format('d/m/Y H:i:s'),
                     'created_at_time' => $createdAt?->format('H:i'),
@@ -2052,8 +2054,10 @@ class WhatsAppAdminController extends Controller
             'human_delay_enabled' => 'nullable|boolean',
             'human_delay_min_seconds' => 'required|integer|min:0|max:300',
             'human_delay_max_seconds' => 'required|integer|min:0|max:600',
-            'evolution_delay_min_ms' => 'required|integer|min:0|max:20000',
-            'evolution_delay_max_ms' => 'required|integer|min:0|max:30000',
+            'send_delay_min_ms' => 'nullable|integer|min:0|max:20000',
+            'send_delay_max_ms' => 'nullable|integer|min:0|max:30000',
+            'evolution_delay_min_ms' => 'nullable|integer|min:0|max:20000',
+            'evolution_delay_max_ms' => 'nullable|integer|min:0|max:30000',
             'release_when_limited_seconds' => 'required|integer|min:60|max:86400',
             'block_groups' => 'nullable|boolean',
             'minimum_message_chars' => 'required|integer|min:1|max:100',
@@ -2123,6 +2127,8 @@ class WhatsAppAdminController extends Controller
             'campaign_cooldown_minutes' => ['cooldowns.campaign_minutes', 'int'],
             'human_delay_min_seconds' => ['human_delay.min_seconds', 'int'],
             'human_delay_max_seconds' => ['human_delay.max_seconds', 'int'],
+            'send_delay_min_ms' => ['send_delay_ms.min', 'int'],
+            'send_delay_max_ms' => ['send_delay_ms.max', 'int'],
             'evolution_delay_min_ms' => ['evolution_delay_ms.min', 'int'],
             'evolution_delay_max_ms' => ['evolution_delay_ms.max', 'int'],
             'release_when_limited_seconds' => ['release_when_limited_seconds', 'int'],
@@ -3138,7 +3144,7 @@ class WhatsAppAdminController extends Controller
         )) ?: '';
     }
 
-    protected function connectedNumberInAnotherInstance(EvolutionClient $client, array $config, string $number): ?array
+    protected function connectedNumberInAnotherInstance(WhatsAppMetaClient $client, array $config, string $number): ?array
     {
         if ($number === '') {
             return null;
@@ -3189,14 +3195,14 @@ class WhatsAppAdminController extends Controller
         return null;
     }
 
-    protected function pollMainInstanceConnectionState(EvolutionClient $client, array $statusPayload, int $attempts = 4, int $delayMs = 500): array
+    protected function pollMainInstanceConnectionState(WhatsAppMetaClient $client, array $statusPayload, int $attempts = 4, int $delayMs = 500): array
     {
         ['status' => $status, 'qrcode' => $qrCode] = $this->pollMainInstanceQrCode($client, $statusPayload, $attempts, $delayMs);
 
         return ['status' => $status, 'qrcode' => $qrCode];
     }
 
-    protected function pollMainInstanceQrCode(EvolutionClient $client, array $statusPayload, int $attempts, int $delayMs, bool $preferDirectStatus = false): array
+    protected function pollMainInstanceQrCode(WhatsAppMetaClient $client, array $statusPayload, int $attempts, int $delayMs, bool $preferDirectStatus = false): array
     {
         $currentStatus = $statusPayload;
         $qrCode = null;

@@ -17,16 +17,17 @@ class Customer extends Model
 {
     protected $fillable = [
         'tenant_id','name','email','document','birth_date','cpf','cnpj',
-        'person_type','phone','whatsapp','whatsapp_optin',
+        'person_type','phone','whatsapp','whatsapp_optin','last_interaction_at',
         'cep','logradouro','numero','complemento','bairro','cidade','uf',
         'meta','active',
     ];
 
     protected $casts = [
-        'meta'           => 'array',
-        'active'         => 'boolean',
-        'birth_date'     => 'date:Y-m-d',
-        'whatsapp_optin' => 'boolean',
+        'meta'                => 'array',
+        'active'              => 'boolean',
+        'birth_date'          => 'date:Y-m-d',
+        'whatsapp_optin'      => 'boolean',
+        'last_interaction_at' => 'datetime',
     ];
 
     protected $appends = [

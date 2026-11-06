@@ -29,7 +29,7 @@ class NotificationsAdminController extends Controller
             'in_app'   => ['enabled' => true, 'label' => 'In-App (sininho)', 'configurable' => false],
             'push'     => ['enabled' => (bool) $s->get('notifications.push_enabled', false), 'label' => 'Push (WebPush/PWA)'],
             'email'    => ['enabled' => (bool) $s->get('notifications.email_enabled', true), 'label' => 'E-mail (SMTP)'],
-            'whatsapp' => ['enabled' => (bool) $s->get('notifications.whatsapp_enabled', false), 'label' => 'WhatsApp (Evolution)'],
+            'whatsapp' => ['enabled' => (bool) $s->get('notifications.whatsapp_enabled', false), 'label' => 'WhatsApp (Meta Oficial)'],
         ];
         return response()->json($channels);
     }

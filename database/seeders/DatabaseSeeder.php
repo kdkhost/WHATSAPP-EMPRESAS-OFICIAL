@@ -169,7 +169,7 @@ class DatabaseSeeder extends Seeder
             DB::table('kanban_cards')->insert([
                 ['column_id' => $colServId, 'title' => 'Cobrança PIX Automática', 'content' => 'Geração de PIX com QR code dinâmico e webhook instantâneo.', 'sort' => 0, 'created_at' => now(), 'updated_at' => now()],
                 ['column_id' => $colServId, 'title' => 'Envio Inteligente de Lembretes', 'content' => 'Réguas automáticas ativas com antecedência parametrizável.', 'sort' => 1, 'created_at' => now(), 'updated_at' => now()],
-                ['column_id' => $colAddonId, 'title' => 'Integração Evolution API', 'content' => 'Conexão modular do WhatsApp sem lag ou bloqueios.', 'sort' => 0, 'created_at' => now(), 'updated_at' => now()],
+                ['column_id' => $colAddonId, 'title' => 'Integração WhatsApp Meta Cloud API', 'content' => 'Conexão oficial da Meta Graph API v21.0 sem risco de banimento.', 'sort' => 0, 'created_at' => now(), 'updated_at' => now()],
                 ['column_id' => $colAddonId, 'title' => 'Painel White Label', 'content' => 'Customização visual completa para revenda.', 'sort' => 1, 'created_at' => now(), 'updated_at' => now()],
             ]);
         }
@@ -181,7 +181,7 @@ class DatabaseSeeder extends Seeder
             $colDestId = DB::table('kanban_columns')->insertGetId(['board_id' => $cardsBoardId, 'name' => 'Casos de Sucesso', 'sort' => 1]);
 
             DB::table('kanban_cards')->insert([
-                ['column_id' => $colNewsId, 'title' => 'Evolution API v2.0', 'content' => 'Melhorias de velocidade e reconexão automática integradas.', 'sort' => 0, 'created_at' => now(), 'updated_at' => now()],
+                ['column_id' => $colNewsId, 'title' => 'Meta WhatsApp Graph API v21.0', 'content' => 'Envio oficial de templates e mensagens com autenticação oficial Meta.', 'sort' => 0, 'created_at' => now(), 'updated_at' => now()],
                 ['column_id' => $colNewsId, 'title' => 'Checkout Transparente Efi', 'content' => 'Transações de Pix e Cartão homologadas.', 'sort' => 1, 'created_at' => now(), 'updated_at' => now()],
                 ['column_id' => $colDestId, 'title' => 'Redução de Inadimplência', 'content' => 'Nossos clientes registraram queda média de 78% na inadimplência.', 'sort' => 0, 'created_at' => now(), 'updated_at' => now()],
             ]);

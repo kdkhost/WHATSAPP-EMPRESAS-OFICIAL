@@ -43,6 +43,8 @@ e este projeto adere ao [Versionamento Semantico](https://semver.org/lang/pt-BR/
 
 ### Removido
 - **Eliminação Total de Bibliotecas e Código de Engenharia Reversa (Resíduo Zero)**:
+  - Excluídos todos os arquivos legados, controllers, rotas, requests, jobs, eventos e listeners relacionados à Evolution API (`EvolutionClient`, `EvolutionGoWebhookController`, `EvolutionGoSyncService`, `ProcessEvolutionWebhookJob`, `SyncEvolutionInstancesJob`, `EvolutionWebhookReceived`, `LogEvolutionWebhookReceived`, etc.).
+  - Substituído `WhatsAppEvolutionDiagnoseCommand` pelo comando oficial `WhatsAppMetaDiagnoseCommand` (`whatsapp:meta-diagnose`).
   - Removidas mais de 780 linhas de emulação de QR Code, Chromium e websockets de browser em `instance.blade.php`.
   - Descontinuada a coleção Postman legada `EvolutionAPIGo-v3.0.postman_collection.json` e substituída pela coleção oficial `Meta-WhatsApp-Cloud-API-v21.0.postman_collection.json`.
   - Neutralizado o script legado `create_bot.php` com senhas estáticas em favor dos seeders seguros.

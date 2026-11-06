@@ -30,5 +30,9 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="SECURITY_WAF_ENABLED" value="false"/>
+        <env name="META_PHONE_NUMBER_ID" value="109876543210"/>
+        <env name="META_WABA_ID" value="123456789012345"/>
+        <env name="META_ACCESS_TOKEN" value="EAAG_test_mock_token_for_testing"/>
+        <env name="META_WEBHOOK_VERIFY_TOKEN" value="test_verify_token"/>
     </php>
 </phpunit>

@@ -31,7 +31,7 @@ it('returns json 403 when waf blocks an ajax or api request', function () {
 it('bypasses webhooks and cron from waf payload inspection', function () {
     Cache::put('waf.mode', 'block', 60);
 
-    $response = $this->postJson('/webhooks/evolution/messages?q=UNION%20SELECT%201', [
+    $response = $this->postJson('/webhooks/whatsapp/messages?q=UNION%20SELECT%201', [
         'message' => 'SELECT * FROM users WHERE 1=1',
     ]);
 

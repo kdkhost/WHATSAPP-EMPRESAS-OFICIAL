@@ -1348,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro na Sincronização',
-                        text: d.error || d.message || 'Falha ao sincronizar dados com a Evolution API.',
+                        text: d.error || d.message || 'Falha ao sincronizar dados com o WhatsApp Oficial.',
                         confirmButtonColor: '#dc3545'
                     });
                 }
@@ -1371,7 +1371,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: 'Excluir instância?',
                 text: connected
                     ? `A instância ${btn.dataset.name || ''} está conectada. Desconecte-a primeiro antes de excluir.`
-                    : `A instância ${btn.dataset.name || ''} será removida do sistema e da Evolution.`,
+                    : `A instância ${btn.dataset.name || ''} será removida do sistema.`,
                 showCancelButton: !connected,
                 confirmButtonText: connected ? 'OK' : 'Sim, excluir',
                 cancelButtonText: 'Cancelar',

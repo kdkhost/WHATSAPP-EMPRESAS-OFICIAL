@@ -177,7 +177,7 @@ class Format
         return preg_replace('/\D/', '', (string) $s);
     }
 
-    /** Numero internacional para Evolution API (E.164 sem +). Ex.: 5511987654321 */
+    /** Numero internacional para WhatsApp Meta API (E.164 sem +). Ex.: 5511987654321 */
     public static function whatsappNumber(string $phone): string
     {
         $p = self::onlyDigits($phone);

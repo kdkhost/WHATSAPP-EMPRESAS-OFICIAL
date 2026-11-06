@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Chatbot\Services\ChatbotEngine;
 use App\Modules\Tenancy\Models\TenantInstance;
 use App\Modules\Tenancy\Services\InstanceManager;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
 use App\Modules\Settings\Services\SettingsManager;
 use App\Services\WebhookSignatureVerifier;
@@ -15,28 +15,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Recebe mensagens da Evolution API e responde automaticamente via chatbot.
- * Configurar em Evolution: Webhook URL = /webhooks/evolution/messages
+ * Recebe mensagens do WhatsApp e responde automaticamente via chatbot.
  */
 class ChatbotWebhookController extends Controller
 {
-    public function handle(Request $request, ChatbotEngine $engine, EvolutionClient $evolution, InstanceManager $instances, WhatsAppSafetyService $safety, WebhookSignatureVerifier $webhookVerifier, ?string $event = null): JsonResponse
+    public function handle(Request $request, ChatbotEngine $engine, WhatsAppMetaClient $whatsApp, InstanceManager $instances, WhatsAppSafetyService $safety, WebhookSignatureVerifier $webhookVerifier, ?string $event = null): JsonResponse
     {
         $data = $request->all();
         $tenantInstance = $this->resolveTenantInstance($request, $data);
 
-        // Eventos de estado da Evolution (ex.: connection.update no restart)
-        // nao carregam mensagem de cliente e algumas instalacoes nao enviam HMAC.
-        // Para esses casos aceitamos apenas token valido e ignoramos o evento.
+        // Eventos de estado do WhatsApp Oficial
         $eventName = strtoupper(str_replace(['.', '-'], '_', (string) ($data['event'] ?? $event ?? '')));
-        $isMessageEvent = in_array($eventName, ['MESSAGES_UPSERT', 'MESSAGE_UPSERT', 'MESSAGE'], true);
+        $isMessageEvent = in_array($eventName, ['MESSAGES_UPSERT', 'MESSAGE_UPSERT', 'MESSAGE', 'MESSAGES'], true);
 
         $secret = (string) ($tenantInstance?->webhook_secret ?: $this->globalWebhookSecret());
-        // A rota legado /webhooks/evolution/messages continua sendo usada pelas
-        // instancias tenant da Evolution Go. Na pratica, varias instalacoes da
-        // v3 nao enviam HMAC nem timestamp nessa URL, apenas o token.
-        // Mantemos token obrigatorio aqui e concentramos validacao forte
-        // (assinatura/replay) no endpoint dedicado /api/webhooks/evolution-go.
         $webhookCheck = $webhookVerifier->validate($request, $secret, $secret, [
             'token_required' => true,
             'signature_required' => false,
@@ -53,7 +45,7 @@ class ChatbotWebhookController extends Controller
             return response()->json(['ok' => false, 'error' => $webhookCheck['message']], 403);
         }
 
-        // Evolution envia diferentes eventos (messages.upsert, connection.update, etc.)
+        // Ignora eventos que não sejam de mensagens recebidas
         if (! $isMessageEvent) {
             return response()->json(['ok' => true, 'ignored' => true]);
         }
@@ -90,7 +82,7 @@ class ChatbotWebhookController extends Controller
                     'origin' => 'chatbot_webhook',
                     'campaign' => 'chatbot_autoreply',
                 ]);
-            } elseif ($evolution->isConfigured()) {
+            } elseif ($whatsApp->isConfigured()) {
                 $inspection = $safety->inspect(null, $from, $reply, [
                     'origin' => 'chatbot_webhook_fallback',
                     'campaign' => 'chatbot_autoreply',
@@ -104,7 +96,7 @@ class ChatbotWebhookController extends Controller
                     continue;
                 }
 
-                $evolution->sendText($from, $reply, $inspection + [
+                $whatsApp->sendText($from, $reply, $inspection + [
                     'origin' => 'chatbot_webhook_fallback',
                     'campaign' => 'chatbot_autoreply',
                 ]);
@@ -133,9 +125,9 @@ class ChatbotWebhookController extends Controller
     private function globalWebhookSecret(): string
     {
         try {
-            return (string) app(SettingsManager::class)->get('whatsapp.webhook_token', env('EVOLUTION_WEBHOOK_TOKEN', ''));
+            return (string) app(SettingsManager::class)->get('whatsapp.webhook_token', config('whatsapp.meta_webhook_verify_token', ''));
         } catch (\Throwable) {
-            return (string) env('EVOLUTION_WEBHOOK_TOKEN', '');
+            return (string) config('whatsapp.meta_webhook_verify_token', '');
         }
     }
 

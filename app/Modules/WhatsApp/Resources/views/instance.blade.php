@@ -31,13 +31,8 @@
         $initialBadgeClass = 'bg-danger';
     }
 
-    $mainWebhookUrl = data_get($evolutionConfig, 'webhook.url', '');
-    $mainWebhookToken = data_get($evolutionConfig, 'webhook.token', '');
-    $currentWebhookEvents = $evolutionConfig['current_events'] ?? [];
-    $activeWebhookEventsCount = count($currentWebhookEvents);
-    $advancedEnabledCount = collect(data_get($evolutionConfig, 'advanced', []))
-        ->filter(fn ($value, $key) => $key !== 'rejectCallsMessage' && (bool) $value)
-        ->count();
+    $mainWebhookUrl = url('/api/v1/webhook');
+    $mainWebhookToken = config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026'));
 @endphp
 
 @push('head')
@@ -413,147 +408,36 @@
                             <div class="wa-config-section">
                                 <div class="wa-config-section__title">
                                     <div>
-                                        <strong>Webhook da instancia</strong>
-                                        <small>URL protegida usada pela Evolution para devolver eventos ao sistema.</small>
+                                        <strong>Webhook Oficial Meta Cloud API</strong>
+                                        <small class="text-muted d-block">Configure este endpoint no painel Meta for Developers para receber status de entrega e interações.</small>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="wa-webhook-url-display" class="form-label">URL do webhook</label>
-                                    <div class="wa-copy-group">
-                                        <input type="text" class="form-control" id="wa-webhook-url-display" value="{{ $mainWebhookUrl }}" readonly data-wa-webhook-url>
-                                        <button type="button" class="btn btn-outline-secondary" id="wa-btn-copy-webhook">
-                                            Copiar webhook
+                                    <label for="wa-webhook-url-display" class="form-label">URL de Callback (Webhook)</label>
+                                    <div class="wa-copy-group d-flex gap-2">
+                                        <input type="text" class="form-control" id="wa-webhook-url-display" value="{{ url('/api/v1/webhook') }}" readonly data-wa-webhook-url>
+                                        <button type="button" class="btn btn-outline-secondary" id="wa-btn-copy-webhook" onclick="navigator.clipboard.writeText('{{ url('/api/v1/webhook') }}'); alert('URL do Webhook copiada!');">
+                                            Copiar URL
                                         </button>
                                     </div>
-                                    <div class="wa-field-help">Essa URL deve permanecer vinculada ao sistema. Nao configure uma ligacao direta sem gestao fora deste painel.</div>
-                                    <div class="wa-field-help">Webhook atual: <span id="wa-webhook-status-url">{{ $mainWebhookUrl ?: 'Nao gerado' }}</span></div>
+                                    <div class="wa-field-help mt-1 text-muted small">Cole este endereço no campo <strong>URL de retorno de chamada</strong> no painel de desenvolvedores da Meta.</div>
                                 </div>
-                            </div>
 
-                            <div class="wa-config-section">
-                                <div class="wa-config-section__title">
-                                    <div>
-                                        <strong>Configuracao recomendada Evolution Go</strong>
-                                        <small>Eventos e comportamento aplicados no servidor Evolution pela API do sistema.</small>
+                                <div class="mb-3">
+                                    <label class="form-label">Token de Verificação (hub.verify_token)</label>
+                                    <div class="wa-copy-group d-flex gap-2">
+                                        <input type="text" class="form-control" value="{{ config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026')) }}" readonly>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ config('whatsapp.meta_webhook_verify_token', env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026')) }}'); alert('Token copiado!');">
+                                            Copiar Token
+                                        </button>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-success" id="wa-btn-apply-recommended">
-                                        Aplicar configuracao recomendada
-                                    </button>
+                                    <div class="wa-field-help mt-1 text-muted small">Cole este token no campo <strong>Verificar token</strong> ao registrar o Webhook na Meta.</div>
                                 </div>
 
-                                <div class="wa-advanced-grid mb-3">
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="webhook_enabled" value="1" @checked((bool) data_get($evolutionConfig, 'webhook.enabled', true))>
-                                        <span class="wa-option-item__body"><strong>Webhook ativo</strong><small class="text-muted">Liga o envio dos eventos desta instancia para o sistema.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="webhook_by_events" value="1" @checked((bool) data_get($evolutionConfig, 'webhook.byEvents', true))>
-                                        <span class="wa-option-item__body"><strong>Separar por eventos</strong><small class="text-muted">Assina apenas os eventos marcados abaixo; desligado usa `ALL` na Evolution.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="webhook_base64" value="1" @checked((bool) data_get($evolutionConfig, 'webhook.base64', false))>
-                                        <span class="wa-option-item__body"><strong>Midia em base64</strong><small class="text-muted">Mantido no sistema para governanca. Recomenda-se deixar desligado.</small></span>
-                                    </label>
+                                <div class="alert alert-info py-2 px-3 small mb-0">
+                                    <i class="bi bi-info-circle-fill me-1"></i> No painel da Meta, assine os campos: <strong>messages</strong> e <strong>message_template_status_update</strong>.
                                 </div>
-
-                                <div class="wa-advanced-grid mb-3">
-                                    <label class="wa-option-item">
-                                        <span class="wa-option-item__body">
-                                            <strong>RabbitMQ</strong>
-                                            <small class="text-muted">Produtor de eventos para AMQP quando configurado na Evolution.</small>
-                                            <select class="form-select mt-2" name="event_producer_rabbitmq">
-                                                <option value="default" @selected(data_get($evolutionConfig, 'webhook.producers.rabbitmq', 'default') === 'default')>Padrao do sistema</option>
-                                                <option value="enabled" @selected(data_get($evolutionConfig, 'webhook.producers.rabbitmq') === 'enabled')>Ativar na Evolution</option>
-                                                <option value="disabled" @selected(data_get($evolutionConfig, 'webhook.producers.rabbitmq') === 'disabled')>Desativar na Evolution</option>
-                                            </select>
-                                        </span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <span class="wa-option-item__body">
-                                            <strong>WebSocket</strong>
-                                            <small class="text-muted">Canal de eventos em tempo real da Evolution para esta instancia.</small>
-                                            <select class="form-select mt-2" name="event_producer_websocket">
-                                                <option value="default" @selected(data_get($evolutionConfig, 'webhook.producers.websocket', 'default') === 'default')>Padrao do sistema</option>
-                                                <option value="enabled" @selected(data_get($evolutionConfig, 'webhook.producers.websocket') === 'enabled')>Ativar na Evolution</option>
-                                                <option value="disabled" @selected(data_get($evolutionConfig, 'webhook.producers.websocket') === 'disabled')>Desativar na Evolution</option>
-                                            </select>
-                                        </span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <span class="wa-option-item__body">
-                                            <strong>NATS</strong>
-                                            <small class="text-muted">Produtor de eventos para NATS quando o servidor Evolution possuir suporte.</small>
-                                            <select class="form-select mt-2" name="event_producer_nats">
-                                                <option value="default" @selected(data_get($evolutionConfig, 'webhook.producers.nats', 'default') === 'default')>Padrao do sistema</option>
-                                                <option value="enabled" @selected(data_get($evolutionConfig, 'webhook.producers.nats') === 'enabled')>Ativar na Evolution</option>
-                                                <option value="disabled" @selected(data_get($evolutionConfig, 'webhook.producers.nats') === 'disabled')>Desativar na Evolution</option>
-                                            </select>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="wa-config-section">
-                                <div class="wa-config-section__title">
-                                    <div>
-                                        <strong>Eventos do webhook</strong>
-                                        <small>Selecione somente o que o sistema realmente usa para operar a Evolution sem ruido.</small>
-                                    </div>
-                                </div>
-                                <div class="wa-event-grid">
-                                    @foreach(($evolutionConfig['event_options'] ?? []) as $event => $eventMeta)
-                                        <label class="wa-option-item">
-                                            <input class="form-check-input" type="checkbox" name="webhook_events[]" value="{{ $event }}" @checked(in_array($event, $evolutionConfig['current_events'] ?? [], true))>
-                                            <span class="wa-option-item__body">
-                                                <strong>{{ $eventMeta['label'] }}</strong>
-                                                <code class="ms-1">{{ $event }}</code>
-                                                <small class="d-block text-muted">{{ $eventMeta['description'] }}</small>
-                                            </span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div class="wa-config-section">
-                                <div class="wa-config-section__title">
-                                    <div>
-                                        <strong>Comportamento da instancia</strong>
-                                        <small>Essas regras tambem precisam ser gravadas no sistema e aplicadas no `advanced-settings` da Evolution.</small>
-                                    </div>
-                                </div>
-                                <div class="wa-advanced-grid">
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="rejectCalls" value="1" @checked((bool) data_get($evolutionConfig, 'advanced.rejectCalls', true))>
-                                        <span class="wa-option-item__body"><strong>Rejeitar chamadas</strong><small class="d-block text-muted">Mantem atendimento somente por mensagem.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="groupsIgnore" value="1" @checked((bool) data_get($evolutionConfig, 'advanced.groupsIgnore', true))>
-                                        <span class="wa-option-item__body"><strong>Ignorar grupos</strong><small class="d-block text-muted">Evita eventos e respostas em grupos.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="alwaysOnline" value="1" @checked((bool) data_get($evolutionConfig, 'advanced.alwaysOnline', false))>
-                                        <span class="wa-option-item__body"><strong>Sempre online</strong><small class="d-block text-muted">Recomendado desligado para operacao discreta.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="readMessages" value="1" @checked((bool) data_get($evolutionConfig, 'advanced.readMessages', false))>
-                                        <span class="wa-option-item__body"><strong>Marcar mensagens como lidas</strong><small class="d-block text-muted">Recomendado desligado para preservar o fluxo do usuario.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="ignoreStatus" value="1" @checked((bool) data_get($evolutionConfig, 'advanced.ignoreStatus', true))>
-                                        <span class="wa-option-item__body"><strong>Ignore Status</strong><small class="d-block text-muted">Ignora atualizacoes de status no WhatsApp.</small></span>
-                                    </label>
-                                    <label class="wa-option-item">
-                                        <input class="form-check-input" type="checkbox" name="syncFullHistory" value="1" @checked((bool) data_get($evolutionConfig, 'advanced.syncFullHistory', false))>
-                                        <span class="wa-option-item__body"><strong>Sincronizar historico completo</strong><small class="d-block text-muted">Recomendado desligado para reduzir risco e volume.</small></span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="wa-config-section">
-                                <label for="wa-reject-calls-message" class="form-label">Mensagem para chamada recusada</label>
-                                <input type="text" class="form-control" id="wa-reject-calls-message" name="rejectCallsMessage" value="{{ data_get($evolutionConfig, 'advanced.rejectCallsMessage', 'Atendimento somente por mensagem.') }}">
-                                <div class="wa-field-help">Mensagem enviada quando o numero tentar ligar para a instancia.</div>
                             </div>
                         </div>
 

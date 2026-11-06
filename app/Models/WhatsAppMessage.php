@@ -15,6 +15,8 @@ class WhatsAppMessage extends Model
         'tenant_instance_id',
         'to',
         'message',
+        'meta_message_id',
+        'external_id',
         'evolution_id',
         'direction',
         'media_type',

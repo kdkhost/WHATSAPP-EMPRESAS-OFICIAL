@@ -37,7 +37,7 @@ class BillingServiceProvider extends ServiceProvider
             name: 'billing.dispatch_due',
             callback: fn () => app(BillingDispatcher::class)->dispatchDue(),
             intervalMinutes: 1,
-            description: 'Envia cobrancas agendadas via Evolution API com pacing inteligente (3-5 min).'
+            description: 'Envia cobrancas agendadas via WhatsApp Cloud API Oficial da Meta com pacing inteligente (3-5 min).'
         );
 
         // Job: a cada 30 minutos, agenda envios para faturas que ainda nao tem dispatches

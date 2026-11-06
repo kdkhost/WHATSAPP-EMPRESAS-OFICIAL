@@ -444,7 +444,7 @@
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="bh-kpi-card text-success">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase fw-bold text-secondary small">WhatsApp (Evolution)</span>
+                    <span class="text-uppercase fw-bold text-secondary small">WhatsApp (Meta Oficial)</span>
                     <div class="bh-kpi-icon bg-success-subtle text-success">
                         <i class="bi bi-whatsapp"></i>
                     </div>
@@ -455,7 +455,7 @@
                         {{ $stats['total'] > 0 ? round(($stats['whatsapp'] / $stats['total']) * 100, 1) : 0 }}% do volume
                     </span>
                 </div>
-                <div class="text-muted small">Mensagens automáticas via Evolution API.</div>
+                <div class="text-muted small">Mensagens automáticas via Meta WhatsApp Cloud API.</div>
             </div>
         </div>
 
@@ -799,7 +799,7 @@
                                             data-status="{{ $item->status }}"
                                             data-date="{{ \App\Support\Format::datetime($item->sent_at ?: $item->created_at) }}"
                                             data-time="{{ \App\Support\Format::time($item->sent_at ?: $item->created_at) }}"
-                                            data-instance="{{ $item->instance_name ?: 'Evolution API' }}"
+                                            data-instance="{{ $item->instance_name ?: 'Meta Cloud API' }}"
                                             title="Visualizar mensagem como o cliente recebeu">
                                         <i class="bi {{ $isWhatsApp ? 'bi-phone' : 'bi-eye' }} me-1"></i> Ver
                                     </button>
@@ -919,7 +919,7 @@
                                 </div>
                                 <div class="flex-grow-1 min-w-0" style="line-height: 1.2;">
                                     <div class="text-white fw-bold small text-truncate" id="waModalContactName">Cliente</div>
-                                    <div style="color: #00a884; font-size: .70rem;">online • via <span id="waModalInstanceName">Evolution API</span></div>
+                                    <div style="color: #00a884; font-size: .70rem;">online • via <span id="waModalInstanceName">Meta Cloud API Oficial</span></div>
                                 </div>
                                 <div class="d-flex align-items-center gap-3 text-muted">
                                     <i class="bi bi-camera-video"></i>
@@ -1027,7 +1027,7 @@
                 <ul class="nav nav-pills mb-3" id="diagTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active py-1 px-3 small rounded-pill" id="tab-response-btn" data-bs-toggle="pill" data-bs-target="#tab-response" type="button" role="tab">
-                            Resposta da API (Evolution / SMTP)
+                            Resposta da API (Meta / SMTP)
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -1191,7 +1191,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const status    = this.getAttribute('data-status');
             const dateStr   = this.getAttribute('data-date');
             const timeStr   = this.getAttribute('data-time') || '12:00';
-            const instance  = this.getAttribute('data-instance') || 'Evolution API';
+            const instance  = this.getAttribute('data-instance') || 'Meta Cloud API';
             const bodyEnc   = this.getAttribute('data-body') || '';
 
             let bodyContent = '';
@@ -1298,7 +1298,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const responseEnc = this.getAttribute('data-response') || '';
             const metaEnc     = this.getAttribute('data-meta') || '';
 
-            document.getElementById('diagChannel').textContent = channel === 'whatsapp' ? 'WhatsApp (Evolution API)' : 'E-mail (SMTP)';
+            document.getElementById('diagChannel').textContent = channel === 'whatsapp' ? 'WhatsApp (Meta Cloud API Oficial)' : 'E-mail (SMTP)';
             document.getElementById('diagProviderId').textContent = providerId;
             document.getElementById('diagDispatchId').textContent = dispatchId;
 

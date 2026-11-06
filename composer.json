@@ -1,8 +1,19 @@
 {
     "name": "kdkhost/whatsapp",
     "type": "project",
-    "description": "Sistema modular de cobrança automatizada via WhatsApp (Evolution API) — Laravel 13 + PHP 8.4 + MySQL/MariaDB. Software proprietário KDK HOST / Marcelo Brad.",
-    "keywords": ["laravel","whatsapp","cobranca","billing","evolution-api","pwa","adminlte","waf","saas"],
+    "description": "Sistema modular de cobrança automatizada via WhatsApp Cloud API Oficial da Meta — Laravel 13 + PHP 8.3/8.4 + MySQL/MariaDB/SQLite. Software proprietário KDK HOST / Marcelo Brad.",
+    "keywords": [
+        "laravel",
+        "whatsapp",
+        "cobranca",
+        "billing",
+        "meta-cloud-api",
+        "meta-whatsapp",
+        "pwa",
+        "adminlte",
+        "waf",
+        "saas"
+    ],
     "license": "proprietary",
     "authors": [
         {
@@ -13,7 +24,7 @@
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.3|^8.4",
         "dompdf/dompdf": "^3.1",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^13.0",

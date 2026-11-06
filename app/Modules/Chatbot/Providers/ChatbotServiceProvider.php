@@ -17,8 +17,8 @@ class ChatbotServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(app_path('Modules/Chatbot/Resources/views'), 'chatbot');
 
-        // Webhook que recebe mensagens da Evolution API — throttle para evitar flood
-        Route::middleware(['web', 'throttle:120,1'])->post('/webhooks/evolution/messages/{event?}',
+        // Webhook que recebe mensagens do WhatsApp Oficial — throttle para evitar flood
+        Route::middleware(['web', 'throttle:120,1'])->post('/webhooks/whatsapp/messages/{event?}',
             [\App\Modules\Chatbot\Http\Controllers\ChatbotWebhookController::class, 'handle']
         )->name('chatbot.webhook');
 

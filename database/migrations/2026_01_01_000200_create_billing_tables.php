@@ -63,12 +63,14 @@ return new class extends Migration
             $t->timestamps();
         });
 
-        // Logs de envio Evolution
+        // Logs de envio WhatsApp Meta Cloud API
         Schema::create('whatsapp_messages', function (Blueprint $t) {
             $t->id();
             $t->foreignId('dispatch_id')->nullable()->constrained('billing_dispatches')->nullOnDelete();
             $t->string('to', 30)->index();
             $t->longText('message');
+            $t->string('meta_message_id')->nullable()->index();
+            $t->string('external_id')->nullable()->index();
             $t->string('evolution_id')->nullable()->index();
             $t->enum('direction', ['out', 'in'])->default('out');
             $t->enum('status', ['queued', 'sent', 'delivered', 'read', 'failed'])->default('queued');

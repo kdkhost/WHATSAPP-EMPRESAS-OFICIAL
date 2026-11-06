@@ -335,7 +335,7 @@ class TenantPackageService
                     'status' => $msgId ? 'sent' : 'queued',
                     'tenant_instance_id' => $instance->id,
                     'meta' => array_merge($context, [
-                        'evolution_id' => $msgId,
+                        'meta_message_id' => $msgId,
                         'customer_name' => $customer->name,
                         'package_name' => $package->name,
                     ]),
@@ -443,11 +443,11 @@ class TenantPackageService
                     }
                 }
 
-                if (! $msgId && class_exists(\App\Modules\WhatsApp\Services\EvolutionClient::class)) {
+                if (! $msgId && class_exists(\App\Modules\WhatsApp\Services\WhatsAppMetaClient::class)) {
                     try {
-                        $msgId = app(\App\Modules\WhatsApp\Services\EvolutionClient::class)->sendText($cleanTo, $message, $context);
+                        $msgId = app(\App\Modules\WhatsApp\Services\WhatsAppMetaClient::class)->sendText($cleanTo, $message, $context);
                     } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("[TenantPackage] Falha ao enviar via EvolutionClient global: " . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::warning("[TenantPackage] Falha ao enviar via WhatsAppMetaClient global: " . $e->getMessage());
                     }
                 }
 
@@ -458,7 +458,7 @@ class TenantPackageService
                         'status' => $msgId ? 'sent' : 'queued',
                         'tenant_instance_id' => $instance?->id,
                         'meta' => array_merge($context, [
-                            'evolution_id' => $msgId,
+                            'meta_message_id' => $msgId,
                             'customer_name' => $customer->name,
                             'package_name' => $subscription->package->name,
                             'installment' => $installment->installment_number,

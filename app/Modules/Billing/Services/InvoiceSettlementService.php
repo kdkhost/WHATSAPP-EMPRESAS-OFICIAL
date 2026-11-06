@@ -530,13 +530,13 @@ class InvoiceSettlementService
                 }
             }
 
-            // Fallback para EvolutionClient global se a instância do tenant falhar ou não estiver conectada
-            if (! $msgId && class_exists(\App\Modules\WhatsApp\Services\EvolutionClient::class)) {
+            // Fallback para WhatsAppMetaClient global se a instância do tenant falhar ou não estiver conectada
+            if (! $msgId && class_exists(\App\Modules\WhatsApp\Services\WhatsAppMetaClient::class)) {
                 try {
-                    $client = app(\App\Modules\WhatsApp\Services\EvolutionClient::class);
+                    $client = app(\App\Modules\WhatsApp\Services\WhatsAppMetaClient::class);
                     $msgId = $client->sendText($cleanTo, $message, $context);
                 } catch (\Throwable $e) {
-                    Log::warning("[InvoiceSettlement] Falha ao enviar via EvolutionClient global: " . $e->getMessage());
+                    Log::warning("[InvoiceSettlement] Falha ao enviar via WhatsAppMetaClient global: " . $e->getMessage());
                 }
             }
 
@@ -545,9 +545,10 @@ class InvoiceSettlementService
                     'to' => $cleanTo,
                     'message' => $message,
                     'status' => $msgId ? 'sent' : 'queued',
+                    'meta_message_id' => $msgId,
                     'tenant_instance_id' => $tenantInstance?->id,
                     'meta' => array_merge($context, [
-                        'evolution_id' => $msgId,
+                        'meta_message_id' => $msgId,
                         'customer_name' => $customerName,
                         'invoice_number' => $numFatura,
                         'gateway' => $gateway,

@@ -63,7 +63,7 @@
                 <li class="nav-item {{ request()->is('admin/whatsapp/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/whatsapp/*') ? 'active' : '' }}"><i class="nav-icon bi bi-whatsapp text-success"></i><p>WhatsApp <i class="nav-arrow bi bi-chevron-right"></i></p></a>
                     <ul class="nav nav-treeview">
-                        <li class="nav-item"><a href="{{ url('/admin/whatsapp/instance') }}" class="nav-link {{ request()->is('admin/whatsapp/instance*') ? 'active' : '' }}">Instancia (Evolution)</a></li>
+                        <li class="nav-item"><a href="{{ url('/admin/whatsapp/instance') }}" class="nav-link {{ request()->is('admin/whatsapp/instance*') ? 'active' : '' }}">WhatsApp Meta Oficial</a></li>
                         <li class="nav-item"><a href="{{ url('/admin/whatsapp/messages') }}" class="nav-link {{ request()->is('admin/whatsapp/messages*') ? 'active' : '' }}">Mensagens</a></li>
                         <li class="nav-item"><a href="{{ route('admin.whatsapp.safety') }}" class="nav-link {{ request()->is('admin/whatsapp/safety*') ? 'active' : '' }}">Anti-Ban e Seguranca</a></li>
                         <li class="nav-item"><a href="{{ url('/admin/whatsapp/export-report') }}" class="nav-link {{ request()->is('admin/whatsapp/export-report*') ? 'active' : '' }}"><i class="bi bi-download"></i> Exportar relatorio</a></li>

@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Jobs\CleanOldLogsJob;
-use App\Jobs\RetryWebhookJob;
-use App\Jobs\SyncEvolutionInstancesJob;
 use App\Jobs\UpdateBillingStatusJob;
 use App\Modules\Gateways\Core\GatewayConfigSchema;
 use App\Modules\Gateways\Core\GatewayFeatureResolver;
@@ -80,26 +78,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('mask', function ($expression) {
             return "<?php echo 'data-mask=\"' . $expression . '\"'; ?>";
         });
-
-        CronManager::register(
-            'whatsapp.evolution.sync',
-            fn () => SyncEvolutionInstancesJob::dispatch(),
-            5,
-            'Sincroniza instancias locais com a Evolution API GO.'
-        );
-
-        CronManager::register(
-            'whatsapp.webhooks.retry',
-            function () {
-                WhatsAppWebhookLog::where('status', 'failed')
-                    ->where('created_at', '>=', now()->subDay())
-                    ->limit(50)
-                    ->pluck('id')
-                    ->each(fn ($id) => RetryWebhookJob::dispatch((int) $id));
-            },
-            10,
-            'Reprocessa webhooks Evolution que falharam.'
-        );
 
         CronManager::register(
             'billing.status.update',

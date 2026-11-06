@@ -3,7 +3,7 @@
 namespace App\Modules\HealthCheck\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -16,19 +16,19 @@ use Illuminate\Support\Facades\Storage;
  *   - database: conexao + tempo de query
  *   - cache: get/set funcionando
  *   - storage: writable
- *   - evolution: API respondendo
+ *   - whatsapp: API oficial da Meta respondendo
  *   - cron: ultimo heartbeat
  *   - disk: espaco em disco
  */
 class HealthController extends Controller
 {
-    public function __invoke(EvolutionClient $evolution): JsonResponse
+    public function __invoke(WhatsAppMetaClient $whatsApp): JsonResponse
     {
         $checks = [
             'database'  => $this->checkDatabase(),
             'cache'     => $this->checkCache(),
             'storage'   => $this->checkStorage(),
-            'evolution' => $this->checkEvolution($evolution),
+            'whatsapp'  => $this->checkWhatsApp($whatsApp),
             'cron'      => $this->checkCron(),
             'disk'      => $this->checkDisk(),
         ];
@@ -79,14 +79,14 @@ class HealthController extends Controller
         }
     }
 
-    protected function checkEvolution(EvolutionClient $client): array
+    protected function checkWhatsApp(WhatsAppMetaClient $client): array
     {
         if (!$client->isConfigured()) {
             return ['ok' => true, 'configured' => false];
         }
         try {
             $status = $client->status();
-            return ['ok' => $status['ok'] ?? false, 'configured' => true];
+            return ['ok' => !empty($status['connected']), 'configured' => true];
         } catch (\Throwable $e) {
             return ['ok' => false, 'error' => $e->getMessage()];
         }

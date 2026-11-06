@@ -48,8 +48,8 @@
         'human_delay_enabled' => ['icon' => 'bi-person-walking', 'when' => 'Simula comportamento humano entre envios automaticos.'],
         'human_delay_min_seconds' => ['icon' => 'bi-stopwatch', 'when' => 'Menor atraso entre mensagens. Evite valores muito baixos.'],
         'human_delay_max_seconds' => ['icon' => 'bi-stopwatch-fill', 'when' => 'Maior atraso entre mensagens para gerar variacao.'],
-        'evolution_delay_min_ms' => ['icon' => 'bi-cpu', 'when' => 'Atraso minimo no client Evolution. Suaviza chamadas proximas.'],
-        'evolution_delay_max_ms' => ['icon' => 'bi-cpu-fill', 'when' => 'Atraso maximo no client Evolution. Reduz previsibilidade.'],
+        'send_delay_min_ms' => ['icon' => 'bi-cpu', 'when' => 'Atraso minimo entre chamadas de API. Suaviza disparos proximos.'],
+        'send_delay_max_ms' => ['icon' => 'bi-cpu-fill', 'when' => 'Atraso maximo entre chamadas de API. Reduz previsibilidade.'],
         'warmup_enabled' => ['icon' => 'bi-thermometer-half', 'when' => 'Use em numero novo ou em recuperacao de reputacao.'],
         'warmup_limit_days_1_3' => ['icon' => 'bi-1-circle', 'when' => 'Limite diario para os primeiros 3 dias.'],
         'warmup_limit_days_4_7' => ['icon' => 'bi-4-circle', 'when' => 'Limite diario intermediario. Aumente gradualmente.'],
@@ -127,13 +127,13 @@
         ],
         [
             'title' => 'Delay e aquecimento',
-            'subtitle' => 'Atrasos humanos, suavizacao da Evolution API e warmup progressivo.',
+            'subtitle' => 'Atrasos humanos, suavizacao de envios e warmup progressivo.',
             'fields' => [
                 ['name' => 'human_delay_enabled', 'label' => 'Delay humano', 'type' => 'select', 'value' => $settings['human_delay_enabled'] ? 1 : 0, 'options' => [1 => 'Ativo', 0 => 'Desligado']],
                 ['name' => 'human_delay_min_seconds', 'label' => 'Minimo em segundos', 'type' => 'number', 'value' => $settings['human_delay_min_seconds']],
                 ['name' => 'human_delay_max_seconds', 'label' => 'Maximo em segundos', 'type' => 'number', 'value' => $settings['human_delay_max_seconds']],
-                ['name' => 'evolution_delay_min_ms', 'label' => 'Evolution minimo ms', 'type' => 'number', 'value' => $settings['evolution_delay_min_ms']],
-                ['name' => 'evolution_delay_max_ms', 'label' => 'Evolution maximo ms', 'type' => 'number', 'value' => $settings['evolution_delay_max_ms']],
+                ['name' => 'send_delay_min_ms', 'label' => 'Delay minimo ms', 'type' => 'number', 'value' => $settings['send_delay_min_ms'] ?? 1500],
+                ['name' => 'send_delay_max_ms', 'label' => 'Delay maximo ms', 'type' => 'number', 'value' => $settings['send_delay_max_ms'] ?? 4500],
                 ['name' => 'warmup_enabled', 'label' => 'Warmup', 'type' => 'select', 'value' => $settings['warmup_enabled'] ? 1 : 0, 'options' => [1 => 'Ativo', 0 => 'Desligado']],
                 ['name' => 'warmup_limit_days_1_3', 'label' => 'Dias 1-3', 'type' => 'number', 'value' => $warmupLimits[3] ?? 30],
                 ['name' => 'warmup_limit_days_4_7', 'label' => 'Dias 4-7', 'type' => 'number', 'value' => $warmupLimits[7] ?? 80],
@@ -465,7 +465,7 @@
                 <div class="empty-state text-center p-4">
                     <i class="bi bi-phone fs-1 text-muted mb-2 d-block"></i>
                     <h6 class="mb-1">Nenhuma instância monitorada</h6>
-                    <p class="text-muted small mb-0">Cadastre uma instância Evolution para habilitar os controles anti-ban.</p>
+                    <p class="text-muted small mb-0">Cadastre uma instância do WhatsApp para habilitar os controles anti-ban.</p>
                 </div>
             @endforelse
             </div>

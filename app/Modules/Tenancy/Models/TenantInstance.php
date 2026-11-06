@@ -47,9 +47,9 @@ class TenantInstance extends Model
 
     public function tenant(): BelongsTo { return $this->belongsTo(Tenant::class); }
 
-    public function getEvolutionBaseUrlAttribute(): string
+    public function getBaseUrlAttribute(): string
     {
-        return rtrim((string) ($this->api_base_url ?: config('whatsapp.base_url')), '/');
+        return rtrim((string) ($this->api_base_url ?: config('whatsapp.meta_base_url')), '/');
     }
 
     public function getWhatsappProfileNameAttribute(): string
@@ -75,11 +75,11 @@ class TenantInstance extends Model
             'token' => $this->webhook_secret,
         ]);
 
-        return url('/webhooks/evolution/messages').'?'.$query;
+        return url('/api/v1/webhook').'?'.$query;
     }
 
     /**
-     * Gera o nome da instancia no servidor Evolution Go.
+     * Gera o identificador da instancia do tenant.
      * Regras: lowercase, sem espacos, sem caracteres especiais, sem maiuscula.
      * Formato: username_cliente_id_slot (ex.: joao_42_1)
      */
@@ -103,7 +103,7 @@ class TenantInstance extends Model
     }
 
     /**
-     * Sanitiza nome para o servidor Evolution Go.
+     * Sanitiza nome da instancia.
      * Remove: espacos, caracteres especiais, letras maiusculas.
      */
     public static function sanitizeName(string $name): string

@@ -6,7 +6,7 @@ use App\Modules\EmailBilling\Services\EmailLayoutRenderer;
 use App\Modules\Settings\Services\SettingsManager;
 use App\Modules\Tenancy\Models\TenantInstance;
 use App\Modules\Tenancy\Services\InstanceManager;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -323,9 +323,9 @@ class NotificationDispatcher
             return;
         }
 
-        $evolution = app(EvolutionClient::class);
-        if ($evolution->isConfigured()) {
-            $evolution->sendText($phone, $message, array_merge($context, $inspection));
+        $whatsApp = app(WhatsAppMetaClient::class);
+        if ($whatsApp->isConfigured()) {
+            $whatsApp->sendText($phone, $message, array_merge($context, $inspection));
         }
     }
 

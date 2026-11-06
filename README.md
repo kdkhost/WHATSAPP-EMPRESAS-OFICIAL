@@ -220,7 +220,7 @@ Documentação complementar:
 
 - Cobranças e recorrência
 - CRM administrativo
-- WhatsApp e Evolution API
+- WhatsApp Cloud API Oficial da Meta (Graph API v21.0)
 - Integração e Hospedagem aaPanel (Websites, PHP-FPM, Bancos de Dados, Backups e Arquivos)
 - API pública
 - Tenancy e planos: gestão de planos SaaS, limites por plano, login supervisionado de tenants, página de detalhes do tenant (/admin/tenancy/tenants/{id}) reformulada em abas premium com KPIs em tempo real, instâncias WhatsApp com indicador luminoso, régua de cobrança, histórico de faturas e módulo integrado de afiliados.
@@ -255,53 +255,48 @@ Cada tenant pode operar com configuração própria, ambiente sandbox/produção
 - envio manual rápido no painel operacional com seleção de cliente, templates dinâmicos, interpolação de variáveis, edição direta de destinatário/mensagem e preview em tempo real com SweetAlert2 e Toast
 - dashboard operacional anti-ban com métricas em tempo real
 
-### Evolution API Go v3.0
+### Meta WhatsApp Cloud API Oficial (Graph API v21.0)
 
-O sistema integra com a **Evolution API Go v3.0** para comunicação com o WhatsApp.
+O sistema opera **exclusivamente com a API Oficial da Meta** (Cloud API Graph API v21.0) para toda a mensageria e automação do WhatsApp, garantindo conformidade total, entrega garantida e zero risco de bloqueio.
 
 **Configuração no `.env`:**
 
 ```bash
-# URL base do servidor Evolution API Go
-EVOLUTION_BASE_URL=https://evolution.seuservidor.com
-
-# Chave global para operacoes administrativas (criar/deletar instancias, listar todas)
-EVOLUTION_GLOBAL_API_KEY=sua_chave_global_aqui
-
-# Token secreto para validacao de webhooks
-EVOLUTION_WEBHOOK_TOKEN=seu_token_webhook
+# Meta WhatsApp Cloud API Oficial (Graph API v21.0)
+META_GRAPH_VERSION=v21.0
+META_PHONE_NUMBER_ID=seu_phone_number_id_aqui
+META_WABA_ID=seu_waba_id_aqui
+META_ACCESS_TOKEN=seu_system_user_token_permanente_aqui
+META_APP_SECRET=seu_app_secret_aqui
+META_WEBHOOK_VERIFY_TOKEN=seu_verify_token_aqui
 ```
 
-**Autenticação:**
-- Operações administrativas (`globalApikey`): criar/deletar instâncias, listar todas, proxy, logs, force reconnect
-- Operações de instância (`apikey`): conectar, desconectar, enviar mensagens, grupos, usuários
+**Principais Recursos da API Oficial da Meta:**
+- **Webhooks Oficiais com Handshake:** Verificação de token no GET (`hub.challenge`) e assinatura criptográfica HMAC-SHA256 no POST (`x-hub-signature-256`).
+- **Janela de 24 Horas:** Envio livre de sessão dentro de 24h e disparo automático via templates oficiais homologados fora da janela.
+- **Templates de Cobrança com Pix e Link:** Envio aprovado com parâmetros dinâmicos de nome, fatura, vencimento, valor e código Pix Copia e Cola.
+- **Disparo de Mídias e Documentos:** Envio oficial de imagens, áudios e PDFs de faturas/contratos.
+- **Sem Risco de Banimento:** Comunicação autorizada pela Meta com monitoramento de qualidade da linha (Quality Rating GREEN).
 
-**Endpoint compatíveis (v3.0):**
+---
 
-- `POST /instance/create` — Criar instância com `advancedSettings`
-- `POST /instance/connect` — Conectar (QR Code)
-- `GET /instance/status` — Status da conexão
-- `POST /send/text` — Enviar texto (com delay, quoted, mentions)
-- `POST /send/link` — Enviar link com preview
-- `POST /send/media` — Enviar mídia (type/url/filename)
-- `POST /send/button` — Botões reply, URL, call, copy
-- `POST /send/list` — Lista interativa (footerText)
-- `POST /send/poll` — Enquete (question/options)
-- `POST /send/contact` — Contato (vcard)
-- `POST /user/check` — Verificar número
-- `POST /user/info` — Informações do usuário
-- `POST /webhook/set/{instance}` — Configurar webhook (fallback compatível)
+## 🗄️ Estratégia de Banco de Dados: Local vs Remoto
 
-**Anti-ban:** Delay aleatório entre mensagens, limites por minuto/hora/dia, warmup progressivo, quarentena automática em erros 401/403/429.
-
-**Segurança:** Webhook com HMAC signature, timestamp anti-replay, token validation, logs sanitizados sem expor apikeys.
-
-Mais detalhes em:
-
-- [docs/EVOLUTION_GO_V3_AUDITORIA.md](docs/EVOLUTION_GO_V3_AUDITORIA.md)
-- [docs/EVOLUTION_GO_V3_TESTES.md](docs/EVOLUTION_GO_V3_TESTES.md)
-- [docs/WHATSAPP_ANTI_BAN_GUIDE.md](docs/WHATSAPP_ANTI_BAN_GUIDE.md)
-- [docs/evolution-go-webhook.md](docs/evolution-go-webhook.md)
+- **Ambiente Local (Desenvolvimento):**
+  - Utiliza **SQLite** (`DB_CONNECTION=sqlite`, `DB_DATABASE=database/database.sqlite`).
+  - Permite rodar rapidamente em máquina local sem necessidade de servidor de banco de dados instalado.
+- **Ambiente Remoto (Servidor de Produção):**
+  - O uso de SQLite é **estritamente proibido** em produção (protegido por trava arquitetural no `config/database.php`).
+  - Em servidores remotos (cPanel, VPS, Ubuntu, Docker, aaPanel), utilize **obrigatoriamente MySQL 8.0+ ou MariaDB 10.6+**:
+    ```bash
+    APP_ENV=production
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=nome_do_banco_producao
+    DB_USERNAME=usuario_mysql
+    DB_PASSWORD=senha_forte_mysql
+    ```
 
 ## Tema e UI
 

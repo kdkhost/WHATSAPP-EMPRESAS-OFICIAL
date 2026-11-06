@@ -32,7 +32,7 @@ conn.on('ready', () => {
     'cd ~/public_html',
     'echo "=== VERIFICANDO SE O CODIGO CHEGOU ==="',
     'grep -q "kdkhost-whatsapp-pwa-v2" app/Modules/Pwa/Http/Controllers/PwaController.php && echo "[OK] Service Worker atualizado" || echo "[ERRO] Service Worker NAO atualizado"',
-    'grep -q "rawurlencode" app/Modules/WhatsApp/Services/EvolutionClient.php && echo "[OK] EvolutionClient atualizado" || echo "[ERRO] EvolutionClient NAO atualizado"',
+    'grep -q "WhatsAppMetaClient" app/Modules/WhatsApp/Services/WhatsAppMetaClient.php && echo "[OK] WhatsAppMetaClient atualizado" || echo "[ERRO] WhatsAppMetaClient NAO atualizado"',
     'echo ""',
     'echo "=== LIMPANDO TODOS OS CACHES ==="',
     PHP + ' artisan optimize:clear',

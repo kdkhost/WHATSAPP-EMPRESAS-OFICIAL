@@ -17,7 +17,6 @@ class WebhookSignatureVerifier
         $providedToken = (string) ($request->bearerToken()
             ?: $request->query('token')
             ?: $request->header('X-Webhook-Token')
-            ?: $request->header('X-Evolution-Token')
             ?: $request->header('apikey'));
 
         if ($expectedToken !== '') {
@@ -40,7 +39,7 @@ class WebhookSignatureVerifier
             }
         }
 
-        $signature = (string) ($request->header('X-Webhook-Signature') ?: $request->header('X-Evolution-Signature') ?: '');
+        $signature = (string) ($request->header('X-Webhook-Signature') ?: $request->header('X-Hub-Signature-256') ?: '');
         if ($signature === '') {
             return $signatureRequired
                 ? ['ok' => false, 'message' => 'webhook_signature_missing']

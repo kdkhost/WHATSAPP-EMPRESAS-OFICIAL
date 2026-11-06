@@ -7,7 +7,7 @@ use App\Models\WhatsAppReputationScore;
 use App\Modules\Tenancy\Models\Plan;
 use App\Modules\Tenancy\Models\Tenant;
 use App\Modules\Tenancy\Models\TenantInstance;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
 use Illuminate\Support\Facades\Http;
 
@@ -49,7 +49,7 @@ function antibanTenant(): array
         'instance_name' => 'tenant_antiban_'.$tenant->id,
         'display_name' => 'AntiBan',
         'status' => 'connected',
-        'api_base_url' => 'https://evo.test',
+        'api_base_url' => 'https://graph.facebook.com/v21.0',
         'api_key' => 'tenant-token',
         'webhook_secret' => 'secret-token',
     ]);
@@ -228,7 +228,7 @@ it('nao bloqueia destinatarios diferentes pelo cooldown de campanha', function (
         ->and($otherRecipient['allowed'])->toBeTrue();
 });
 
-it('aplica camada anti ban tambem em envios de video pelo client evolution', function () {
+it('aplica camada anti ban tambem em envios de video pelo client whatsapp meta', function () {
     [$tenant, $instance] = antibanTenant();
 
     config()->set('whatsapp_anti_ban.business_hours.enabled', false);
@@ -237,11 +237,14 @@ it('aplica camada anti ban tambem em envios de video pelo client evolution', fun
     config()->set('whatsapp_anti_ban.cooldowns.message_minutes', 0);
     config()->set('whatsapp_anti_ban.cooldowns.media_minutes', 0);
 
+    config()->set('whatsapp.meta_access_token', 'test-token');
+    config()->set('whatsapp.meta_phone_number_id', '123456789');
+
     Http::fake([
-        'https://evo.test/send/media' => Http::response(['key' => ['id' => 'video-1']], 201),
+        'https://graph.facebook.com/*' => Http::response(['messages' => [['id' => 'video-1']]], 200),
     ]);
 
-    $client = new EvolutionClient('https://evo.test', 'api-key', $instance->instance_name, 5);
+    $client = new WhatsAppMetaClient('', '', $instance->instance_name, 5);
     $id = $client->sendVideo('5511999997777', 'https://cdn.example.com/video.mp4', 'Video de teste', [
         'tenant_id' => $tenant->id,
         'tenant_instance_id' => $instance->id,
@@ -252,13 +255,13 @@ it('aplica camada anti ban tambem em envios de video pelo client evolution', fun
         ->and(WhatsAppMessage::where('tenant_instance_id', $instance->id)->where('media_type', 'video')->where('status', 'sent')->exists())->toBeTrue();
 
     Http::assertSent(fn ($request) =>
-        str_contains((string) $request->url(), '/send/media')
+        str_contains((string) $request->url(), 'graph.facebook.com')
         && data_get($request->data(), 'type') === 'video'
-        && data_get($request->data(), 'delay') >= 0
+        && data_get($request->data(), 'video.link') === 'https://cdn.example.com/video.mp4'
     );
 });
 
-it('bloqueia envio direto do evolution client quando tenant tem opt out', function () {
+it('bloqueia envio direto do whatsapp meta client quando tenant tem opt out', function () {
     [$tenant] = antibanTenant();
 
     config()->set('whatsapp_anti_ban.business_hours.enabled', false);
@@ -275,7 +278,7 @@ it('bloqueia envio direto do evolution client quando tenant tem opt out', functi
 
     Http::fake();
 
-    $client = new EvolutionClient('https://evo.test', 'api-key', 'global', 5);
+    $client = new WhatsAppMetaClient('', '', 'global', 5);
 
     expect(fn () => $client->sendText('5511999991111', 'Mensagem bloqueada', [
         'tenant_id' => $tenant->id,

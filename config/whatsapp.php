@@ -25,16 +25,9 @@ return [
     // URL base oficial da Meta Graph API
     'meta_base_url'             => 'https://graph.facebook.com/' . env('META_GRAPH_VERSION', env('GRAPH_VERSION', 'v21.0')),
 
-    // Configurações legadas mantidas como fallback seguro
-    'base_url'                  => rtrim((string) env('EVOLUTION_BASE_URL', env('WHATSAPP_EVOLUTION_BASE_URL', '')), '/'),
-    'global_api_key'            => env('EVOLUTION_GLOBAL_API_KEY', env('EVOLUTION_GLOBAL_APIKEY', '')),
-    'global_apikey'             => env('EVOLUTION_GLOBAL_APIKEY', env('EVOLUTION_GLOBAL_API_KEY', '')),
-    'instance_api_key'          => env('EVOLUTION_INSTANCE_API_KEY', ''),
-    'apikey'                    => env('EVOLUTION_INSTANCE_API_KEY', env('EVOLUTION_API_KEY', '')),
-    'api_key'                   => env('EVOLUTION_API_KEY', ''),
-    'instance'                  => env('EVOLUTION_INSTANCE', env('WHATSAPP_INSTANCE', 'meta_official')),
+    'instance'                  => env('WHATSAPP_INSTANCE', 'meta_official'),
     'timeout'                   => (int) env('WHATSAPP_TIMEOUT', 30),
-    'webhook_token'             => env('META_WEBHOOK_VERIFY_TOKEN', env('EVOLUTION_WEBHOOK_TOKEN', 'kdkhost_meta_webhook_secret_2026')),
+    'webhook_token'             => env('META_WEBHOOK_VERIFY_TOKEN', 'kdkhost_meta_webhook_secret_2026'),
     'version'                   => 'v21.0',
 
     // Política de retry para envios falhados

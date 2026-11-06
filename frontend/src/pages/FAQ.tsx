@@ -16,7 +16,7 @@ export default function FAQ() {
         { q: 'Como funciona a cobranca?', a: 'A cobranca e mensal ou anual conforme o ciclo escolhido. Aceitamos PIX, boleto e cartao de credito.' },
         { q: 'Tem fidelidade?', a: 'Nao. Voce pode cancelar a qualquer momento sem multa pelo proprio painel.' },
         { q: 'Os dados sao seguros?', a: 'Sim. Usamos criptografia de ponta, WAF proprio com bloqueio de bots e backups diarios automaticos.' },
-        { q: 'Posso usar minha API do WhatsApp?', a: 'Sim. Suportamos Evolution API Go. Voce conecta sua propria instancia rapidamente no painel de integracoes.' },
+        { q: 'Posso usar minha API do WhatsApp?', a: 'Sim. Suportamos a API Oficial da Meta (WhatsApp Cloud API v21.0). Você conecta sua conta oficial diretamente no painel de configurações.' },
         { q: 'Voces cobram taxa por transacao?', a: 'Nao. O sistema e uma plataforma SaaS. Se voce usa um gateway, paga apenas a taxa dele. Nos cobramos a mensalidade do software.' },
     ];
 

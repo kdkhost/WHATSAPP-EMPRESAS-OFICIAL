@@ -460,7 +460,7 @@
         <form class="row g-3 wa-messages-filter" method="GET" action="{{ url('/admin/whatsapp/messages') }}">
             <div class="col-12 col-md-4 col-xl-3">
                 <label class="form-label small fw-bold">Buscar</label>
-                <input type="search" name="q" class="form-control" placeholder="Número, texto ou Evolution ID" value="{{ request('q') }}">
+                <input type="search" name="q" class="form-control" placeholder="Número, texto ou ID Meta (WAMID)" value="{{ request('q') }}">
             </div>
             <div class="col-6 col-md-2 col-xl-2">
                 <label class="form-label small fw-bold">Status</label>
@@ -559,8 +559,8 @@
                                     </div>
                                     <div>
                                         <div class="fw-semibold text-body font-monospace">{{ $formattedPhone }}</div>
-                                        <div class="small text-muted font-monospace" style="font-size: .75rem;" title="{{ $msg->evolution_id }}">
-                                            {{ $msg->evolution_id ? \Illuminate\Support\Str::limit($msg->evolution_id, 18) : 'Sem Evolution ID' }}
+                                        <div class="small text-muted font-monospace" style="font-size: .75rem;" title="{{ $msg->meta_message_id ?? $msg->external_id }}">
+                                            {{ ($msg->meta_message_id ?? $msg->external_id) ? \Illuminate\Support\Str::limit($msg->meta_message_id ?? $msg->external_id, 18) : 'Sem ID' }}
                                         </div>
                                     </div>
                                 </div>
@@ -590,7 +590,7 @@
                                         data-id="{{ $msg->id }}"
                                         data-to="{{ $formattedPhone }}"
                                         data-status="{{ $msg->status }}"
-                                        data-evo-id="{{ $msg->evolution_id ?? '' }}"
+                                        data-meta-id="{{ $msg->meta_message_id ?? $msg->external_id ?? '' }}"
                                         data-date="{{ \Carbon\Carbon::parse($msg->created_at)->format('d/m/Y H:i') }}"
                                         data-time="{{ \Carbon\Carbon::parse($msg->created_at)->format('H:i') }}"
                                         data-content="{{ base64_encode($msg->message ?? '') }}"
@@ -762,8 +762,8 @@
                                     <td id="det-to" class="font-monospace"></td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted fw-bold bg-body-tertiary">Evolution ID</td>
-                                    <td id="det-evo-id" class="font-monospace small"></td>
+                                    <td class="text-muted fw-bold bg-body-tertiary">Meta Message ID (WAMID)</td>
+                                    <td id="det-meta-id" class="font-monospace small"></td>
                                 </tr>
                                 <tr>
                                     <td class="text-muted fw-bold bg-body-tertiary">Status</td>
@@ -987,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const id = btn.dataset.id;
         const to = btn.dataset.to || '-';
         const status = btn.dataset.status || 'sent';
-        const evoId = btn.dataset.evoId || '-';
+        const metaId = btn.dataset.metaId || btn.dataset.evoId || '-';
         const date = btn.dataset.date || '-';
         const time = btn.dataset.time || '12:00';
         const content = decodeBase64Utf8(btn.dataset.content || '');
@@ -1024,7 +1024,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Preenche a aba técnica
         document.getElementById('det-id').textContent = `#${id}`;
         document.getElementById('det-to').textContent = to;
-        document.getElementById('det-evo-id').textContent = evoId || 'Não registrado';
+        document.getElementById('det-meta-id').textContent = metaId || 'Não registrado';
         document.getElementById('det-status').innerHTML = `<span class="badge bg-secondary-subtle text-body border text-uppercase">${status}</span>`;
         document.getElementById('det-date').textContent = date;
 

@@ -36,9 +36,9 @@ return [
             'driver'  => 'monolog',
             'handler' => NullHandler::class,
         ],
-        'evolution' => [
+        'whatsapp' => [
             'driver' => 'daily',
-            'path'   => storage_path('logs/evolution.log'),
+            'path'   => storage_path('logs/whatsapp.log'),
             'level'  => env('LOG_LEVEL', 'debug'),
             'days'   => 30,
         ],

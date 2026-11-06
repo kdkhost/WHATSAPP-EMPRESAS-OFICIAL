@@ -24,6 +24,9 @@ return new class extends Migration
             if (!Schema::hasColumn('customers', 'whatsapp_optin')) {
                 $table->boolean('whatsapp_optin')->default(true)->index()->after('whatsapp');
             }
+            if (!Schema::hasColumn('customers', 'last_interaction_at')) {
+                $table->timestamp('last_interaction_at')->nullable()->after('whatsapp_optin');
+            }
         });
     }
 

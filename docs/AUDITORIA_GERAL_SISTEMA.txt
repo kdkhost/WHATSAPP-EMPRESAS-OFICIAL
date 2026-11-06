@@ -3,10 +3,10 @@
 ## Pontos positivos
 1. Arquitetura modular por Service Providers.
 2. Middlewares de seguranca registrados.
-3. Evolution API Go com separacao de chave global e chave da instancia.
+3. WhatsApp Cloud API Oficial da Meta (Graph API v21.0).
 4. Feature flags para endpoints experimentais.
 5. PWA, Billing, Contracts, WebhookMonitor, HealthCheck e Backup existentes.
-6. Diagnostico Evolution via Artisan.
+6. Diagnostico Meta Cloud API via Artisan (whatsapp:meta-diagnose).
 7. Upload multipart com validacao de MIME/tamanho.
 8. Sanitizacao rich-text para contratos/templates.
 
@@ -29,7 +29,7 @@
 - `resources/views/layouts/pwa-public.blade.php`
 - `resources/views/frontend/home.blade.php`
 - `app/Modules/Pwa/Http/Controllers/PwaController.php`
-- `app/Modules/WhatsApp/Services/EvolutionClient.php`
+- `app/Modules/WhatsApp/Services/WhatsAppMetaClient.php`
 - `app/Http/Middleware/SanitizeInput.php`
 - `app/Modules/Contracts/Resources/views/admin/create.blade.php`
 - `config/whatsapp.php`
@@ -39,14 +39,14 @@
 - `php -l routes/web.php`
 - `php artisan optimize:clear`
 - `php artisan route:list`
-- `php artisan whatsapp:evolution-diagnose`
+- `php artisan whatsapp:meta-diagnose`
 
 ## Feature requests pendentes
 1. **Tenant editar seus proprios pacotes/planos**: Hoje o tenant usa planos definidos pelo superadmin. Criar CRUD de planos/pacotes no painel do tenant para que ele possa vender seus proprios planos aos clientes dele, sem afetar planos globais do admin.
 2. **Arrastar faturas no calendario**: Permitir drag-and-drop de faturas no calendario do Billing para alterar vencimento rapidamente.
 
 ## Pendencias tecnicas
-1. Criar testes Pest para PWA, contratos, Evolution e Billing.
+1. Criar testes Pest para PWA, contratos, WhatsApp Meta e Billing.
 2. Refatorar closures complexas de rotas para controllers.
-3. Separar EvolutionClient em servicos menores.
+3. Arquitetura Meta Cloud API Oficial v21.0 consolidada.
 4. Validar endpoints nativos /send/pix, /send/link e /send/sticker em producao antes de ativar flags.

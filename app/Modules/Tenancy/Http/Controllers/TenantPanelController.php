@@ -755,7 +755,7 @@ class TenantPanelController extends Controller
                 'applied' => (bool) ($result['ok'] ?? true),
                 'message' => ($result['ok'] ?? true)
                     ? 'Configuracao salva e aplicada.'
-                    : 'Configuracao salva, mas a Evolution retornou alerta.',
+                    : 'Configuracao salva, mas a API retornou alerta.',
                 'webhook_url' => $result['webhook_url'] ?? $instance->secure_webhook_url,
                 'event_producers' => $result['event_producers'] ?? data_get($instance->meta ?? [], 'evolution_event_producers', []),
                 'instance' => $this->instancePayload($instance),
@@ -3528,7 +3528,8 @@ class TenantPanelController extends Controller
             return response()->json([
                 'ok' => true,
                 'message' => 'Mensagem enviada com sucesso!',
-                'evolution_id' => $id,
+                'message_id' => $id,
+                'meta_message_id' => $id,
                 'to' => $cleanTo,
             ]);
         } catch (\Throwable $e) {

@@ -36,7 +36,7 @@ class SystemAuditFullCommand extends Command
         $performanceReport = $this->buildPerformanceReport($codeAudit);
         $databaseReport = $this->buildDatabaseReport($codeAudit);
         $pwaReport = $this->buildPwaReport($codeAudit);
-        $evolutionReport = $this->buildEvolutionReport($codeAudit);
+        $whatsappMetaReport = $this->buildWhatsAppMetaReport($codeAudit);
         $multiTenantReport = $this->buildMultiTenantReport($codeAudit);
         $addonsReport = $this->buildAddonsReport($codeAudit);
 
@@ -45,7 +45,7 @@ class SystemAuditFullCommand extends Command
         File::put($reportDir.'/PERFORMANCE_REPORT.md', $performanceReport);
         File::put($reportDir.'/DATABASE_REPORT.md', $databaseReport);
         File::put($reportDir.'/PWA_REPORT.md', $pwaReport);
-        File::put($reportDir.'/EVOLUTION_REPORT.md', $evolutionReport);
+        File::put($reportDir.'/WHATSAPP_META_REPORT.md', $whatsappMetaReport);
         File::put($reportDir.'/MULTITENANT_REPORT.md', $multiTenantReport);
         File::put($reportDir.'/ADDONS_REPORT.md', $addonsReport);
 
@@ -157,13 +157,10 @@ class SystemAuditFullCommand extends Command
                 'cache_exclusions_login' => str_contains($pwaSwContent, '/login'),
                 'cache_exclusions_api' => str_contains($pwaSwContent, '/api'),
             ],
-            'evolution' => [
-                'client_exists' => File::exists(app_path('Modules/WhatsApp/Services/EvolutionClient.php'))
-                    || File::exists(app_path('Services/EvolutionApiService.php'))
-                    || File::exists(app_path('Services/EvolutionGoWebhookService.php')),
-                'webhook_controller_exists' => File::exists(app_path('Http/Controllers/WebhookController.php'))
-                    || File::exists(app_path('Modules/WhatsApp/Http/Controllers/WebhookController.php'))
-                    || File::exists(app_path('Http/Controllers/Api/EvolutionGoWebhookController.php')),
+            'whatsapp_meta' => [
+                'client_exists' => File::exists(app_path('Modules/WhatsApp/Services/WhatsAppMetaClient.php'))
+                    || File::exists(app_path('Modules/WhatsApp/Services/MetaCloudApiClient.php')),
+                'webhook_controller_exists' => File::exists(app_path('Modules/WhatsApp/Http/Controllers/MetaWebhookController.php')),
             ],
             'addons' => [
                 'installer_service_exists' => File::exists(app_path('Modules/Marketplace/Services/AddonInstallerService.php'))
@@ -331,11 +328,11 @@ class SystemAuditFullCommand extends Command
         ]);
     }
 
-    protected function buildEvolutionReport(array $audit): string
+    protected function buildWhatsAppMetaReport(array $audit): string
     {
-        return $this->simpleSectionReport('EVOLUTION_REPORT', [
-            'EvolutionClient presente: '.($audit['evolution']['client_exists'] ? 'sim' : 'nao'),
-            'Webhook Controller presente: '.($audit['evolution']['webhook_controller_exists'] ? 'sim' : 'nao'),
+        return $this->simpleSectionReport('WHATSAPP_META_REPORT', [
+            'WhatsAppMetaClient / MetaCloudApiClient presente: '.($audit['whatsapp_meta']['client_exists'] ? 'sim' : 'nao'),
+            'Meta Webhook Controller presente: '.($audit['whatsapp_meta']['webhook_controller_exists'] ? 'sim' : 'nao'),
         ]);
     }
 

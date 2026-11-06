@@ -10,7 +10,7 @@ use App\Modules\EmailBilling\Services\SmtpMailer;
 use App\Modules\Tenancy\Models\Tenant;
 use App\Modules\Tenancy\Models\TenantInstance;
 use App\Modules\Tenancy\Services\InstanceManager;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
 use App\Support\Format;
 use Illuminate\Support\Carbon;
@@ -21,7 +21,7 @@ class ContractService
 {
     public function __construct(
         protected ContractTemplateCatalog $catalog,
-        protected ?EvolutionClient $evolution = null,
+        protected ?WhatsAppMetaClient $whatsAppClient = null,
         protected ?SmtpMailer $mailer = null,
         protected ?InstanceManager $instances = null,
         protected ?WhatsAppSafetyService $safety = null,
@@ -311,15 +311,15 @@ class ContractService
                     }
                 }
 
-                // 2. Fallback: Caso não haja TenantInstance conectado, tenta Evolution global se configurado
-                if (! $id && $this->evolution && $this->evolution->isConfigured()) {
+                // 2. Fallback: Caso não haja TenantInstance conectado, tenta WhatsAppMetaClient global se configurado
+                if (! $id && $this->whatsAppClient && $this->whatsAppClient->isConfigured()) {
                     $sendContext = $pdfPath ? array_merge($context, ['media_type' => 'document']) : $context;
                     $inspection = ($this->safety ??= app(WhatsAppSafetyService::class))->inspect(null, $recipientPhone, $message, $sendContext);
 
                     if ($inspection['allowed']) {
                         if ($pdfPath && Storage::disk('local')->exists($pdfPath)) {
                             try {
-                                $id = $this->evolution->sendDocument(
+                                $id = $this->whatsAppClient->sendDocument(
                                     $recipientPhone,
                                     Storage::disk('local')->path($pdfPath),
                                     "contrato-{$contract->number}.pdf",
@@ -327,12 +327,12 @@ class ContractService
                                     array_merge($sendContext, $inspection)
                                 );
                             } catch (\Throwable $docErr2) {
-                                Log::warning('[Contract] Falha no envio do PDF via evolution global, enviando texto: ' . $docErr2->getMessage());
+                                Log::warning('[Contract] Falha no envio do PDF via WhatsAppMetaClient global, enviando texto: ' . $docErr2->getMessage());
                             }
                         }
 
                         if (! $id) {
-                            $id = $this->evolution->sendText($recipientPhone, $message, array_merge($sendContext, $inspection));
+                            $id = $this->whatsAppClient->sendText($recipientPhone, $message, array_merge($sendContext, $inspection));
                         }
                     } else {
                         $this->safety->recordOutcome($inspection, [
@@ -442,11 +442,11 @@ class ContractService
                         }
                     }
 
-                    // B) Fallback via Evolution global
-                    if (! $provMsgId && $this->evolution && $this->evolution->isConfigured()) {
+                    // B) Fallback via WhatsAppMetaClient global
+                    if (! $provMsgId && $this->whatsAppClient && $this->whatsAppClient->isConfigured()) {
                         if ($pdfPath && Storage::disk('local')->exists($pdfPath)) {
                             try {
-                                $provMsgId = $this->evolution->sendDocument(
+                                $provMsgId = $this->whatsAppClient->sendDocument(
                                     $cleanProviderPhone,
                                     Storage::disk('local')->path($pdfPath),
                                     "contrato-{$contract->number}-assinado.pdf",
@@ -454,12 +454,12 @@ class ContractService
                                     $provContext
                                 );
                             } catch (\Throwable $pErr2) {
-                                Log::warning('[Contract] Falha no envio de PDF para fornecedor via evolution global: ' . $pErr2->getMessage());
+                                Log::warning('[Contract] Falha no envio de PDF para fornecedor via WhatsAppMetaClient global: ' . $pErr2->getMessage());
                             }
                         }
 
                         if (! $provMsgId) {
-                            $provMsgId = $this->evolution->sendText($cleanProviderPhone, $providerMsg, $provContext);
+                            $provMsgId = $this->whatsAppClient->sendText($cleanProviderPhone, $providerMsg, $provContext);
                         }
                     }
 
@@ -577,7 +577,7 @@ class ContractService
                 ));
             }
 
-            if (! $this->evolution || ! $this->evolution->isConfigured()) {
+            if (! $this->whatsAppClient || ! $this->whatsAppClient->isConfigured()) {
                 return false;
             }
 
@@ -592,7 +592,7 @@ class ContractService
                 return false;
             }
 
-            return (bool) $this->evolution->sendText(
+            return (bool) $this->whatsAppClient->sendText(
                 $recipientPhone,
                 $message,
                 array_merge($context, $inspection)

@@ -39,9 +39,9 @@ return [
         'min_seconds' => (int) env('WHATSAPP_HUMAN_DELAY_MIN_SECONDS', 12),
         'max_seconds' => (int) env('WHATSAPP_HUMAN_DELAY_MAX_SECONDS', 32),
     ],
-    'evolution_delay_ms' => [
-        'min' => (int) env('WHATSAPP_EVOLUTION_DELAY_MIN_MS', 1500),
-        'max' => (int) env('WHATSAPP_EVOLUTION_DELAY_MAX_MS', 4500),
+    'send_delay_ms' => [
+        'min' => (int) env('WHATSAPP_SEND_DELAY_MIN_MS', 1500),
+        'max' => (int) env('WHATSAPP_SEND_DELAY_MAX_MS', 4500),
     ],
     'release_when_limited_seconds' => (int) env('WHATSAPP_RELEASE_WHEN_LIMITED_SECONDS', 300),
     'cooldowns' => [

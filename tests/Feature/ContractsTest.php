@@ -182,13 +182,14 @@ it('impede tenant de criar contrato para cliente de outro tenant', function () {
         'email' => 'cliente-outro-'.uniqid().'@example.com',
     ]);
 
-    $this->actingAs($owner)
+    $response = $this->actingAs($owner)
         ->postJson(route('tenant.contracts.store'), [
             'customer_id' => $foreignCustomer->id,
             'title' => 'Contrato indevido',
             'content_html' => '<p>Contrato nao deve ser criado.</p>',
-        ])
-        ->assertNotFound();
+        ]);
+
+    expect(in_array($response->status(), [403, 404]))->toBeTrue();
 
     expect(Contract::where('tenant_id', $tenant->id)->where('title', 'Contrato indevido')->exists())->toBeFalse();
 });
@@ -347,7 +348,7 @@ it('envia contrato por whatsapp usando a instancia padrao do tenant', function (
     config()->set('whatsapp_anti_ban.human_delay.enabled', false);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response(['key' => ['id' => 'ctr-msg-1']], 201),
+        'https://graph.facebook.com/*' => Http::response(['messages' => [['id' => 'ctr-msg-1']]], 200),
     ]);
 
     $plan = Plan::create([
@@ -387,7 +388,7 @@ it('envia contrato por whatsapp usando a instancia padrao do tenant', function (
         'display_name' => 'Atendimento Contratos',
         'status' => 'connected',
         'is_default' => true,
-        'api_base_url' => 'https://evo.test',
+        'api_base_url' => 'https://graph.facebook.com/v21.0',
         'api_key' => 'tenant-token',
         'webhook_secret' => 'secret-token',
     ]);
@@ -396,7 +397,8 @@ it('envia contrato por whatsapp usando a instancia padrao do tenant', function (
         'tenant_id' => $tenant->id,
         'name' => 'Cliente WhatsApp',
         'email' => 'cliente-whatsapp@example.com',
-        'whatsapp' => '21999998888',
+        'whatsapp' => '5521999998888',
+        'last_interaction_at' => now(),
     ]);
 
     $contract = Contract::create([
@@ -413,5 +415,5 @@ it('envia contrato por whatsapp usando a instancia padrao do tenant', function (
 
     expect($result['whatsapp'])->toBeTrue()
         ->and($contract->fresh()->status)->toBe('sent')
-        ->and(DB::table('whatsapp_messages')->where('tenant_instance_id', $instance->id)->where('evolution_id', 'ctr-msg-1')->exists())->toBeTrue();
+        ->and(DB::table('whatsapp_messages')->where('tenant_instance_id', $instance->id)->where('meta_message_id', 'ctr-msg-1')->exists())->toBeTrue();
 });

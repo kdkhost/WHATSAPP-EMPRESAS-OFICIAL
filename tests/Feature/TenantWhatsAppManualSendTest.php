@@ -179,11 +179,11 @@ it('renderiza template para o cliente do tenant via endpoint render-template', f
 it('envia mensagem manual pelo tenant utilizando a instancia conectada do tenant', function () {
     [$user, $tenant, $instance] = createTenantForManualSend();
 
-    // Mock do InstanceManager para não fazer requisições HTTP reais para Evolution
+    // Mock do InstanceManager para não fazer requisições HTTP reais
     $mock = Mockery::mock(InstanceManager::class);
     $mock->shouldReceive('sendText')
         ->twice()
-        ->andReturn('EVOLUTION_MANUAL_123');
+        ->andReturn('META_MANUAL_123');
     app()->instance(InstanceManager::class, $mock);
 
     $template = WhatsAppTemplate::create([
@@ -204,7 +204,7 @@ it('envia mensagem manual pelo tenant utilizando a instancia conectada do tenant
 
     $response->assertOk();
     $response->assertJsonPath('ok', true);
-    $response->assertJsonPath('evolution_id', 'EVOLUTION_MANUAL_123');
+    $response->assertJsonPath('message_id', 'META_MANUAL_123');
 
     // Segundo envio manual consecutivo para o mesmo destinatário: NÃO deve ser bloqueado por campaign_cooldown_active
     $secondResponse = $this->actingAs($user)
@@ -327,7 +327,7 @@ it('envia notificacao de cancelamento de assinatura de pacote pelo gestor', func
             Mockery::on(fn ($msg) => str_contains($msg, 'cancelada') && str_contains($msg, 'Pacote Mensal Cancel')),
             Mockery::any()
         )
-        ->andReturn('EVOLUTION_CANCEL_123');
+        ->andReturn('META_CANCEL_123');
 
     app()->instance(InstanceManager::class, $mockMgr);
 
@@ -381,7 +381,7 @@ it('confirma pagamento de fatura, cancela dispatches e dispara WhatsApp de confi
             Mockery::on(fn ($msg) => str_contains($msg, 'confirmação do seu pagamento') || str_contains($msg, 'INV-TEST-99')),
             Mockery::any()
         )
-        ->andReturn('EVOLUTION_PAID_123');
+        ->andReturn('META_PAID_123');
 
     app()->instance(InstanceManager::class, $mockMgr);
 

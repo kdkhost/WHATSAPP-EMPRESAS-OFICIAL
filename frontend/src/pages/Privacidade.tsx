@@ -49,7 +49,7 @@ export default function Privacidade() {
                         <ul className="list-disc pl-6 space-y-2 text-slate-400 font-medium">
                             <li><strong>Dados Cadastrais:</strong> Nome, CPF/CNPJ, Razão Social, e-mail, telefone e endereço.</li>
                             <li><strong>Dados Financeiros:</strong> Chaves PIX, credenciais encriptadas de gateways integrados por você, faturas geradas e histórico de transações.</li>
-                            <li><strong>Dados de Integração:</strong> Credenciais da Evolution API conectadas à sua conta para envio de mensagens WhatsApp.</li>
+                            <li><strong>Dados de Integração:</strong> Credenciais da WhatsApp Cloud API da Meta conectadas à sua conta para envio oficial de mensagens.</li>
                         </ul>
                     </section>
 

@@ -10,7 +10,8 @@
 namespace App\Modules\WhatsApp\Providers;
 
 use App\Modules\WhatsApp\Http\Controllers\WhatsAppAdminController;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\MetaCloudApiClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppQuarantineService;
 use App\Modules\WhatsApp\Services\WhatsAppQueuePlanner;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
@@ -21,24 +22,12 @@ class WhatsAppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(EvolutionClient::class, function ($app) {
-            $s = $app->make(\App\Modules\Settings\Services\SettingsManager::class);
+        $this->app->singleton(MetaCloudApiClient::class);
 
-            $client = new EvolutionClient(
-                baseUrl:  $s->get('whatsapp.base_url') ?: config('whatsapp.base_url', ''),
-                apiKey:   $s->get('whatsapp.instance_api_key')
-                    ?: $s->get('whatsapp.apikey')
-                    ?: $s->get('whatsapp.api_key')
-                    ?: config('whatsapp.instance_api_key', '')
-                    ?: config('whatsapp.apikey', '')
-                    ?: config('whatsapp.api_key', ''),
-                instance: $s->get('whatsapp.instance') ?: config('whatsapp.instance', ''),
-                timeout:  (int) ($s->get('whatsapp.timeout') ?: config('whatsapp.timeout', 15)),
+        $this->app->singleton(WhatsAppMetaClient::class, function ($app) {
+            return new WhatsAppMetaClient(
+                metaClient: $app->make(MetaCloudApiClient::class)
             );
-
-            $client->setQuarantineService($app->make(WhatsAppQuarantineService::class));
-
-            return $client;
         });
 
         $this->app->singleton(WhatsAppSafetyService::class);

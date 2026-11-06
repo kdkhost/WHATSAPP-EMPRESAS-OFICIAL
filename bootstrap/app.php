@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands([
         \App\Console\Commands\SystemAuditFullCommand::class,
-        \App\Console\Commands\WhatsAppEvolutionDiagnoseCommand::class,
+        \App\Console\Commands\WhatsAppMetaDiagnoseCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
@@ -35,9 +35,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\CronHeartbeat::class);
 
         $middleware->validateCsrfTokens(except: [
-            'webhooks/evolution/messages',
-            'webhooks/evolution/messages/*',
-            'webhooks/whmcs/*',
+            'webhook',
+            'api/webhook',
+            'api/v1/webhook',
+            'webhooks/*',
+            'api/webhooks/*',
             'api/gestao-financeira/open-finance-webhook',
             'gestao-financeira/open-finance-webhook',
             // Página pública de fatura — acesso sem sessão autenticada

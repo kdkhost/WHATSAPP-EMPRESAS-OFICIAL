@@ -15,7 +15,7 @@ use App\Modules\Tenancy\Models\Tenant;
 use App\Modules\Tenancy\Models\TenantInstance;
 use App\Modules\Tenancy\Services\InstanceManager;
 use App\Modules\Tenancy\Services\TenantTemplateResolver;
-use App\Modules\WhatsApp\Services\EvolutionClient;
+use App\Modules\WhatsApp\Services\WhatsAppMetaClient;
 use App\Modules\WhatsApp\Services\WhatsAppSafetyService;
 use App\Modules\WhmcsIntegration\Models\WhmcsConnection;
 use App\Modules\WhmcsIntegration\Models\WhmcsService;
@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Storage;
  * Orquestrador de envios automaticos de cobranca.
  *
  * Suporta multi-canal:
- *  - whatsapp: envia mensagem (texto/audio/imagem) via Evolution
+ *  - whatsapp: envia mensagem (texto/audio/imagem/template) via Meta WhatsApp Oficial
  *  - email: envia email via SMTP do tenant
  *  - both: envia em ambos canais
  *
@@ -39,7 +39,7 @@ use Illuminate\Support\Facades\Storage;
 class BillingDispatcher
 {
     public function __construct(
-        protected EvolutionClient $evolution,
+        protected WhatsAppMetaClient $whatsAppClient,
         protected TemplateRenderer $renderer,
         protected ?SmtpMailer $mailer = null,
         protected ?EmailTemplateRenderer $emailRenderer = null,
@@ -278,7 +278,6 @@ class BillingDispatcher
                             $count++;
                         }
                     }
-                }
 
                 // Cria o disparo imediato de atraso com o template mais apropriado
                 $category = TenantTemplateResolver::categoryForOffset($bestPastOffset);
@@ -1046,18 +1045,18 @@ class BillingDispatcher
                             } else {
                                 if ($isSingleWithQr) {
                                     // Envia em MENSAGEM ÚNICA: imagem do QR Code + legenda com template completo
-                                    $id = $this->evolution->sendImage($phoneToSend, $qrImage, $message, array_merge($sendContext, $inspection, [
+                                    $id = $this->whatsAppClient->sendImage($phoneToSend, $qrImage, $message, array_merge($sendContext, $inspection, [
                                         'skip_safety' => true,
                                     ]));
 
                                     // Fallback para texto caso falhe o envio da imagem
                                     if (! $id) {
-                                        $id = $this->evolution->sendText($phoneToSend, $message, array_merge($sendContext, $inspection, [
+                                        $id = $this->whatsAppClient->sendText($phoneToSend, $message, array_merge($sendContext, $inspection, [
                                             'skip_safety' => true,
                                         ]));
                                     }
                                 } else {
-                                    $id = $this->evolution->sendText($phoneToSend, $message, array_merge($sendContext, $inspection, [
+                                    $id = $this->whatsAppClient->sendText($phoneToSend, $message, array_merge($sendContext, $inspection, [
                                         'skip_safety' => true,
                                     ]));
                                 }
@@ -1321,10 +1320,10 @@ class BillingDispatcher
 
         $id = $tenantInstance
             ? $this->instances->sendImage($tenantInstance, $customer->whatsapp, $qrImage, $caption, $qrContext)
-            : $this->evolution->sendImage($customer->whatsapp, $qrImage, $caption, $qrContext);
+            : $this->whatsAppClient->sendImage($customer->whatsapp, $qrImage, $caption, $qrContext);
 
         if (! $id) {
-            throw new \RuntimeException('imagem do QR Code nao confirmada pela Evolution.');
+            throw new \RuntimeException('imagem do QR Code nao confirmada pela Meta API.');
         }
 
         return $id;
@@ -1347,10 +1346,10 @@ class BillingDispatcher
 
         $id = $tenantInstance
             ? $this->instances->sendDocument($tenantInstance, $customer->whatsapp, $document['source'], $document['name'], $caption, $docContext)
-            : $this->evolution->sendDocument($customer->whatsapp, $document['source'], $document['name'], $caption, $docContext);
+            : $this->whatsAppClient->sendDocument($customer->whatsapp, $document['source'], $document['name'], $caption, $docContext);
 
         if (! $id) {
-            throw new \RuntimeException('documento do boleto nao confirmado pela Evolution.');
+            throw new \RuntimeException('documento do boleto nao confirmado pela Meta API.');
         }
 
         return $id;
@@ -1374,10 +1373,10 @@ class BillingDispatcher
 
         $id = $tenantInstance
             ? $this->instances->sendText($tenantInstance, $customer->whatsapp, $message, array_merge($pixContext, ['skip_safety' => true]))
-            : $this->evolution->sendText($customer->whatsapp, $message, array_merge($pixContext, ['skip_safety' => true]));
+            : $this->whatsAppClient->sendText($customer->whatsapp, $message, array_merge($pixContext, ['skip_safety' => true]));
 
         if (! $id) {
-            throw new \RuntimeException('mensagem PIX Copia e Cola nao confirmada pela Evolution.');
+            throw new \RuntimeException('mensagem PIX Copia e Cola nao confirmada pela Meta API.');
         }
 
         return $id;

@@ -49,7 +49,7 @@
         'webhook_base64' => ['label' => 'Enviar mídia em base64', 'description' => 'Inclui arquivos no payload em base64. Normalmente deve ficar desligado para evitar consumo alto.'],
     ];
     $eventMeta = [
-        'APPLICATION_STARTUP' => ['label' => 'Inicialização da aplicação', 'description' => 'Evento técnico disparado quando a Evolution inicia. Normalmente não é necessário no painel.'],
+        'APPLICATION_STARTUP' => ['label' => 'Inicialização da aplicação', 'description' => 'Evento técnico disparado quando a aplicação inicia. Normalmente não é necessário no painel.'],
         'QRCODE_UPDATED' => ['label' => 'QR Code atualizado', 'description' => 'Atualiza o QR Code de conexão no painel.'],
         'CONNECTION_UPDATE' => ['label' => 'Status da conexão', 'description' => 'Informa quando a instância conecta, desconecta ou muda de estado.'],
         'MESSAGES_UPSERT' => ['label' => 'Nova mensagem recebida', 'description' => 'Recebe novas mensagens e alimenta chat, atendimento e automações.'],
@@ -124,7 +124,7 @@
 @section('content')
 <div class="tenant-premium-hero mb-4">
     <div>
-        <span class="tenant-premium-hero__eyebrow"><i class="bi bi-whatsapp me-2"></i>Evolution Go por instância</span>
+        <span class="tenant-premium-hero__eyebrow"><i class="bi bi-whatsapp me-2"></i>WhatsApp Meta por instância</span>
         <h1 class="tenant-premium-hero__title">Instâncias WhatsApp</h1>
         <p class="tenant-premium-hero__text">Conecte o WhatsApp, sincronize avatar, nome, slogan e mantenha webhook e comportamento da API separados para cada instância do tenant.</p>
     </div>
@@ -188,7 +188,7 @@
         <div>
             <span class="premium-panel__kicker">Conta WhatsApp</span>
             <h3 class="premium-panel__title">Identidade sincronizada</h3>
-            <p class="premium-panel__subtitle">Os dados abaixo são lidos da Evolution e refletem o perfil conectado no WhatsApp.</p>
+            <p class="premium-panel__subtitle">Os dados abaixo refletem o perfil conectado no WhatsApp Oficial.</p>
         </div>
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle" data-instance-count-badge>{{ $instances->count() }} instância(s)</span>
     </div>
@@ -321,12 +321,12 @@
                     <div class="mb-3">
                         <label class="form-label">Nome de exibição</label>
                         <input type="text" name="name" class="form-control" required placeholder="Ex.: Atendimento Loja Centro" maxlength="60">
-                        <div class="form-text">O identificador técnico será sanitizado automaticamente para a Evolution.</div>
+                        <div class="form-text">O identificador técnico será sanitizado automaticamente.</div>
                     </div>
                     @unless($canCreateIncluded)
                         <div class="alert alert-warning mb-0">
                             <strong>Instância extra recorrente.</strong>
-                            O limite do plano foi atingido. Ao confirmar, o sistema cria a instância na Evolution e gera a cobrança pró-rata agrupada na fatura pendente.
+                            O limite do plano foi atingido. Ao confirmar, o sistema cria a instância do WhatsApp e gera a cobrança pró-rata agrupada na fatura pendente.
                         </div>
                     @endunless
                 </form>
@@ -510,11 +510,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title"><i class="bi bi-sliders me-2"></i>Configuração Evolution Go</h5>
+                    <h5 class="modal-title"><i class="bi bi-sliders me-2"></i>Configuração WhatsApp Meta</h5>
                     <small class="text-muted">Ajustes aplicados somente nesta instância.</small>
                     <div class="config-sync-indicator mt-2 d-none" id="config-sync-indicator">
                         <i class="bi bi-cloud-check me-1"></i>
-                        <span id="config-sync-text">Sincronizado com Evolution agora</span>
+                        <span id="config-sync-text">Sincronizado com WhatsApp Oficial agora</span>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -527,7 +527,7 @@
                                 <span class="tenant-premium-kicker">Conexão</span>
                                 <h6>Credenciais da API</h6>
                                 <div class="mb-3">
-                                    <label class="form-label">URL base da Evolution</label>
+                                    <label class="form-label">URL da API</label>
                                     <input type="url" class="form-control" name="api_base_url" placeholder="Usar URL global do sistema">
                                 </div>
                                 <div class="mb-0">
@@ -585,24 +585,24 @@
                                         <label class="form-label">RabbitMQ</label>
                                         <select class="form-select" name="event_producer_rabbitmq">
                                             <option value="default">Padrao do sistema</option>
-                                            <option value="enabled">Ativar na Evolution</option>
-                                            <option value="disabled">Desativar na Evolution</option>
+                                            <option value="enabled">Ativar</option>
+                                            <option value="disabled">Desativar</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">WebSocket</label>
                                         <select class="form-select" name="event_producer_websocket">
                                             <option value="default">Padrao do sistema</option>
-                                            <option value="enabled">Ativar na Evolution</option>
-                                            <option value="disabled">Desativar na Evolution</option>
+                                            <option value="enabled">Ativar</option>
+                                            <option value="disabled">Desativar</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">NATS</label>
                                         <select class="form-select" name="event_producer_nats">
                                             <option value="default">Padrao do sistema</option>
-                                            <option value="enabled">Ativar na Evolution</option>
-                                            <option value="disabled">Desativar na Evolution</option>
+                                            <option value="enabled">Ativar</option>
+                                            <option value="disabled">Desativar</option>
                                         </select>
                                     </div>
                                 </div>
@@ -614,7 +614,7 @@
                         <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
                             <div>
                                 <span class="tenant-premium-kicker">Eventos</span>
-                                <h6 class="mb-1">Eventos enviados pela Evolution</h6>
+                                <h6 class="mb-1">Eventos do Webhook</h6>
                                 <p class="small text-muted mb-0">Passe o mouse no ícone de ajuda para entender cada evento sem poluir a visualização.</p>
                             </div>
                             <button type="button" class="btn btn-outline-success btn-sm" id="btn-apply-recommended-config">
@@ -628,7 +628,7 @@
                                     <span class="event-pill__body">
                                         <span class="event-pill__meta">
                                             <strong>{{ $eventMeta[$event]['label'] ?? $event }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $eventMeta[$event]['description'] ?? 'Evento técnico da Evolution API.' }}" aria-label="Ajuda sobre {{ strtolower($eventMeta[$event]['label'] ?? $event) }}">
+                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $eventMeta[$event]['description'] ?? 'Evento técnico do Webhook.' }}" aria-label="Ajuda sobre {{ strtolower($eventMeta[$event]['label'] ?? $event) }}">
                                                 <i class="bi bi-question-circle"></i>
                                             </button>
                                         </span>
@@ -919,12 +919,12 @@ function updateConfigSyncIndicator(id, timestamp = null) {
     const formattedTimestamp = formatSyncTimestamp(rawTimestamp);
     if (!formattedTimestamp) {
         indicator.classList.add('d-none');
-        text.textContent = 'Sincronizado com Evolution agora';
+        text.textContent = 'Sincronizado com WhatsApp Oficial agora';
         return;
     }
 
     indicator.classList.remove('d-none');
-    text.textContent = `Sincronizado com Evolution em ${formattedTimestamp}`;
+    text.textContent = `Sincronizado com WhatsApp Oficial em ${formattedTimestamp}`;
 }
 
 function notify(type, message) {
@@ -1050,7 +1050,7 @@ document.querySelectorAll('.btn-delete-instance').forEach(btn => {
             title: 'Excluir instância?',
             text: connected
                 ? `A instância ${btn.dataset.name || ''} esta conectada. Desconecte-a primeiro antes de excluir.`
-                : `A instância ${btn.dataset.name || ''} sera removida da Evolution Go e do sistema.`,
+                : `A instância ${btn.dataset.name || ''} sera removida do sistema.`,
             showCancelButton: !connected,
             confirmButtonText: connected ? 'OK' : 'Excluir',
             cancelButtonText: 'Cancelar',
@@ -1676,7 +1676,7 @@ function bindDynamicInstanceActions(root) {
             const result = await Swal.fire({
                 icon: 'warning',
                 title: 'Excluir instância?',
-                text: `A instância ${btn.dataset.name || ''} sera removida da Evolution Go e do sistema.`,
+                text: `A instância ${btn.dataset.name || ''} sera removida do sistema.`,
                 showCancelButton: true,
                 confirmButtonText: 'Excluir',
                 cancelButtonText: 'Cancelar',

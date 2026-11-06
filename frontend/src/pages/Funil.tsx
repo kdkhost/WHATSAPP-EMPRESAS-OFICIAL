@@ -136,8 +136,8 @@ const stages = [
     },
     {
         icon: <CheckCircle2 className="w-8 h-8"/>, title: 'Qualificação automática',
-        desc: 'Sistema verifica os dados, valida o número de WhatsApp ativo através da Evolution API e enriquece o endereço via ViaCEP de forma invisível.',
-        tags: ['Validação Anti-Fraude', 'Evolution API', 'Enriquecimento de Dados'],
+        desc: 'Sistema verifica os dados, valida o número de WhatsApp ativo através da WhatsApp Cloud API Oficial da Meta e enriquece o endereço via ViaCEP de forma invisível.',
+        tags: ['Validação Anti-Fraude', 'Meta WhatsApp API', 'Enriquecimento de Dados'],
         gradient: 'from-indigo-500 to-purple-600',
     },
     {

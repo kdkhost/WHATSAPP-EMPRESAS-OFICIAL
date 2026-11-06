@@ -15,7 +15,7 @@ use Illuminate\Support\ServiceProvider;
  *   - in_app (sininho do admin)
  *   - push (WebPush via PWA)
  *   - email (SMTP/Mailgun/SES)
- *   - whatsapp (via Evolution API)
+ *   - whatsapp (via Meta WhatsApp Cloud API Oficial)
  *   - sms (extensivel via addon)
  *
  * Cada modulo/addon pode disparar notificacoes via:

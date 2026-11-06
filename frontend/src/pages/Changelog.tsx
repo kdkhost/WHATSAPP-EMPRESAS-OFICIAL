@@ -32,8 +32,8 @@ const releasesDefault = [
         labelColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
         entries: [
             { type: 'new', text: 'Reescrita completa da plataforma com arquitetura modular Laravel 13.' },
-            { type: 'new', text: 'Multi-tenancy SaaS com planos, tenants e instancias Evolution por cliente.' },
-            { type: 'new', text: 'Envios automaticos de cobranca via WhatsApp com Evolution API.' },
+            { type: 'new', text: 'Multi-tenancy SaaS com planos, tenants e instâncias WhatsApp por cliente.' },
+            { type: 'new', text: 'Envios automáticos de cobrança via WhatsApp Cloud API Oficial da Meta.' },
         ],
     },
 ];

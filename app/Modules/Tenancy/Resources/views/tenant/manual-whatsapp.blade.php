@@ -160,7 +160,7 @@
                     {{-- Botão de Envio --}}
                     <div class="d-flex align-items-center justify-content-between pt-2 border-top">
                         <div class="text-muted small">
-                            <i class="bi bi-shield-check text-success me-1"></i> Disparo protegido via Evolution API
+                            <i class="bi bi-shield-check text-success me-1"></i> Disparo protegido via Meta WhatsApp Oficial
                         </div>
                         <button type="submit" class="btn btn-success px-4 py-2 fw-semibold" id="btn-submit-send">
                             <i class="bi bi-send-fill me-2"></i> Disparar Mensagem

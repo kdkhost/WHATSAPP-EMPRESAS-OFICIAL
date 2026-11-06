@@ -145,7 +145,7 @@ class DemoTenantSeeder extends Seeder
                 'display_name' => 'Atendimento Principal',
                 'phone' => '21999990000',
                 'status' => 'active',
-                'meta' => ['demo' => true, 'provider' => 'Evolution GO'],
+                'meta' => ['demo' => true, 'provider' => 'Meta Cloud API Oficial'],
                 'is_default' => true,
             ]
         );
