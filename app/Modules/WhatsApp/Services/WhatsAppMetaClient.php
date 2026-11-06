@@ -61,20 +61,27 @@ class WhatsAppMetaClient
     }
 
     /**
-     * Valida segurança e opt-out antes do disparo
+     * Resolve o cliente Graph API da instancia informada no contexto (credenciais Meta proprias do tenant),
+     * herdando a configuracao global quando a instancia nao tiver credenciais proprias.
      */
-    protected function checkSafety(string $to, string $message, array &$context, string $mediaType = 'text'): void
+    protected function metaFor(array $context = []): MetaCloudApiClient
+    {
+        if (empty($context['tenant_instance_id'])) {
+            return $this->metaClient;
+        }
+
+        return $this->metaClient->forInstance(TenantInstance::find($context['tenant_instance_id']));
+    }
+
+    /**
+     * Valida segurança e opt-out antes do disparo
+     */    protected function checkSafety(string $to, string $message, array &$context, string $mediaType = 'text'): void
     {
         $safetyService = app(WhatsAppSafetyService::class);
         $tenantInstance = null;
 
         if (!empty($context['tenant_instance_id'])) {
             $tenantInstance = TenantInstance::find($context['tenant_instance_id']);
-        } elseif (!empty($this->instance)) {
-            $tenantInstance = TenantInstance::where('instance_name', $this->instance)->first();
-            if ($tenantInstance && empty($context['tenant_instance_id'])) {
-                $context['tenant_instance_id'] = $tenantInstance->id;
-            }
         }
 
         $context['media_type'] = $mediaType;
@@ -98,7 +105,7 @@ class WhatsAppMetaClient
     {
         $this->checkSafety($to, $message, $context, 'text');
 
-        $result = $this->metaClient->sendSessionTextMessage($to, $message, $context);
+        $result = $this->metaFor($context)->sendSessionTextMessage($to, $message, $context);
 
         if (!empty($result['ok']) && !empty($result['message_id'])) {
             $this->logMessage($to, $message, 'text', $result['message_id'], $context);
@@ -126,7 +133,7 @@ class WhatsAppMetaClient
         $preview = $caption ?: '[imagem]';
         $this->checkSafety($to, $preview, $context, 'image');
 
-        $result = $this->metaClient->sendMediaMessage($to, 'image', $image, $caption);
+        $result = $this->metaFor($context)->sendMediaMessage($to, 'image', $image, $caption);
 
         if (!empty($result['ok']) && !empty($result['message_id'])) {
             $this->logMessage($to, $preview, 'image', $result['message_id'], $context);
@@ -144,7 +151,7 @@ class WhatsAppMetaClient
         $preview = $caption ?: "[documento: {$filename}]";
         $this->checkSafety($to, $preview, $context, 'document');
 
-        $result = $this->metaClient->sendMediaMessage($to, 'document', $file, $caption, $filename);
+        $result = $this->metaFor($context)->sendMediaMessage($to, 'document', $file, $caption, $filename);
 
         if (!empty($result['ok']) && !empty($result['message_id'])) {
             $this->logMessage($to, $preview, 'document', $result['message_id'], $context);
@@ -161,7 +168,7 @@ class WhatsAppMetaClient
     {
         $this->checkSafety($to, '[audio]', $context, 'audio');
 
-        $result = $this->metaClient->sendMediaMessage($to, 'audio', $audio);
+        $result = $this->metaFor($context)->sendMediaMessage($to, 'audio', $audio);
 
         if (!empty($result['ok']) && !empty($result['message_id'])) {
             $this->logMessage($to, '[audio]', 'audio', $result['message_id'], $context);
@@ -179,7 +186,7 @@ class WhatsAppMetaClient
         $preview = $caption ?: '[video]';
         $this->checkSafety($to, $preview, $context, 'video');
 
-        $result = $this->metaClient->sendMediaMessage($to, 'video', $video, $caption);
+        $result = $this->metaFor($context)->sendMediaMessage($to, 'video', $video, $caption);
 
         if (!empty($result['ok']) && !empty($result['message_id'])) {
             $this->logMessage($to, $preview, 'video', $result['message_id'], $context);

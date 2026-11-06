@@ -17,64 +17,6 @@
     $safetyDelayMin = (int) ($safetyControl?->human_delay_min_seconds ?: config('whatsapp_anti_ban.human_delay.min_seconds', 12));
     $safetyDelayMax = (int) ($safetyControl?->human_delay_max_seconds ?: config('whatsapp_anti_ban.human_delay.max_seconds', 32));
     $adminMaxDaily = (int) config('whatsapp_anti_ban.tenant_settings.max_limit_per_day', 500);
-    $defaultWebhookEvents = [
-        'APPLICATION_STARTUP',
-        'QRCODE_UPDATED',
-        'CONNECTION_UPDATE',
-        'MESSAGES_UPSERT',
-        'MESSAGES_UPDATE',
-        'MESSAGES_DELETE',
-        'SEND_MESSAGE',
-        'CONTACTS_UPSERT',
-        'CONTACTS_UPDATE',
-        'PRESENCE_UPDATE',
-        'CHATS_UPDATE',
-        'GROUPS_UPSERT',
-        'GROUP_UPDATE',
-        'GROUP_PARTICIPANTS_UPDATE',
-        'CALL',
-        'NEW_JWT_TOKEN',
-    ];
-    $recommendedWebhookEvents = [
-        'QRCODE_UPDATED',
-        'CONNECTION_UPDATE',
-        'MESSAGES_UPSERT',
-        'MESSAGES_UPDATE',
-        'SEND_MESSAGE',
-        'CALL',
-    ];
-    $webhookMeta = [
-        'webhook_enabled' => ['label' => 'Ativar webhook', 'description' => 'Liga o envio de eventos desta instância para o seu sistema.'],
-        'webhook_by_events' => ['label' => 'Separar por eventos', 'description' => 'Envia apenas os eventos marcados abaixo para reduzir ruído e tráfego desnecessário.'],
-        'webhook_base64' => ['label' => 'Enviar mídia em base64', 'description' => 'Inclui arquivos no payload em base64. Normalmente deve ficar desligado para evitar consumo alto.'],
-    ];
-    $eventMeta = [
-        'APPLICATION_STARTUP' => ['label' => 'Inicialização da aplicação', 'description' => 'Evento técnico disparado quando a aplicação inicia. Normalmente não é necessário no painel.'],
-        'QRCODE_UPDATED' => ['label' => 'QR Code atualizado', 'description' => 'Atualiza o QR Code de conexão no painel.'],
-        'CONNECTION_UPDATE' => ['label' => 'Status da conexão', 'description' => 'Informa quando a instância conecta, desconecta ou muda de estado.'],
-        'MESSAGES_UPSERT' => ['label' => 'Nova mensagem recebida', 'description' => 'Recebe novas mensagens e alimenta chat, atendimento e automações.'],
-        'MESSAGES_UPDATE' => ['label' => 'Atualização de mensagem', 'description' => 'Atualiza status de mensagens, como entregue, lida ou alterada.'],
-        'MESSAGES_DELETE' => ['label' => 'Mensagem apagada', 'description' => 'Informa quando uma mensagem foi apagada. Desativado por padrão.'],
-        'SEND_MESSAGE' => ['label' => 'Mensagem enviada', 'description' => 'Confirma mensagens enviadas pela instância.'],
-        'CONTACTS_UPSERT' => ['label' => 'Novo contato', 'description' => 'Recebe contatos criados ou sincronizados. Pode gerar volume alto.'],
-        'CONTACTS_UPDATE' => ['label' => 'Contato atualizado', 'description' => 'Recebe alterações de contatos. Pode gerar volume alto.'],
-        'PRESENCE_UPDATE' => ['label' => 'Presença online/digitando', 'description' => 'Recebe eventos de digitando e online. Pode gerar muito ruído.'],
-        'CHATS_UPDATE' => ['label' => 'Atualização de conversas', 'description' => 'Recebe alterações em chats. Pode gerar volume alto.'],
-        'GROUPS_UPSERT' => ['label' => 'Novo grupo', 'description' => 'Use apenas se o sistema trabalhar com grupos.'],
-        'GROUP_UPDATE' => ['label' => 'Grupo atualizado', 'description' => 'Recebe mudanças de nome, descrição ou configurações de grupos.'],
-        'GROUP_PARTICIPANTS_UPDATE' => ['label' => 'Participantes do grupo', 'description' => 'Recebe entrada, saída e alteração de participantes em grupos.'],
-        'CALL' => ['label' => 'Chamadas recebidas', 'description' => 'Permite detectar chamadas e rejeitar automaticamente.'],
-        'NEW_JWT_TOKEN' => ['label' => 'Novo token JWT', 'description' => 'Evento técnico de token. Normalmente não é usado no painel.'],
-    ];
-    $behaviorMeta = [
-        'reject_call' => ['label' => 'Rejeitar chamadas', 'description' => 'Rejeita chamadas recebidas automaticamente e evita interferência na automação.'],
-        'groups_ignore' => ['label' => 'Ignorar grupos', 'description' => 'Evita que o sistema responda mensagens em grupos.'],
-        'always_online' => ['label' => 'Sempre online', 'description' => 'Mantém a instância como online. Fica desligado por padrão para não parecer artificial.'],
-        'read_messages' => ['label' => 'Marcar mensagens como lidas', 'description' => 'Marca mensagens recebidas como lidas. Pode atrapalhar atendimento humano.'],
-        'ignore_status' => ['label' => 'Ignore Status', 'description' => 'Ignora atualizacoes de status (stories) no WhatsApp.'],
-        'sync_full_history' => ['label' => 'Sincronizar histórico completo', 'description' => 'Sincroniza histórico antigo. Pode causar lentidão e alto consumo.'],
-        'msg_call' => ['label' => 'Mensagem ao rejeitar chamada', 'description' => 'Mensagem enviada quando uma chamada é recusada automaticamente.'],
-    ];
     $statusLabels = [
         'creating' => 'Criando',
         'active' => 'Ativa',
@@ -91,32 +33,18 @@
         'suspended' => 'secondary',
         'banned' => 'danger',
     ];
-    $instanceConfig = $instances->mapWithKeys(function ($inst) use ($defaultWebhookEvents) {
-        $settings = data_get($inst->meta ?? [], 'evolution_settings', []);
+    $instanceConfig = $instances->mapWithKeys(function ($inst) {
         return [$inst->id => [
             'id' => $inst->id,
-            'api_base_url' => $inst->api_base_url,
-            'has_api_key' => filled($inst->api_key),
-            'webhook_enabled' => (bool) $inst->webhook_enabled,
-            'webhook_by_events' => $inst->webhook_by_events ?? true,
-            'webhook_base64' => (bool) $inst->webhook_base64,
-            'webhook_events' => $inst->webhook_events ?: $defaultWebhookEvents,
+            'display_name' => $inst->display_name,
+            'phone' => $inst->phone,
+            'meta_phone_number_id' => $inst->meta_phone_number_id,
+            'meta_waba_id' => $inst->meta_waba_id,
+            'has_meta_token' => filled($inst->meta_access_token),
+            'quality_rating' => data_get($inst->meta, 'quality_rating', 'GREEN'),
+            'status' => $inst->status,
             'webhook_url' => $inst->secure_webhook_url,
-            'event_producers' => data_get($inst->meta ?? [], 'evolution_event_producers', [
-                'rabbitmq' => 'default',
-                'websocket' => 'default',
-                'nats' => 'default',
-            ]),
-            'settings' => [
-                'reject_call' => (bool) data_get($settings, 'rejectCall', data_get($settings, 'reject_call', false)),
-                'msg_call' => (string) data_get($settings, 'msgCall', data_get($settings, 'msg_call', '')),
-                'groups_ignore' => (bool) data_get($settings, 'groupsIgnore', data_get($settings, 'groups_ignore', false)),
-                'always_online' => (bool) data_get($settings, 'alwaysOnline', data_get($settings, 'always_online', false)),
-                'read_messages' => (bool) data_get($settings, 'readMessages', data_get($settings, 'read_messages', false)),
-                'ignore_status' => (bool) data_get($settings, 'ignoreStatus', ! (bool) data_get($settings, 'readStatus', data_get($settings, 'read_status', false))),
-                'read_status' => (bool) data_get($settings, 'readStatus', data_get($settings, 'read_status', false)),
-                'sync_full_history' => (bool) data_get($settings, 'syncFullHistory', data_get($settings, 'sync_full_history', false)),
-            ],
+            'last_synced_at' => $inst->last_profile_sync_at?->toIso8601String(),
         ]];
     });
 @endphp
@@ -196,104 +124,7 @@
         @if($instances->count())
             <div class="instance-grid">
                 @foreach($instances as $inst)
-                    @php
-                        $status = $inst->status ?? 'creating';
-                        $profileName = $inst->whatsapp_profile_name;
-                        $displayName = $inst->display_name ?: $profileName;
-                        $initial = mb_strtoupper(mb_substr($displayName, 0, 1));
-                        $number = $inst->profile_number ?: $inst->phone;
-                        $maskedNumber = $number ? Format::phone(preg_replace('/^55/', '', $number)) : '-';
-                        $settings = data_get($inst->meta ?? [], 'evolution_settings', []);
-                    @endphp
-                    <article class="instance-card" data-instance-card="{{ $inst->id }}">
-                        <div class="instance-card__top">
-                            <div class="instance-avatar" data-avatar-wrap>
-                                @if($inst->profile_avatar_url)
-                                    <img src="{{ $inst->profile_avatar_url }}" alt="{{ $displayName }}" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('d-none');" data-profile-avatar>
-                                    <span data-profile-initial class="d-none">{{ $initial }}</span>
-                                @else
-                                    <span data-profile-initial>{{ $initial }}</span>
-                                @endif
-                            </div>
-                            <div class="min-w-0 flex-grow-1">
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
-                                    <h3 class="instance-card__title mb-0" data-profile-name>{{ $displayName }}</h3>
-                                    @if($inst->is_default)
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Padrão</span>
-                                    @endif
-                                @if($inst->is_extra_billable)
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle">Extra {{ Format::money($inst->recurring_amount ?? 0) }}/mes</span>
-                                @endif
-                                <span class="badge bg-{{ $inst->profile_is_business ? 'info' : 'secondary' }}-subtle text-{{ $inst->profile_is_business ? 'info' : 'secondary' }} border border-{{ $inst->profile_is_business ? 'info' : 'secondary' }}-subtle" data-profile-type>
-                                    {{ $inst->profile_is_business ? 'Business' : 'Pessoal' }}
-                                </span>
-                                </div>
-                                <div class="instance-card__code"><code>{{ $inst->instance_name }}</code></div>
-                                <p class="instance-card__slogan" data-profile-status>{{ $inst->profile_status ?: 'Slogan/status ainda não sincronizado.' }}</p>
-                            </div>
-                            <span class="badge text-bg-{{ $statusColors[$status] ?? 'secondary' }}" data-status-badge>
-                                {{ $statusLabels[$status] ?? ucfirst((string) $status) }}
-                            </span>
-                        </div>
-
-                        <div class="instance-card__meta">
-                            <div>
-                                <span>Número</span>
-                                <strong data-profile-number>{{ $maskedNumber }}</strong>
-                            </div>
-                        <div>
-                            <span>JID</span>
-                            <strong class="text-truncate" data-profile-jid>{{ $inst->profile_jid ?: '-' }}</strong>
-                        </div>
-                        <div>
-                            <span>LID</span>
-                            <strong class="text-truncate" data-profile-lid>{{ $inst->profile_lid ?: '-' }}</strong>
-                        </div>
-                        <div>
-                            <span>Dispositivos</span>
-                            <strong data-profile-devices>{{ is_array($inst->profile_devices) ? count($inst->profile_devices) : 0 }}</strong>
-                        </div>
-                        <div>
-                            <span>Token</span>
-                            <strong>{{ filled($inst->api_key) ? 'Configurado' : 'Pendente' }}</strong>
-                            </div>
-                            <div>
-                                <span>Última sincronização</span>
-                                <strong data-profile-sync>{{ $inst->last_profile_sync_at?->format('d/m/Y H:i') ?? '-' }}</strong>
-                            </div>
-                        </div>
-
-                        @if($inst->last_error)
-                            <div class="alert alert-warning py-2 px-3 small mb-3" data-last-error>
-                                <i class="bi bi-exclamation-triangle me-1"></i>{{ $inst->last_error }}
-                            </div>
-                        @else
-                            <div class="d-none" data-last-error></div>
-                        @endif
-
-                        <div class="instance-card__actions">
-                            <button class="btn btn-outline-success btn-sm btn-qr" data-id="{{ $inst->id }}">
-                                <i class="bi bi-qr-code me-1"></i> QR Code
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm btn-sync" data-id="{{ $inst->id }}">
-                                <i class="bi bi-arrow-repeat me-1"></i> Sincronizar
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm btn-disconnect {{ $inst->status !== 'connected' ? 'd-none' : '' }}" data-id="{{ $inst->id }}">
-                                <i class="bi bi-wifi-off me-1"></i> Desconectar
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm btn-config" data-id="{{ $inst->id }}">
-                                <i class="bi bi-sliders me-1"></i> Configurar API
-                            </button>
-                            @unless($inst->is_default)
-                                <button class="btn btn-outline-dark btn-sm btn-rename" data-id="{{ $inst->id }}" data-current="{{ $inst->display_name }}">
-                                    <i class="bi bi-pencil me-1"></i> Renomear
-                                </button>
-                            @endunless
-                            <button class="btn btn-outline-danger btn-sm btn-delete-instance" data-id="{{ $inst->id }}" data-name="{{ $displayName }}">
-                                <i class="bi bi-trash me-1"></i> Excluir
-                            </button>
-                        </div>
-                    </article>
+                    @include('tenancy::tenant.partials.instance-card', ['inst' => $inst, 'statusLabels' => $statusLabels, 'statusColors' => $statusColors])
                 @endforeach
             </div>
         @else
@@ -481,40 +312,32 @@
 </div>
 
 <div class="modal fade" id="modalQR" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-qr-code me-2"></i>QR Code</h5>
+                <h5 class="modal-title"><i class="bi bi-patch-check-fill text-success me-2"></i>Conexão Oficial Meta</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body text-center">
-                <div id="qr-loading" class="py-4">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 text-muted">Gerando QR Code...</p>
-                </div>
-                <div id="qr-content" class="d-none">
-                    <img id="qr-image" src="" alt="QR Code" class="img-fluid border rounded" style="max-width:250px;">
-                    <p class="mt-2 small text-muted">Escaneie com o WhatsApp e depois clique em sincronizar.</p>
-                </div>
-                <div id="qr-error" class="d-none">
-                    <i class="bi bi-exclamation-triangle text-warning display-4"></i>
-                    <p class="mt-2 text-muted">Nao foi possivel gerar o QR Code.</p>
-                </div>
+            <div class="modal-body text-center py-4">
+                <i class="bi bi-shield-check text-success display-4 mb-3"></i>
+                <h5 class="fw-bold">Sem necessidade de QR Code</h5>
+                <p class="text-muted small">A WhatsApp Cloud API Oficial da Meta conecta de forma nativa e segura através do Phone Number ID e Token de Acesso Permanente, sem risco de desconexão ou necessidade de emulação de celular.</p>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Entendido</button>
             </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="modalInstanceConfig" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title"><i class="bi bi-sliders me-2"></i>Configuração WhatsApp Meta</h5>
-                    <small class="text-muted">Ajustes aplicados somente nesta instância.</small>
+                    <h5 class="modal-title"><i class="bi bi-patch-check-fill text-success me-2"></i>Credenciais Meta WhatsApp Cloud API</h5>
+                    <small class="text-muted">Ajustes da API Oficial da Meta (Graph API v21.0) para esta instância.</small>
                     <div class="config-sync-indicator mt-2 d-none" id="config-sync-indicator">
                         <i class="bi bi-cloud-check me-1"></i>
-                        <span id="config-sync-text">Sincronizado com WhatsApp Oficial agora</span>
+                        <span id="config-sync-text">Sincronizado com WhatsApp Oficial</span>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -522,213 +345,71 @@
             <div class="modal-body">
                 <form id="frm-instance-config">
                     <div class="row g-3">
-                        <div class="col-lg-6">
-                            <div class="config-section h-100">
-                                <span class="tenant-premium-kicker">Conexão</span>
-                                <h6>Credenciais da API</h6>
-                                <div class="mb-3">
-                                    <label class="form-label">URL da API</label>
-                                    <input type="url" class="form-control" name="api_base_url" placeholder="Usar URL global do sistema">
-                                </div>
-                                <div class="mb-0">
-                                    <label class="form-label">Token da instância</label>
-                                    <input type="password" class="form-control" name="api_key" autocomplete="new-password" placeholder="Token atual será mantido">
-                                    <div class="form-text" id="token-status">Informe apenas quando quiser cadastrar ou trocar o token.</div>
+                        <div class="col-12">
+                            <div class="alert alert-info py-2 px-3 small mb-2 d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle-fill fs-5"></i>
+                                <div>
+                                    Esta instância opera diretamente na <strong>WhatsApp Cloud API v21.0 da Meta</strong>. Caso deixe os campos em branco, serão utilizadas as credenciais globais do sistema.
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="config-section h-100">
-                                <span class="tenant-premium-kicker">Webhook seguro</span>
-                                <h6>Recebimento de eventos</h6>
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" name="webhook_url_display" readonly>
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-copy-webhook"><i class="bi bi-clipboard"></i></button>
-                                </div>
-                                <div class="row g-2">
-                                    <div class="col-md-4">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="webhook_enabled" id="webhook_enabled">
-                                            <label class="form-check-label d-inline-flex align-items-center gap-2" for="webhook_enabled">
-                                                <span>{{ $webhookMeta['webhook_enabled']['label'] }}</span>
-                                                <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $webhookMeta['webhook_enabled']['description'] }}" aria-label="Ajuda sobre {{ strtolower($webhookMeta['webhook_enabled']['label']) }}">
-                                                    <i class="bi bi-question-circle"></i>
-                                                </button>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="webhook_by_events" id="webhook_by_events">
-                                            <label class="form-check-label d-inline-flex align-items-center gap-2" for="webhook_by_events">
-                                                <span>{{ $webhookMeta['webhook_by_events']['label'] }}</span>
-                                                <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $webhookMeta['webhook_by_events']['description'] }}" aria-label="Ajuda sobre {{ strtolower($webhookMeta['webhook_by_events']['label']) }}">
-                                                    <i class="bi bi-question-circle"></i>
-                                                </button>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="webhook_base64" id="webhook_base64">
-                                            <label class="form-check-label d-inline-flex align-items-center gap-2" for="webhook_base64">
-                                                <span>{{ $webhookMeta['webhook_base64']['label'] }}</span>
-                                                <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $webhookMeta['webhook_base64']['description'] }}" aria-label="Ajuda sobre {{ strtolower($webhookMeta['webhook_base64']['label']) }}">
-                                                    <i class="bi bi-question-circle"></i>
-                                                </button>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row g-2 mt-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label">RabbitMQ</label>
-                                        <select class="form-select" name="event_producer_rabbitmq">
-                                            <option value="default">Padrao do sistema</option>
-                                            <option value="enabled">Ativar</option>
-                                            <option value="disabled">Desativar</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">WebSocket</label>
-                                        <select class="form-select" name="event_producer_websocket">
-                                            <option value="default">Padrao do sistema</option>
-                                            <option value="enabled">Ativar</option>
-                                            <option value="disabled">Desativar</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">NATS</label>
-                                        <select class="form-select" name="event_producer_nats">
-                                            <option value="default">Padrao do sistema</option>
-                                            <option value="enabled">Ativar</option>
-                                            <option value="disabled">Desativar</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="config-section mt-3">
-                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-                            <div>
-                                <span class="tenant-premium-kicker">Eventos</span>
-                                <h6 class="mb-1">Eventos do Webhook</h6>
-                                <p class="small text-muted mb-0">Passe o mouse no ícone de ajuda para entender cada evento sem poluir a visualização.</p>
-                            </div>
-                            <button type="button" class="btn btn-outline-success btn-sm" id="btn-apply-recommended-config">
-                                <i class="bi bi-magic me-1"></i> Aplicar configuração recomendada
-                            </button>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Nome de exibição</label>
+                            <input type="text" class="form-control" name="display_name" placeholder="Ex: Suporte Financeiro" maxlength="80">
+                            <div class="form-text">Identificador interno da linha no painel.</div>
                         </div>
-                        <div class="event-grid">
-                            @foreach($defaultWebhookEvents as $event)
-                                <label class="event-pill event-pill--detail">
-                                    <input type="checkbox" name="webhook_events[]" value="{{ $event }}">
-                                    <span class="event-pill__body">
-                                        <span class="event-pill__meta">
-                                            <strong>{{ $eventMeta[$event]['label'] ?? $event }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $eventMeta[$event]['description'] ?? 'Evento técnico do Webhook.' }}" aria-label="Ajuda sobre {{ strtolower($eventMeta[$event]['label'] ?? $event) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                        <code>{{ $event }}</code>
-                                    </span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
 
-                    <div class="config-section mt-3">
-                        <span class="tenant-premium-kicker">Comportamento</span>
-                        <h6>Configurações da instância</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="form-check form-switch config-switch-card">
-                                    <input class="form-check-input" type="checkbox" name="reject_call" id="reject_call">
-                                    <label class="form-check-label" for="reject_call">
-                                        <span class="config-switch-card__header">
-                                            <strong>{{ $behaviorMeta['reject_call']['label'] }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['reject_call']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['reject_call']['label']) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                    </label>
-                                </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Número de Telefone</label>
+                            <input type="text" class="form-control" name="phone" placeholder="Ex: 5511999999999" maxlength="30">
+                            <div class="form-text">Número oficial do WhatsApp com DDI e DDD.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number ID da Meta</label>
+                            <input type="text" class="form-control font-monospace" name="meta_phone_number_id" placeholder="Ex: 109283746592817" maxlength="64">
+                            <div class="form-text">Obtido no Meta for Developers > WhatsApp > API Setup.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">WABA ID (Conta Comercial)</label>
+                            <input type="text" class="form-control font-monospace" name="meta_waba_id" placeholder="Ex: 192837465019283" maxlength="64">
+                            <div class="form-text">WhatsApp Business Account ID.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Token de Acesso Permanente (System User Token)</label>
+                            <input type="password" class="form-control font-monospace" name="meta_access_token" autocomplete="new-password" placeholder="EAAG... (deixe em branco para manter o token atual)">
+                            <div class="form-text" id="token-status">
+                                <i class="bi bi-shield-lock me-1"></i> Armazenado com criptografia AES-256 no banco de dados.
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-check form-switch config-switch-card">
-                                    <input class="form-check-input" type="checkbox" name="groups_ignore" id="groups_ignore">
-                                    <label class="form-check-label" for="groups_ignore">
-                                        <span class="config-switch-card__header">
-                                            <strong>{{ $behaviorMeta['groups_ignore']['label'] }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['groups_ignore']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['groups_ignore']['label']) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                    </label>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded p-3 bg-body-tertiary">
+                                <h6 class="fw-bold mb-2"><i class="bi bi-arrow-repeat me-1"></i> Webhook Oficial da Meta</h6>
+                                <p class="small text-muted mb-2">Cadastre este webhook no Meta Developer Portal para receber status de entrega e mensagens:</p>
+                                
+                                <div class="mb-2">
+                                    <label class="form-label small fw-semibold">Callback URL (URL de Retorno)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control font-monospace" name="webhook_url_display" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" id="btn-copy-webhook">
+                                            <i class="bi bi-clipboard me-1"></i> Copiar
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check form-switch config-switch-card">
-                                    <input class="form-check-input" type="checkbox" name="always_online" id="always_online">
-                                    <label class="form-check-label" for="always_online">
-                                        <span class="config-switch-card__header">
-                                            <strong>{{ $behaviorMeta['always_online']['label'] }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['always_online']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['always_online']['label']) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                    </label>
+
+                                <div>
+                                    <label class="form-label small fw-semibold">Verify Token (Token de Verificação)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control font-monospace" name="webhook_verify_token_display" value="{{ config('whatsapp.meta_webhook_verify_token', 'kdkhost_meta_webhook_secret_2026') }}" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" id="btn-copy-verify-token">
+                                            <i class="bi bi-clipboard me-1"></i> Copiar
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check form-switch config-switch-card">
-                                    <input class="form-check-input" type="checkbox" name="read_messages" id="read_messages">
-                                    <label class="form-check-label" for="read_messages">
-                                        <span class="config-switch-card__header">
-                                            <strong>{{ $behaviorMeta['read_messages']['label'] }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['read_messages']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['read_messages']['label']) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check form-switch config-switch-card">
-                                    <input class="form-check-input" type="checkbox" name="ignore_status" id="ignore_status">
-                                    <label class="form-check-label" for="ignore_status">
-                                        <span class="config-switch-card__header">
-                                            <strong>{{ $behaviorMeta['ignore_status']['label'] }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['ignore_status']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['ignore_status']['label']) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check form-switch config-switch-card">
-                                    <input class="form-check-input" type="checkbox" name="sync_full_history" id="sync_full_history">
-                                    <label class="form-check-label" for="sync_full_history">
-                                        <span class="config-switch-card__header">
-                                            <strong>{{ $behaviorMeta['sync_full_history']['label'] }}</strong>
-                                            <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['sync_full_history']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['sync_full_history']['label']) }}">
-                                                <i class="bi bi-question-circle"></i>
-                                            </button>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label d-flex align-items-center gap-2">
-                                    <strong>{{ $behaviorMeta['msg_call']['label'] }}</strong>
-                                    <button type="button" class="config-help-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $behaviorMeta['msg_call']['description'] }}" aria-label="Ajuda sobre {{ strtolower($behaviorMeta['msg_call']['label']) }}">
-                                        <i class="bi bi-question-circle"></i>
-                                    </button>
-                                </label>
-                                <input type="text" class="form-control" name="msg_call" maxlength="500" placeholder="Ex.: Atendimento somente por mensagem.">
                             </div>
                         </div>
                     </div>
@@ -737,7 +418,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
                 <button type="button" class="btn btn-primary" id="btn-save-config">
-                    <i class="bi bi-cloud-check me-1"></i> Salvar e aplicar
+                    <i class="bi bi-cloud-check me-1"></i> Salvar e Testar Conexão
                 </button>
             </div>
         </div>
@@ -897,8 +578,6 @@
 const instanceConfig = @json($instanceConfig);
 const statusLabels = @json($statusLabels);
 const statusColors = @json($statusColors);
-const defaultWebhookEvents = @json($defaultWebhookEvents);
-const recommendedWebhookEvents = @json($recommendedWebhookEvents);
 const instancesBaseUrl = '{{ url('/painel/instancias') }}';
 const syncDateTimeFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
 
@@ -967,10 +646,8 @@ async function submitCreateInstance(purchaseExtra = false) {
             form.reset();
             insertInstanceCard(d);
             updateInstanceCounts(d.counts);
-            if (d.qr) {
-                showQrCode(d.qr);
-            } else if (d.instance?.id) {
-                await openQrModalForInstance(d.instance.id);
+            if (d.instance?.id) {
+                openConfigModal(d.instance.id);
             }
         } else if (d.requires_purchase && d.quote && !purchaseExtra) {
             const quote = d.quote;
@@ -1093,20 +770,8 @@ function isInstanceConnected(btn) {
 }
 
 document.querySelectorAll('.btn-qr').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        if (isInstanceConnected(btn)) {
-            await Swal.fire({
-                icon: 'info',
-                title: 'Instancia ja em uso',
-                text: 'Esta instancia ja esta conectada ao WhatsApp. Desconecte-a primeiro se quiser trocar de numero.',
-                confirmButtonText: 'OK',
-                background: getComputedStyle(document.body).getPropertyValue('--bs-body-bg'),
-                color: getComputedStyle(document.body).getPropertyValue('--bs-body-color'),
-            });
-            return;
-        }
-
-        await openQrModalForInstance(btn.dataset.id);
+    btn.addEventListener('click', () => {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQR')).show();
     });
 });
 
@@ -1227,27 +892,23 @@ function openConfigModal(id) {
     const cfg = instanceConfig[id] || {};
     const form = document.getElementById('frm-instance-config');
     form.dataset.id = id;
-    form.api_base_url.value = cfg.api_base_url || '';
-    form.api_key.value = '';
-    document.getElementById('token-status').textContent = cfg.has_api_key ? 'Token já configurado. Informe apenas se quiser trocar.' : 'Token ainda pendente para esta instância.';
-    form.webhook_url_display.value = cfg.webhook_url || '';
-    form.webhook_enabled.checked = !!cfg.webhook_enabled;
-    form.webhook_by_events.checked = cfg.webhook_by_events !== false;
-    form.webhook_base64.checked = !!cfg.webhook_base64;
-    form.event_producer_rabbitmq.value = cfg.event_producers?.rabbitmq || 'default';
-    form.event_producer_websocket.value = cfg.event_producers?.websocket || 'default';
-    form.event_producer_nats.value = cfg.event_producers?.nats || 'default';
+    form.display_name.value = cfg.display_name || '';
+    form.phone.value = cfg.phone || '';
+    form.meta_phone_number_id.value = cfg.meta_phone_number_id || '';
+    form.meta_waba_id.value = cfg.meta_waba_id || '';
+    form.meta_access_token.value = '';
 
-    const events = cfg.webhook_events?.length ? cfg.webhook_events : defaultWebhookEvents;
-    form.querySelectorAll('input[name="webhook_events[]"]').forEach(input => {
-        input.checked = events.includes(input.value);
-    });
+    const tokenStatus = document.getElementById('token-status');
+    if (tokenStatus) {
+        tokenStatus.innerHTML = cfg.has_meta_token
+            ? '<i class="bi bi-shield-check text-success me-1"></i> Token permanente já configurado. Preencha apenas se desejar substituir.'
+            : '<i class="bi bi-info-circle text-muted me-1"></i> Token individual pendente (utilizando credencial global do sistema).';
+    }
 
-    const settings = cfg.settings || {};
-    ['reject_call', 'groups_ignore', 'always_online', 'read_messages', 'ignore_status', 'sync_full_history'].forEach(name => {
-        form[name].checked = !!settings[name];
-    });
-    form.msg_call.value = settings.msg_call || '';
+    if (form.webhook_url_display) {
+        form.webhook_url_display.value = cfg.webhook_url || `${instancesBaseUrl}/${id}/webhook`;
+    }
+
     updateConfigSyncIndicator(id);
 
     const modalElement = document.getElementById('modalInstanceConfig');
@@ -1270,55 +931,28 @@ document.getElementById('btn-copy-webhook')?.addEventListener('click', async () 
     }
 });
 
-document.getElementById('btn-apply-recommended-config')?.addEventListener('click', () => {
-    const form = document.getElementById('frm-instance-config');
-    if (!form) return;
-
-    form.webhook_enabled.checked = true;
-    form.webhook_by_events.checked = true;
-    form.webhook_base64.checked = false;
-    form.event_producer_rabbitmq.value = 'default';
-    form.event_producer_websocket.value = 'default';
-    form.event_producer_nats.value = 'default';
-
-    form.querySelectorAll('input[name="webhook_events[]"]').forEach(input => {
-        input.checked = recommendedWebhookEvents.includes(input.value);
-    });
-
-    form.reject_call.checked = true;
-    form.groups_ignore.checked = true;
-    form.always_online.checked = false;
-    form.read_messages.checked = false;
-    form.ignore_status.checked = true;
-    form.sync_full_history.checked = false;
-    form.msg_call.value = 'Atendimento somente por mensagem.';
-
-    notify('success', 'Configuração recomendada aplicada na tela. Clique em Salvar e aplicar para persistir.');
+document.getElementById('btn-copy-verify-token')?.addEventListener('click', async () => {
+    const input = document.querySelector('[name="webhook_verify_token_display"]');
+    try {
+        await navigator.clipboard.writeText(input.value);
+        notify('success', 'Token de verificação copiado.');
+    } catch (e) {
+        input.select();
+        document.execCommand('copy');
+        notify('success', 'Token de verificação copiado.');
+    }
 });
 
 document.getElementById('btn-save-config')?.addEventListener('click', async () => {
     const form = document.getElementById('frm-instance-config');
     const id = form.dataset.id;
     const btn = document.getElementById('btn-save-config');
-    const events = [...form.querySelectorAll('input[name="webhook_events[]"]:checked')].map(input => input.value);
     const payload = {
-        api_base_url: form.api_base_url.value,
-        api_key: form.api_key.value,
-        webhook_enabled: form.webhook_enabled.checked,
-        webhook_by_events: form.webhook_by_events.checked,
-        webhook_base64: form.webhook_base64.checked,
-        webhook_events: events,
-        event_producer_rabbitmq: form.event_producer_rabbitmq.value,
-        event_producer_websocket: form.event_producer_websocket.value,
-        event_producer_nats: form.event_producer_nats.value,
-        reject_call: form.reject_call.checked,
-        msg_call: form.msg_call.value,
-        groups_ignore: form.groups_ignore.checked,
-        always_online: form.always_online.checked,
-        read_messages: form.read_messages.checked,
-        ignore_status: form.ignore_status.checked,
-        read_status: !form.ignore_status.checked,
-        sync_full_history: form.sync_full_history.checked,
+        display_name: form.display_name.value,
+        phone: form.phone.value,
+        meta_phone_number_id: form.meta_phone_number_id.value,
+        meta_waba_id: form.meta_waba_id.value,
+        meta_access_token: form.meta_access_token.value,
     };
 
     setLoading(btn, true);
@@ -1335,18 +969,15 @@ document.getElementById('btn-save-config')?.addEventListener('click', async () =
             instanceConfig[id] = {
                 ...instanceConfig[id],
                 ...payload,
-                event_producers: {
-                    rabbitmq: payload.event_producer_rabbitmq,
-                    websocket: payload.event_producer_websocket,
-                    nats: payload.event_producer_nats,
-                },
-                webhook_url: d.webhook_url,
-                has_api_key: instanceConfig[id]?.has_api_key || !!payload.api_key,
+                has_meta_token: instanceConfig[id]?.has_meta_token || !!payload.meta_access_token,
                 last_synced_at: savedAt
             };
-            form.webhook_url_display.value = d.webhook_url || form.webhook_url_display.value;
+            if (d.instance) {
+                applyInstancePayload(d.instance);
+            }
             updateConfigSyncIndicator(id, savedAt);
-            notify(d.applied ? 'success' : 'error', d.message || 'Configuração salva.');
+            notify('success', d.message || 'Configuração da Meta salva com sucesso.');
+            bootstrap.Modal.getInstance(document.getElementById('modalInstanceConfig'))?.hide();
             clearStuckModalBackdrop();
         } else {
             notify('error', d.error || 'Erro ao salvar configuração.');
@@ -1373,31 +1004,41 @@ function applyInstancePayload(instance) {
 
     const name = instance.display_name || instance.profile_business_name || instance.profile_full_name || instance.profile_name || instance.profile_push_name || instance.instance_name;
     const avatarWrap = card.querySelector('[data-avatar-wrap]');
-    if (instance.profile_avatar_url) {
-        avatarWrap.innerHTML = `<img src="${escapeAttr(instance.profile_avatar_url)}" alt="${escapeAttr(name)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('d-none');" data-profile-avatar><span data-profile-initial class="d-none">${escapeHtml((name || '-').charAt(0).toUpperCase())}</span>`;
-    } else {
-        avatarWrap.innerHTML = `<span data-profile-initial>${escapeHtml((name || '-').charAt(0).toUpperCase())}</span>`;
+    if (avatarWrap) {
+        if (instance.profile_avatar_url) {
+            avatarWrap.innerHTML = `<img src="${escapeAttr(instance.profile_avatar_url)}" alt="${escapeAttr(name)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('d-none');" data-profile-avatar><span data-profile-initial class="d-none">${escapeHtml((name || '-').charAt(0).toUpperCase())}</span>`;
+        } else {
+            avatarWrap.innerHTML = `<span data-profile-initial>${escapeHtml((name || '-').charAt(0).toUpperCase())}</span>`;
+        }
     }
 
-    card.querySelector('[data-profile-name]').textContent = name || '-';
-    card.querySelector('[data-profile-status]').textContent = instance.profile_status || 'Slogan/status ainda não sincronizado.';
-    card.querySelector('[data-profile-number]').textContent = formatPhone(instance.profile_number || instance.phone || '');
-    card.querySelector('[data-profile-jid]').textContent = instance.profile_jid || '-';
-    card.querySelector('[data-profile-lid]').textContent = instance.profile_lid || '-';
-    card.querySelector('[data-profile-devices]').textContent = Array.isArray(instance.profile_devices) ? instance.profile_devices.length : 0;
-    card.querySelector('[data-profile-sync]').textContent = instance.last_profile_sync_at || '-';
+    const nameEl = card.querySelector('[data-profile-name]');
+    if (nameEl) nameEl.textContent = name || '-';
 
-    const typeBadge = card.querySelector('[data-profile-type]');
-    if (typeBadge) {
-        const tone = instance.profile_is_business ? 'info' : 'secondary';
-        typeBadge.className = `badge bg-${tone}-subtle text-${tone} border border-${tone}-subtle`;
-        typeBadge.textContent = instance.profile_is_business ? 'Business' : 'Pessoal';
-    }
+    const statusEl = card.querySelector('[data-profile-status]');
+    if (statusEl) statusEl.textContent = instance.profile_status || 'WhatsApp Cloud API Oficial da Meta';
+
+    const numEl = card.querySelector('[data-profile-number]');
+    if (numEl) numEl.textContent = formatPhone(instance.profile_number || instance.phone || '');
+
+    const phoneIdEl = card.querySelector('[data-profile-phone-id]');
+    if (phoneIdEl) phoneIdEl.textContent = instance.meta_phone_number_id || 'Padrão Global';
+
+    const wabaIdEl = card.querySelector('[data-profile-waba-id]');
+    if (wabaIdEl) wabaIdEl.textContent = instance.meta_waba_id || 'Padrão Global';
+
+    const qualityEl = card.querySelector('[data-profile-quality]');
+    if (qualityEl) qualityEl.innerHTML = `<i class="bi bi-shield-check me-1"></i>${escapeHtml(instance.quality_rating || 'GREEN')}`;
+
+    const syncEl = card.querySelector('[data-profile-sync]');
+    if (syncEl) syncEl.textContent = instance.last_profile_sync_at || '-';
 
     const badge = card.querySelector('[data-status-badge]');
-    const color = statusColors[instance.status] || 'secondary';
-    badge.className = `badge text-bg-${color}`;
-    badge.textContent = statusLabels[instance.status] || instance.status || 'Desconhecido';
+    if (badge) {
+        const color = statusColors[instance.status] || 'secondary';
+        badge.className = `badge text-bg-${color}`;
+        badge.textContent = statusLabels[instance.status] || instance.status || 'Desconhecido';
+    }
 
     const discBtn = card.querySelector('.btn-disconnect');
     if (discBtn) {
@@ -1405,12 +1046,14 @@ function applyInstancePayload(instance) {
     }
 
     const errorBox = card.querySelector('[data-last-error]');
-    if (instance.last_error) {
-        errorBox.className = 'alert alert-warning py-2 px-3 small mb-3';
-        errorBox.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>${escapeHtml(instance.last_error)}`;
-    } else {
-        errorBox.className = 'd-none';
-        errorBox.innerHTML = '';
+    if (errorBox) {
+        if (instance.last_error) {
+            errorBox.className = 'alert alert-warning py-2 px-3 small mb-3';
+            errorBox.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>${escapeHtml(instance.last_error)}`;
+        } else {
+            errorBox.className = 'd-none';
+            errorBox.innerHTML = '';
+        }
     }
 }
 
@@ -1489,7 +1132,7 @@ function ensureInstancesEmptyState() {
         <div class="empty-state">
             <i class="bi bi-phone"></i>
             <h3>Nenhuma instância cadastrada</h3>
-            <p>Crie a primeira instância para gerar QR Code, conectar o WhatsApp e sincronizar a identidade do perfil.</p>
+            <p>Crie a primeira instância para conectar à WhatsApp Cloud API Oficial da Meta e configurar suas credenciais.</p>
             <button class="btn btn-primary btn-sm empty-state__action" data-bs-toggle="modal" data-bs-target="#modalCreateInstance">
                 <i class="bi bi-plus-lg me-1"></i> Criar instância
             </button>
@@ -1498,69 +1141,17 @@ function ensureInstancesEmptyState() {
 }
 
 function showQrCode(qr) {
-    const modal = new bootstrap.Modal(document.getElementById('modalQR'));
-    document.getElementById('qr-loading').classList.add('d-none');
-    document.getElementById('qr-error').classList.add('d-none');
-    document.getElementById('qr-content').classList.remove('d-none');
-    document.getElementById('qr-image').src = normalizeQrSrc(qr);
-    modal.show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQR')).show();
 }
 
 async function openQrModalForInstance(id) {
-    const modal = new bootstrap.Modal(document.getElementById('modalQR'));
-    document.getElementById('qr-image').removeAttribute('src');
-    document.getElementById('qr-loading').classList.remove('d-none');
-    document.getElementById('qr-content').classList.add('d-none');
-    document.getElementById('qr-error').classList.add('d-none');
-    modal.show();
-
-    try {
-        const r = await fetch(`${instancesBaseUrl}/${id}/qr`, {
-            credentials: 'same-origin',
-            headers: { 'Accept': 'application/json' }
-        });
-        const d = await r.json();
-        document.getElementById('qr-loading').classList.add('d-none');
-        if (d.ok && d.qr) {
-            document.getElementById('qr-image').src = normalizeQrSrc(d.qr);
-            document.getElementById('qr-content').classList.remove('d-none');
-        } else {
-            modal.hide();
-            if (d.connected) {
-                notify('info', d.message || 'Esta instancia ja esta conectada.');
-                return;
-            }
-            notify('error', d.error || d.message || 'Nao foi possivel gerar o QR Code.');
-        }
-    } catch (e) {
-        modal.hide();
-        document.getElementById('qr-loading').classList.add('d-none');
-        notify('error', 'Erro de conexao ao gerar o QR Code.');
-    }
-}
-
-function normalizeQrSrc(qr) {
-    const value = String(qr || '').trim();
-    if (!value || value.startsWith('data:image')) return value;
-    return `data:image/png;base64,${value.replace(/\s+/g, '')}`;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQR')).show();
 }
 
 function bindDynamicInstanceActions(root) {
     root.querySelectorAll('.btn-qr').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            if (isInstanceConnected(btn)) {
-                await Swal.fire({
-                    icon: 'info',
-                    title: 'Instancia ja em uso',
-                    text: 'Esta instancia ja esta conectada ao WhatsApp. Desconecte-a primeiro se quiser trocar de numero.',
-                    confirmButtonText: 'OK',
-                    background: getComputedStyle(document.body).getPropertyValue('--bs-body-bg'),
-                    color: getComputedStyle(document.body).getPropertyValue('--bs-body-color'),
-                });
-                return;
-            }
-
-            await openQrModalForInstance(btn.dataset.id);
+        btn.addEventListener('click', () => {
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQR')).show();
         });
     });
 

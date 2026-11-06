@@ -71,7 +71,6 @@ return new class extends Migration
             $t->longText('message');
             $t->string('meta_message_id')->nullable()->index();
             $t->string('external_id')->nullable()->index();
-            $t->string('evolution_id')->nullable()->index();
             $t->enum('direction', ['out', 'in'])->default('out');
             $t->enum('status', ['queued', 'sent', 'delivered', 'read', 'failed'])->default('queued');
             $t->json('response')->nullable();

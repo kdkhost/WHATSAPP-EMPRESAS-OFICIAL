@@ -619,7 +619,7 @@ class TenantPanelController extends Controller
                 'html' => $this->instanceCardHtml($instance),
                 'config' => $this->instanceConfigPayload($instance),
                 'counts' => $this->instanceCounts($tenant->fresh()),
-                'qr' => $instance->evolution_qr_code,
+                'qr' => null,
                 'requires_purchase' => $requiresPurchase,
                 'invoice' => $invoice,
             ]);
@@ -666,17 +666,11 @@ class TenantPanelController extends Controller
     {
         $instance = TenantInstance::where('tenant_id', $this->tenant()->id)->findOrFail($id);
 
-        if ($instance->status === 'connected' || $mgr->isConnectedByStatus($instance)) {
-            return response()->json(['ok' => false, 'connected' => true, 'message' => 'Instancia ja esta conectada.']);
-        }
-
-        try {
-            $qr = $mgr->getQrCode($instance);
-        } catch (\Throwable $e) {
-            return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
-        }
-
-        return response()->json(['ok' => (bool) $qr, 'qr' => $qr]);
+        return response()->json([
+            'ok' => false,
+            'qr' => null,
+            'message' => 'A WhatsApp Cloud API Oficial da Meta conecta diretamente por Token e Phone Number ID sem necessidade de QR Code.',
+        ]);
     }
 
     public function syncInstance(int $id, InstanceManager $mgr): JsonResponse
@@ -692,19 +686,20 @@ class TenantPanelController extends Controller
                 return response()->json([
                     'ok' => false,
                     'connected' => false,
-                    'state' => $result['state'] ?? null,
+                    'state' => $result['state'] ?? 'close',
                     'instance' => $this->instancePayload($instance),
                     'errors' => $result['errors'] ?? [],
-                    'error' => 'Nenhum WhatsApp conectado nesta instancia. Gere o QR Code e conecte o aparelho antes de sincronizar.',
+                    'error' => $result['error'] ?? 'Nao foi possivel conectar com a Meta WhatsApp API. Verifique Phone Number ID e Token.',
                 ], 422);
             }
 
             return response()->json([
                 'ok' => true,
                 'connected' => true,
-                'state' => $result['state'] ?? null,
+                'state' => 'open',
                 'instance' => $this->instancePayload($instance),
-                'errors' => $result['errors'] ?? [],
+                'profile' => $result['profile'] ?? [],
+                'errors' => [],
             ]);
         } catch (\Throwable $e) {
             return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
@@ -726,41 +721,29 @@ class TenantPanelController extends Controller
         $instance = TenantInstance::where('tenant_id', $this->tenant()->id)->findOrFail($id);
 
         $data = $request->validate([
-            'api_base_url' => 'nullable|url|max:255',
-            'api_key' => 'nullable|string|min:5|max:1000',
-            'webhook_enabled' => 'required|boolean',
-            'webhook_by_events' => 'required|boolean',
-            'webhook_base64' => 'required|boolean',
+            'meta_phone_number_id' => 'nullable|string|max:64',
+            'meta_waba_id' => 'nullable|string|max:64',
+            'meta_access_token' => 'nullable|string|max:1000',
+            'display_name' => 'nullable|string|max:80',
+            'phone' => 'nullable|string|max:30',
+            'api_base_url' => 'nullable|string|max:255',
+            'api_key' => 'nullable|string|max:1000',
+            'webhook_enabled' => 'nullable|boolean',
             'webhook_events' => 'nullable|array',
-            'webhook_events.*' => 'string|max:80',
-            'event_producer_rabbitmq' => 'nullable|in:default,enabled,disabled',
-            'event_producer_websocket' => 'nullable|in:default,enabled,disabled',
-            'event_producer_nats' => 'nullable|in:default,enabled,disabled',
-            'reject_call' => 'required|boolean',
-            'msg_call' => 'nullable|string|max:500',
-            'groups_ignore' => 'required|boolean',
-            'always_online' => 'required|boolean',
-            'read_messages' => 'required|boolean',
-            'read_status' => 'nullable|boolean',
-            'ignore_status' => 'nullable|boolean',
-            'sync_full_history' => 'required|boolean',
         ]);
 
         try {
-            $result = $mgr->saveEvolutionConfig($instance, $data);
+            $result = $mgr->saveInstanceConfig($instance, $data);
             $instance->refresh();
 
             return response()->json([
                 'ok' => true,
-                'applied' => (bool) ($result['ok'] ?? true),
-                'message' => ($result['ok'] ?? true)
-                    ? 'Configuracao salva e aplicada.'
-                    : 'Configuracao salva, mas a API retornou alerta.',
-                'webhook_url' => $result['webhook_url'] ?? $instance->secure_webhook_url,
-                'event_producers' => $result['event_producers'] ?? data_get($instance->meta ?? [], 'evolution_event_producers', []),
+                'applied' => (bool) ($result['applied'] ?? true),
+                'message' => $result['message'] ?? 'Configuracao da Meta salva com sucesso.',
+                'webhook_url' => $instance->secure_webhook_url,
                 'instance' => $this->instancePayload($instance),
-                'remote' => $result['remote'] ?? [],
-                'errors' => $result['errors'] ?? [],
+                'config' => $this->instanceConfigPayload($instance),
+                'sync' => $result['sync'] ?? [],
             ]);
         } catch (\Throwable $e) {
             return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
@@ -775,6 +758,10 @@ class TenantPanelController extends Controller
             'display_name' => $instance->display_name,
             'status' => $instance->status,
             'phone' => $instance->phone,
+            'meta_phone_number_id' => $instance->meta_phone_number_id,
+            'meta_waba_id' => $instance->meta_waba_id,
+            'has_meta_token' => filled($instance->meta_access_token),
+            'quality_rating' => data_get($instance->meta, 'quality_rating', 'GREEN'),
             'profile_name' => $instance->profile_name,
             'profile_push_name' => $instance->profile_push_name,
             'profile_full_name' => $instance->profile_full_name,
@@ -819,28 +806,15 @@ class TenantPanelController extends Controller
 
     private function instanceConfigPayload(TenantInstance $instance): array
     {
-        $defaultWebhookEvents = $this->defaultWebhookEvents();
-        $settings = data_get($instance->meta ?? [], 'evolution_settings', []);
-
         return [
             'id' => $instance->id,
-            'api_base_url' => $instance->api_base_url,
-            'has_api_key' => filled($instance->api_key),
-            'webhook_enabled' => (bool) $instance->webhook_enabled,
-            'webhook_by_events' => $instance->webhook_by_events ?? true,
-            'webhook_base64' => (bool) $instance->webhook_base64,
-            'webhook_events' => $instance->webhook_events ?: $defaultWebhookEvents,
+            'display_name' => $instance->display_name,
+            'phone' => $instance->phone,
+            'meta_phone_number_id' => $instance->meta_phone_number_id,
+            'meta_waba_id' => $instance->meta_waba_id,
+            'has_meta_token' => filled($instance->meta_access_token),
+            'status' => $instance->status,
             'webhook_url' => $instance->secure_webhook_url,
-            'settings' => [
-                'reject_call' => (bool) data_get($settings, 'rejectCall', data_get($settings, 'reject_call', false)),
-                'msg_call' => (string) data_get($settings, 'msgCall', data_get($settings, 'msg_call', '')),
-                'groups_ignore' => (bool) data_get($settings, 'groupsIgnore', data_get($settings, 'groups_ignore', false)),
-                'always_online' => (bool) data_get($settings, 'alwaysOnline', data_get($settings, 'always_online', false)),
-                'read_messages' => (bool) data_get($settings, 'readMessages', data_get($settings, 'read_messages', false)),
-                'read_status' => (bool) data_get($settings, 'readStatus', data_get($settings, 'read_status', false)),
-                'ignore_status' => (bool) data_get($settings, 'ignoreStatus', ! (bool) data_get($settings, 'readStatus', data_get($settings, 'read_status', false))),
-                'sync_full_history' => (bool) data_get($settings, 'syncFullHistory', data_get($settings, 'sync_full_history', false)),
-            ],
         ];
     }
 

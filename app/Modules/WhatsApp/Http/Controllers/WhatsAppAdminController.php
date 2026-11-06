@@ -57,33 +57,39 @@ class WhatsAppAdminController extends Controller
     protected function whatsappRuntimeConfig(?SettingsManager $settings = null): array
     {
         $settings ??= app(SettingsManager::class);
-        $baseUrl = $this->firstFilled($settings->get('whatsapp.base_url'), config('whatsapp.base_url'));
-        $globalApiKey = $this->firstFilled(
-            $settings->get('whatsapp.global_api_key'),
-            $settings->get('whatsapp.global_apikey'),
-            config('whatsapp.global_api_key'),
-            config('whatsapp.global_apikey'),
-            env('EVOLUTION_GLOBAL_API_KEY'),
-            env('EVOLUTION_GLOBAL_APIKEY'),
-            config('whatsapp.api_key')
+        $baseUrl = $this->firstFilled(
+            $settings->get('whatsapp.base_url'),
+            config('whatsapp.meta_base_url'),
+            config('whatsapp.base_url'),
+            'https://graph.facebook.com/v21.0'
         );
         $apiKey = $this->firstFilled(
+            $settings->get('whatsapp.meta_access_token'),
+            config('whatsapp.meta_access_token'),
             $settings->get('whatsapp.instance_api_key'),
             $settings->get('whatsapp.apikey'),
             $settings->get('whatsapp.api_key'),
             config('whatsapp.instance_api_key'),
-            config('whatsapp.apikey'),
-            env('EVOLUTION_INSTANCE_API_KEY'),
-            env('EVOLUTION_API_KEY'),
+            config('whatsapp.api_key')
+        );
+        $globalApiKey = $this->firstFilled(
+            $settings->get('whatsapp.meta_access_token'),
+            config('whatsapp.meta_access_token'),
+            $settings->get('whatsapp.global_api_key'),
+            $settings->get('whatsapp.global_apikey'),
+            config('whatsapp.global_api_key'),
             config('whatsapp.api_key')
         );
 
         return [
-            'base_url'       => $baseUrl ? rtrim($baseUrl, '/') : '',
-            'global_api_key' => (string) ($globalApiKey ?? ''),
-            'api_key'        => (string) ($apiKey ?? ''),
-            'instance'       => (string) ($this->firstFilled($settings->get('whatsapp.instance'), config('whatsapp.instance')) ?? ''),
-            'timeout'        => max(5, (int) ($this->firstFilled($settings->get('whatsapp.timeout'), config('whatsapp.timeout', 15)) ?? 15)),
+            'base_url'               => $baseUrl ? rtrim($baseUrl, '/') : 'https://graph.facebook.com/v21.0',
+            'global_api_key'         => (string) ($globalApiKey ?? ''),
+            'api_key'                => (string) ($apiKey ?? ''),
+            'meta_access_token'      => (string) ($apiKey ?? ''),
+            'meta_phone_number_id'   => (string) ($this->firstFilled($settings->get('whatsapp.meta_phone_number_id'), config('whatsapp.meta_phone_number_id')) ?? ''),
+            'meta_waba_id'           => (string) ($this->firstFilled($settings->get('whatsapp.meta_waba_id'), config('whatsapp.meta_waba_id')) ?? ''),
+            'instance'               => (string) ($this->firstFilled($settings->get('whatsapp.instance'), config('whatsapp.instance')) ?? 'meta_official'),
+            'timeout'                => max(5, (int) ($this->firstFilled($settings->get('whatsapp.timeout'), config('whatsapp.timeout', 15)) ?? 15)),
         ];
     }
 
@@ -213,8 +219,7 @@ class WhatsAppAdminController extends Controller
             $query->where(function ($qb) use ($q) {
                 $qb->where('to', 'like', "%{$q}%")
                    ->orWhere('message', 'like', "%{$q}%")
-                   ->orWhere('meta_message_id', 'like', "%{$q}%")
-                   ->orWhere('evolution_id', 'like', "%{$q}%");
+                   ->orWhere('meta_message_id', 'like', "%{$q}%");
             });
         }
         if ($status = $request->input('status')) {
@@ -539,114 +544,65 @@ class WhatsAppAdminController extends Controller
     public function saveConfig(Request $request, SettingsManager $s): JsonResponse
     {
         $data = $request->validate([
-            'base_url'       => 'required|url',
-            'global_api_key' => 'nullable|string|min:5',
-            'api_key'        => 'nullable|string|min:5',
-            'instance'       => 'required|string|min:1',
-            'timeout'        => 'nullable|integer|min:5|max:120',
-            'webhook_enabled' => 'nullable|boolean',
-            'webhook_by_events' => 'nullable|boolean',
-            'webhook_base64' => 'nullable|boolean',
-            'webhook_events' => 'nullable|array',
-            'webhook_events.*' => 'string|max:80',
-            'event_producer_rabbitmq' => 'nullable|in:default,enabled,disabled',
-            'event_producer_websocket' => 'nullable|in:default,enabled,disabled',
-            'event_producer_nats' => 'nullable|in:default,enabled,disabled',
-            'rejectCalls' => 'nullable|boolean',
-            'groupsIgnore' => 'nullable|boolean',
-            'alwaysOnline' => 'nullable|boolean',
-            'readMessages' => 'nullable|boolean',
-            'readStatus' => 'nullable|boolean',
-            'syncFullHistory' => 'nullable|boolean',
-            'ignoreStatus' => 'nullable|boolean',
-            'rejectCallsMessage' => 'nullable|string|max:500',
+            'meta_phone_number_id'      => 'nullable|string|max:64',
+            'meta_waba_id'              => 'nullable|string|max:64',
+            'meta_access_token'         => 'nullable|string|max:1000',
+            'meta_app_secret'           => 'nullable|string|max:128',
+            'meta_webhook_verify_token' => 'nullable|string|max:128',
+            'base_url'                  => 'nullable|url',
+            'global_api_key'            => 'nullable|string|min:5',
+            'api_key'                   => 'nullable|string|min:5',
+            'instance'                  => 'nullable|string|min:1',
+            'timeout'                   => 'nullable|integer|min:5|max:120',
         ]);
 
-        $existingConfig = $this->whatsappRuntimeConfig($s);
-        $globalApiKey = $this->firstFilled($data['global_api_key'] ?? null, $existingConfig['global_api_key'] ?? null);
-        $instanceApiKey = $this->firstFilled($data['api_key'] ?? null, $existingConfig['api_key'] ?? null);
-
-        if (! $globalApiKey || ! $instanceApiKey) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Informe ou preserve as credenciais da Meta WhatsApp API antes de salvar.',
-            ], 422);
+        if (filled($data['meta_phone_number_id'] ?? null)) {
+            $s->set('whatsapp.meta_phone_number_id', $data['meta_phone_number_id']);
+        }
+        if (filled($data['meta_waba_id'] ?? null)) {
+            $s->set('whatsapp.meta_waba_id', $data['meta_waba_id']);
+        }
+        if (filled($data['meta_access_token'] ?? null)) {
+            $s->set('whatsapp.meta_access_token', $data['meta_access_token']);
+            $s->set('whatsapp.api_key', $data['meta_access_token']);
+            $s->set('whatsapp.instance_api_key', $data['meta_access_token']);
+            $s->set('whatsapp.global_api_key', $data['meta_access_token']);
+        }
+        if (filled($data['meta_app_secret'] ?? null)) {
+            $s->set('whatsapp.meta_app_secret', $data['meta_app_secret']);
+        }
+        if (filled($data['meta_webhook_verify_token'] ?? null)) {
+            $s->set('whatsapp.meta_webhook_verify_token', $data['meta_webhook_verify_token']);
+            $s->set('whatsapp.webhook_token', $data['meta_webhook_verify_token']);
         }
 
-        $s->set('whatsapp.base_url', $data['base_url']);
-        $s->set('whatsapp.global_api_key', $globalApiKey);
-        $s->set('whatsapp.global_apikey', $globalApiKey);
-        $s->set('whatsapp.instance_api_key', $instanceApiKey);
-        $s->set('whatsapp.apikey', $instanceApiKey);
-        $s->set('whatsapp.api_key', $instanceApiKey);
-        $s->set('whatsapp.instance', $data['instance']);
-        $s->set('whatsapp.timeout', $data['timeout'] ?? 15, 'int');
-
-        $remoteApply = [];
-        $remoteErrors = [];
-        $shouldApplyEvolution = $request->hasAny([
-            'webhook_enabled',
-            'webhook_by_events',
-            'webhook_base64',
-            'webhook_events',
-            'event_producer_rabbitmq',
-            'event_producer_websocket',
-            'event_producer_nats',
-            'rejectCalls',
-            'groupsIgnore',
-            'alwaysOnline',
-            'readMessages',
-            'readStatus',
-            'ignoreStatus',
-            'syncFullHistory',
-            'rejectCallsMessage',
-        ]);
-
-        if ($shouldApplyEvolution) {
-            $advancedSettings = $this->normalizeMainAdvancedSettings($request);
-            $webhookConfig = [
-                'enabled' => $request->boolean('webhook_enabled'),
-                'byEvents' => $request->boolean('webhook_by_events', true),
-                'base64' => $request->boolean('webhook_base64'),
-                'events' => $this->normalizeMainWebhookEvents($data['webhook_events'] ?? []),
-                'producers' => $this->normalizeMainEventProducers($data),
-            ];
-
-            $s->set('whatsapp.webhook_enabled', $webhookConfig['enabled'], 'bool');
-            $s->set('whatsapp.webhook_by_events', $webhookConfig['byEvents'], 'bool');
-            $s->set('whatsapp.webhook_base64', $webhookConfig['base64'], 'bool');
-            $s->set('whatsapp.webhook_events', $webhookConfig['events'], 'json');
-            $s->set('whatsapp.event_producers', $webhookConfig['producers'], 'json');
-            $s->set('whatsapp.advanced_settings', $advancedSettings, 'json');
-
-            app()->forgetInstance(WhatsAppMetaClient::class);
-            $remoteApply = $this->applyMainEvolutionConfig(app(WhatsAppMetaClient::class), $s, $this->whatsappRuntimeConfig($s), $webhookConfig, $advancedSettings);
-            $remoteErrors = collect($remoteApply)
-                ->filter(fn ($item) => is_array($item) && ($item['ok'] ?? true) === false)
-                ->map(fn ($item) => $item['message'] ?? 'Falha desconhecida na Evolution.')
-                ->filter()
-                ->values()
-                ->all();
+        if (filled($data['base_url'] ?? null)) {
+            $s->set('whatsapp.base_url', $data['base_url']);
+        }
+        if (filled($data['instance'] ?? null)) {
+            $s->set('whatsapp.instance', $data['instance']);
+        }
+        if (isset($data['timeout'])) {
+            $s->set('whatsapp.timeout', (int) $data['timeout'], 'int');
         }
 
-        // Recria o singleton com as novas configuracoes
+        // Recria os singletons com as novas configuracoes
         app()->forgetInstance(WhatsAppMetaClient::class);
+        app()->forgetInstance(\App\Modules\WhatsApp\Services\MetaCloudApiClient::class);
 
-        $this->persistMainInstanceStatus($this->whatsappRuntimeConfig($s), [
+        $runtime = $this->whatsappRuntimeConfig($s);
+        $this->persistMainInstanceStatus($runtime, [
             'state' => 'nao_verificado',
-            'instance' => $data['instance'],
+            'instance' => $runtime['instance'] ?: 'meta_official',
             'last_check' => now()->toIso8601String(),
             '_source' => 'admin_config',
         ]);
 
         return response()->json([
             'ok' => true,
-            'message' => 'Configuração salva com sucesso.',
-            'data' => $this->mainInstanceStatusPayload($this->whatsappRuntimeConfig($s)),
-            'remote' => $remoteApply,
-            'webhook_url' => $this->buildMainEvolutionWebhookUrl($s, $this->whatsappRuntimeConfig($s)),
-            'config' => $this->mainEvolutionConfig($s),
-            'errors' => $remoteErrors,
+            'message' => 'Configurações da Meta WhatsApp Cloud API salvas com sucesso.',
+            'data' => $this->mainInstanceStatusPayload($runtime),
+            'webhook_url' => url('/api/v1/webhook'),
         ]);
     }
 
@@ -1367,44 +1323,34 @@ class WhatsAppAdminController extends Controller
         }
     }
 
-    /** Salva configuracao da Evolution em uma instancia de tenant (admin). */
+    /** Salva configuracao da Meta Cloud API em uma instancia de tenant (admin). */
     public function saveInstanceConfig(Request $request, int $id, InstanceManager $mgr): JsonResponse
     {
         $instance = TenantInstance::findOrFail($id);
 
         $data = $request->validate([
-            'api_base_url' => 'nullable|url|max:255',
-            'api_key' => 'nullable|string|min:5|max:1000',
-            'webhook_enabled' => 'required|boolean',
-            'webhook_by_events' => 'required|boolean',
-            'webhook_base64' => 'required|boolean',
+            'meta_phone_number_id' => 'nullable|string|max:64',
+            'meta_waba_id' => 'nullable|string|max:64',
+            'meta_access_token' => 'nullable|string|max:1000',
+            'display_name' => 'nullable|string|max:80',
+            'phone' => 'nullable|string|max:30',
+            'api_base_url' => 'nullable|string|max:255',
+            'api_key' => 'nullable|string|max:1000',
+            'webhook_enabled' => 'nullable|boolean',
             'webhook_events' => 'nullable|array',
-            'webhook_events.*' => 'string|max:80',
-            'event_producer_rabbitmq' => 'nullable|in:default,enabled,disabled',
-            'event_producer_websocket' => 'nullable|in:default,enabled,disabled',
-            'event_producer_nats' => 'nullable|in:default,enabled,disabled',
-            'reject_call' => 'required|boolean',
-            'msg_call' => 'nullable|string|max:500',
-            'groups_ignore' => 'required|boolean',
-            'always_online' => 'required|boolean',
-            'read_messages' => 'required|boolean',
-            'read_status' => 'required|boolean',
-            'sync_full_history' => 'required|boolean',
         ]);
 
         try {
-            $result = $mgr->saveEvolutionConfig($instance, $data);
+            $result = $mgr->saveInstanceConfig($instance, $data);
             $instance->refresh();
 
             return response()->json([
                 'ok' => true,
-                'applied' => (bool) ($result['ok'] ?? true),
+                'applied' => (bool) ($result['applied'] ?? true),
+                'message' => $result['message'] ?? 'Configuracao salva com sucesso.',
                 'webhook_url' => $result['webhook_url'] ?? $instance->secure_webhook_url,
-                'event_producers' => $result['event_producers'] ?? data_get($instance->meta ?? [], 'evolution_event_producers', []),
-                'settings' => $result['settings'] ?? [],
                 'instance' => $instance,
-                'remote' => $result['remote'] ?? [],
-                'errors' => $result['errors'] ?? [],
+                'sync' => $result['sync'] ?? [],
             ]);
         } catch (\Throwable $e) {
             return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
@@ -1568,7 +1514,7 @@ class WhatsAppAdminController extends Controller
                 'skip_safety' => true,
                 'delay_seconds' => 0,
             ]));
-            return response()->json(['ok' => (bool) $id, 'evolution_id' => $id]);
+            return response()->json(['ok' => (bool) $id, 'meta_message_id' => $id, 'message_id' => $id]);
         } catch (\Throwable $e) {
             return response()->json(['ok' => false, 'message' => $e->getMessage()], 422);
         }
@@ -1691,7 +1637,8 @@ class WhatsAppAdminController extends Controller
             return response()->json([
                 'ok' => true,
                 'message' => 'Mensagem enviada com sucesso!',
-                'evolution_id' => $id,
+                'meta_message_id' => $id,
+                'message_id' => $id,
                 'to' => $cleanTo,
             ]);
         } catch (\Throwable $e) {
@@ -1907,7 +1854,7 @@ class WhatsAppAdminController extends Controller
                 $newId = $client->sendText($msg->to, $msg->message, array_merge($context, $inspection));
             }
 
-            return response()->json(['ok' => (bool) $newId, 'evolution_id' => $newId]);
+            return response()->json(['ok' => (bool) $newId, 'meta_message_id' => $newId, 'message_id' => $newId]);
         } catch (\Throwable $e) {
             return response()->json(['ok' => false, 'message' => $e->getMessage()], 422);
         }
@@ -1999,8 +1946,7 @@ class WhatsAppAdminController extends Controller
                     'formatted_to' => $formattedTo,
                     'direction' => $msg->direction,
                     'status' => $msg->status,
-                    'meta_message_id' => $msg->meta_message_id ?? $msg->evolution_id ?? 'Sem ID',
-                    'evolution_id' => $msg->meta_message_id ?? $msg->evolution_id ?? 'Sem ID',
+                    'meta_message_id' => $msg->meta_message_id ?? 'Sem ID',
                     'content' => $msg->message,
                     'created_at' => $createdAt?->format('d/m/Y H:i:s'),
                     'created_at_time' => $createdAt?->format('H:i'),

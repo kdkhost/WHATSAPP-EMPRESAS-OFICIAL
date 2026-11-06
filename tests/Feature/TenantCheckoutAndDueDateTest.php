@@ -196,10 +196,10 @@ test('cobranca avulsa criada pelo tenant via Mercado Pago utiliza checkout segur
         $noMpTicket = ! str_contains($text, $mockTicketUrl) && ! str_contains($text, 'mercadopago.com.br');
         // Deve conter o link transparente do painel
         $hasSecureLink = str_contains($text, url('/fatura/' . $invoice->webhook_token));
-        // Não deve dizer que vence hoje se vence amanhã
+        // Não deve dizer que vence hoje se vence amanhã ou no próximo dia útil
         $noVenceHoje = ! str_contains($text, 'Hoje é o vencimento');
         // Deve conter a data cadastrada do vencimento
-        $hasDueDate = str_contains($text, $expectedFormattedDate) || str_contains($text, 'amanhã');
+        $hasDueDate = str_contains($text, $invoice->due_date->format('d/m/Y')) || str_contains($text, $expectedFormattedDate) || str_contains($text, 'amanhã');
 
         return $noMpTicket && $hasSecureLink && $noVenceHoje && $hasDueDate;
     });

@@ -12,6 +12,7 @@ namespace App\Modules\WhatsApp\Services;
 use App\Models\Customer;
 use App\Models\WhatsAppMessage;
 use App\Modules\Settings\Services\SettingsManager;
+use App\Modules\Tenancy\Models\TenantInstance;
 use App\Support\Format;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -55,6 +56,38 @@ class MetaCloudApiClient
     public function isConfigured(): bool
     {
         return !empty($this->phoneNumberId) && !empty($this->accessToken);
+    }
+
+    /**
+     * Retorna uma copia do cliente usando as credenciais Meta proprias da instancia do tenant
+     * (Phone Number ID, WABA ID e token). Campos nao preenchidos herdam a configuracao global.
+     */
+    public function forInstance(?TenantInstance $instance): static
+    {
+        if (!$instance) {
+            return $this;
+        }
+
+        $phoneNumberId = trim((string) $instance->meta_phone_number_id);
+        $wabaId = trim((string) $instance->meta_waba_id);
+        $token = trim((string) $instance->meta_access_token);
+
+        if ($phoneNumberId === '' && $wabaId === '' && $token === '') {
+            return $this;
+        }
+
+        $clone = clone $this;
+        if ($phoneNumberId !== '') {
+            $clone->phoneNumberId = $phoneNumberId;
+        }
+        if ($wabaId !== '') {
+            $clone->wabaId = $wabaId;
+        }
+        if ($token !== '') {
+            $clone->accessToken = $token;
+        }
+
+        return $clone;
     }
 
     public function getGraphVersion(): string

@@ -7,6 +7,7 @@
     $initial = mb_strtoupper(mb_substr($displayName, 0, 1));
     $number = $inst->profile_number ?: $inst->phone;
     $maskedNumber = $number ? Format::phone(preg_replace('/^55/', '', $number)) : '-';
+    $quality = data_get($inst->meta, 'quality_rating', 'GREEN');
 @endphp
 
 <article class="instance-card" data-instance-card="{{ $inst->id }}">
@@ -28,12 +29,12 @@
                 @if($inst->is_extra_billable)
                     <span class="badge bg-info-subtle text-info border border-info-subtle">Extra {{ Format::money($inst->recurring_amount ?? 0) }}/mes</span>
                 @endif
-                <span class="badge bg-{{ $inst->profile_is_business ? 'info' : 'secondary' }}-subtle text-{{ $inst->profile_is_business ? 'info' : 'secondary' }} border border-{{ $inst->profile_is_business ? 'info' : 'secondary' }}-subtle" data-profile-type>
-                    {{ $inst->profile_is_business ? 'Business' : 'Pessoal' }}
+                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    <i class="bi bi-patch-check-fill me-1"></i> Meta Cloud API v21.0
                 </span>
             </div>
             <div class="instance-card__code"><code>{{ $inst->instance_name }}</code></div>
-            <p class="instance-card__slogan" data-profile-status>{{ $inst->profile_status ?: 'Slogan/status ainda nao sincronizado.' }}</p>
+            <p class="instance-card__slogan" data-profile-status>{{ $inst->profile_status ?: 'WhatsApp Cloud API Oficial da Meta' }}</p>
         </div>
         <span class="badge text-bg-{{ $statusColors[$status] ?? 'secondary' }}" data-status-badge>
             {{ $statusLabels[$status] ?? ucfirst((string) $status) }}
@@ -42,24 +43,24 @@
 
     <div class="instance-card__meta">
         <div>
-            <span>Numero</span>
+            <span>Numero Oficial</span>
             <strong data-profile-number>{{ $maskedNumber }}</strong>
         </div>
         <div>
-            <span>JID</span>
-            <strong class="text-truncate" data-profile-jid>{{ $inst->profile_jid ?: '-' }}</strong>
+            <span>Phone Number ID</span>
+            <strong class="text-truncate" data-profile-phone-id>{{ $inst->meta_phone_number_id ?: 'Padrao Global' }}</strong>
         </div>
         <div>
-            <span>LID</span>
-            <strong class="text-truncate" data-profile-lid>{{ $inst->profile_lid ?: '-' }}</strong>
+            <span>WABA ID</span>
+            <strong class="text-truncate" data-profile-waba-id>{{ $inst->meta_waba_id ?: 'Padrao Global' }}</strong>
         </div>
         <div>
-            <span>Dispositivos</span>
-            <strong data-profile-devices>{{ is_array($inst->profile_devices) ? count($inst->profile_devices) : 0 }}</strong>
+            <span>Qualidade Meta</span>
+            <strong class="text-success" data-profile-quality><i class="bi bi-shield-check me-1"></i>{{ $quality }}</strong>
         </div>
         <div>
-            <span>Token</span>
-            <strong>{{ filled($inst->api_key) ? 'Configurado' : 'Pendente' }}</strong>
+            <span>Token Permanente</span>
+            <strong>{{ filled($inst->meta_access_token) ? 'Individual' : 'Padrao Global' }}</strong>
         </div>
         <div>
             <span>Ultima sincronizacao</span>
@@ -76,14 +77,11 @@
     @endif
 
     <div class="instance-card__actions">
-        <button class="btn btn-outline-success btn-sm btn-qr" data-id="{{ $inst->id }}">
-            <i class="bi bi-qr-code me-1"></i> QR Code
-        </button>
         <button class="btn btn-outline-primary btn-sm btn-sync" data-id="{{ $inst->id }}">
-            <i class="bi bi-arrow-repeat me-1"></i> Sincronizar
+            <i class="bi bi-arrow-repeat me-1"></i> Testar Conexao
         </button>
-        <button class="btn btn-outline-secondary btn-sm btn-config" data-id="{{ $inst->id }}">
-            <i class="bi bi-sliders me-1"></i> Configurar API
+        <button class="btn btn-outline-success btn-sm btn-config" data-id="{{ $inst->id }}">
+            <i class="bi bi-key-fill me-1"></i> Credenciais Meta
         </button>
         @unless($inst->is_default)
             <button class="btn btn-outline-dark btn-sm btn-rename" data-id="{{ $inst->id }}" data-current="{{ $inst->display_name }}">

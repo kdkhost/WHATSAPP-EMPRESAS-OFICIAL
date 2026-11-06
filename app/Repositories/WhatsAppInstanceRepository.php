@@ -88,8 +88,8 @@ class WhatsAppInstanceRepository
             return 'disconnected';
         }
 
-        if ($tenantInstance->evolution_qr_code) {
-            return 'pending_qr';
+        if (! $tenantInstance->meta_phone_number_id) {
+            return 'pending_credentials';
         }
 
         return $remotePayload === [] ? 'local_only' : 'synced';

@@ -9,7 +9,7 @@ class TenantInstance extends Model
 {
     protected $fillable = [
         'tenant_id', 'instance_name', 'display_name', 'phone',
-        'status', 'evolution_qr_code', 'meta', 'is_default',
+        'status', 'meta_phone_number_id', 'meta_waba_id', 'meta_access_token', 'meta', 'is_default',
         'is_extra_billable', 'recurring_amount', 'billing_started_at', 'cancelled_at',
         'api_base_url', 'api_key', 'webhook_url', 'webhook_enabled',
         'webhook_by_events', 'webhook_base64', 'webhook_events', 'webhook_secret',
@@ -23,6 +23,7 @@ class TenantInstance extends Model
 
     protected $hidden = [
         'api_key',
+        'meta_access_token',
         'webhook_secret',
     ];
 
@@ -34,6 +35,7 @@ class TenantInstance extends Model
         'billing_started_at'   => 'date',
         'cancelled_at'         => 'datetime',
         'api_key'              => 'encrypted',
+        'meta_access_token'    => 'encrypted',
         'webhook_enabled'      => 'boolean',
         'webhook_by_events'    => 'boolean',
         'webhook_base64'       => 'boolean',

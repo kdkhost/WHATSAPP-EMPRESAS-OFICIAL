@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Multi-tenancy SaaS: planos, assinaturas, instancias Evolution, isolamento de dados.
+ * Multi-tenancy SaaS: planos, assinaturas, numeros Meta (WhatsApp Cloud API), isolamento de dados.
  *
  * Hierarquia:
  *   superadmin -> gerencia planos, periodos de teste, precos
@@ -25,7 +25,7 @@ return new class extends Migration
             $t->decimal('price', 10, 2);               // mensalidade
             $t->enum('billing_cycle', ['monthly', 'quarterly', 'semiannual', 'annual'])->default('monthly');
             $t->unsignedInteger('trial_days')->default(7); // periodo de teste configuravel
-            $t->unsignedInteger('max_instances')->default(1); // instancias Evolution incluidas
+            $t->unsignedInteger('max_instances')->default(1); // numeros Meta incluidos
             $t->unsignedInteger('max_customers')->default(100); // clientes por tenant
             $t->unsignedInteger('max_invoices_month')->default(500); // faturas/mes
             $t->unsignedInteger('max_messages_month')->default(1000); // msgs whatsapp/mes
@@ -56,7 +56,7 @@ return new class extends Migration
             $t->timestamps();
         });
 
-        // Instancias Evolution por tenant
+        // Numeros da WhatsApp Cloud API Oficial (Meta) por tenant
         Schema::create('tenant_instances', function (Blueprint $t) {
             $t->id();
             $t->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
@@ -64,7 +64,6 @@ return new class extends Migration
             $t->string('display_name')->nullable();      // nome amigavel
             $t->string('phone', 20)->nullable();
             $t->enum('status', ['creating', 'active', 'connected', 'disconnected', 'suspended', 'banned'])->default('creating');
-            $t->longText('evolution_qr_code')->nullable();
             $t->json('meta')->nullable();
             $t->boolean('is_default')->default(false);   // instancia padrao do plano
             $t->timestamps();
