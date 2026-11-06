@@ -12,6 +12,8 @@
 #frm-template .note-editor .note-editing-area   { background: #fff !important; }
 #frm-template .note-editor .note-editable       { min-height: 520px; background: #fff !important; color: #000 !important; font-size: 15px; line-height: 1.7; padding: 32px !important; }
 #frm-template .note-editor .note-editable *     { color: #000 !important; }
+#frm-template .note-editor .note-editing-area .note-editable *,
+.note-editor .note-editing-area .note-editable * { color: #000 !important; }
 #frm-template .note-editor .note-btn            { color: var(--bs-body-color) !important; background: var(--bs-body-bg) !important; border-color: var(--bs-border-color) !important; border-radius: 8px !important; padding: 6px 10px !important; font-size: 13px !important; }
 #frm-template .note-editor .note-btn:hover      { background: var(--bs-tertiary-bg) !important; border-color: var(--bs-primary) !important; }
 #frm-template .note-editor .note-dropdown-menu  { background: var(--bs-body-bg) !important; border: 1px solid var(--bs-border-color) !important; border-radius: 12px !important; box-shadow: 0 12px 30px rgba(0,0,0,.12) !important; padding: 6px !important; }
@@ -101,7 +103,7 @@
 <div class="container-fluid">
 
     {{-- HERO --}}
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4" style="padding:8px 0 16px;">
+    <div class="contract-premium-hero d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4" style="padding:8px 0 16px;">
         <div class="d-flex align-items-center gap-3">
             <a href="{{ route($contractRoutePrefix . 'templates') }}" class="btn btn-outline-secondary btn-sm" style="border-radius:10px;">
                 <i class="bi bi-arrow-left"></i>
@@ -171,7 +173,7 @@
                         <div class="cte-card">
                             <div class="cte-card-header"><strong><i class="bi bi-images me-1"></i>Papel timbrado</strong></div>
                             <div class="cte-card-body">
-                                <div class="cte-upload-zone mb-3"
+                                <div class="cte-upload-zone contract-letterhead-upload mb-3"
                                      data-upload
                                      data-url="{{ $contractUploadUrl }}"
                                      data-max-mb="20"

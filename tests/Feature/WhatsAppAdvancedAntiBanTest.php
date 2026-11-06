@@ -35,7 +35,7 @@ function advancedTenant(): array
     $instance = TenantInstance::create([
         'tenant_id' => $tenant->id, 'instance_name' => 'tenant_advanced_'.$tenant->id,
         'display_name' => 'Advanced', 'status' => 'connected',
-        'api_base_url' => 'https://evo.test', 'api_key' => 'token', 'webhook_secret' => 'secret',
+        'api_base_url' => 'https://graph.facebook.com/v21.0', 'api_key' => 'token', 'webhook_secret' => 'secret',
     ]);
 
     return [$tenant, $instance];

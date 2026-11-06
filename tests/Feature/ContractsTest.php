@@ -84,6 +84,7 @@ it('exibe editor premium de template com upload drag and drop de timbrado', func
         'custom_templates' => true,
         'installment_enabled' => true,
         'fee_passthrough' => false,
+        'features' => ['contracts'],
         'active' => true,
     ]);
 
@@ -141,6 +142,7 @@ it('impede tenant de criar contrato para cliente de outro tenant', function () {
         'custom_templates' => true,
         'installment_enabled' => true,
         'fee_passthrough' => false,
+        'features' => ['contracts'],
         'active' => true,
     ]);
 
@@ -232,6 +234,7 @@ it('abre detalhe do contrato mesmo com evento antigo sem data', function () {
         'custom_templates' => true,
         'installment_enabled' => true,
         'fee_passthrough' => false,
+        'features' => ['contracts'],
         'active' => true,
     ]);
 
@@ -365,6 +368,7 @@ it('envia contrato por whatsapp usando a instancia padrao do tenant', function (
         'custom_templates' => true,
         'installment_enabled' => true,
         'fee_passthrough' => false,
+        'features' => ['contracts'],
         'active' => true,
     ]);
 

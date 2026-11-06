@@ -50,7 +50,7 @@ function createTestTenantAndInstance(): array
         'display_name' => 'Instancia Teste',
         'status' => 'connected',
         'is_default' => true,
-        'api_base_url' => 'https://evo.test',
+        'api_base_url' => 'https://graph.facebook.com/v21.0',
         'api_key' => 'token-test',
         'webhook_secret' => 'wh-secret',
     ]);
@@ -115,10 +115,7 @@ it('permite envio no dispatchDue quando o ultimo envio ocorreu no passado (corri
     config()->set('whatsapp_anti_ban.cooldowns.campaign_minutes', 0);
 
     Http::fake([
-        'https://evo.test/send/text' => Http::response([
-            'data' => ['Info' => ['ID' => '3EB0TESTPASTDIFF']],
-            'message' => 'success',
-        ], 200),
+        'https://graph.facebook.com/*' => Http::response(['messages' => [['id' => 'wamid.TESTPASTDIFF']]], 200),
     ]);
 
     [$tenant] = createTestTenantAndInstance();

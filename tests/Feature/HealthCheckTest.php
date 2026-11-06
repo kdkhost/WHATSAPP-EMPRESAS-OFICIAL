@@ -1,10 +1,20 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
 test('health check retorna 200', function () {
+    Http::fake([
+        'https://graph.facebook.com/*' => Http::response([
+            'id' => '109876543210',
+            'display_phone_number' => '+55 21 99999-8888',
+            'verified_name' => 'Conta Teste',
+            'quality_rating' => 'GREEN',
+        ], 200),
+    ]);
+
     // Cria installed.lock para permitir acesso
     file_put_contents(storage_path('installed.lock'), '{}');
 

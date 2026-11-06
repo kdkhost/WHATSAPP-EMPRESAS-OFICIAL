@@ -132,7 +132,7 @@ it('envia cobranca manual por whatsapp usando template padrao e id de mensagem',
 
     expect(DB::table('billing_dispatches')->where('invoice_id', $invoice->id)->where('status', 'sent')->exists())->toBeTrue()
         ->and(WhatsAppMessage::where('dispatch_id', DB::table('billing_dispatches')->where('invoice_id', $invoice->id)->value('id'))
-            ->where(fn ($q) => $q->where('meta_message_id', '3EB0TESTBILLING')->orWhere('evolution_id', '3EB0TESTBILLING'))
+            ->where('meta_message_id', '3EB0TESTBILLING')
             ->where('status', 'sent')
             ->exists())->toBeTrue();
 });
@@ -254,7 +254,7 @@ it('envia cobranca com servico parcelas link e qr code pelo whatsapp', function 
 
     $dispatchId = DB::table('billing_dispatches')->where('invoice_id', $invoice->id)->value('id');
 
-    expect(WhatsAppMessage::where('dispatch_id', $dispatchId)->where(fn ($q) => $q->where('meta_message_id', '3EB0IMAGEQR')->orWhere('evolution_id', '3EB0IMAGEQR'))->exists())->toBeTrue();
+    expect(WhatsAppMessage::where('dispatch_id', $dispatchId)->where('meta_message_id', '3EB0IMAGEQR')->exists())->toBeTrue();
 });
 
 it('anexa boleto no email e envia documento no whatsapp quando a cobranca usa boleto', function () {

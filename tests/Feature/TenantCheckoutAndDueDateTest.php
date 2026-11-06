@@ -65,7 +65,7 @@ function setupTenantForDueDateAndCheckoutTest(): array
         'display_name' => 'WhatsApp Oficial',
         'status' => 'connected',
         'is_default' => true,
-        'api_base_url' => 'https://evo.test',
+        'api_base_url' => 'https://graph.facebook.com/v21.0',
         'api_key' => 'tenant-token',
         'webhook_secret' => 'secret-token',
     ]);
@@ -149,9 +149,7 @@ test('cobranca avulsa criada pelo tenant via Mercado Pago utiliza checkout segur
                 ],
             ],
         ], 201),
-        'https://evo.test/*' => Http::response(['key' => ['id' => 'MSG-123']], 200),
-        '*/message/sendText*' => Http::response(['key' => ['id' => 'MSG-123']], 200),
-        '*/message/sendMedia*' => Http::response(['key' => ['id' => 'MEDIA-123']], 200),
+        'https://graph.facebook.com/*' => Http::response(['messages' => [['id' => 'MSG-123']]], 200),
     ]);
 
     $dueDateTomorrow = now('America/Sao_Paulo')->addDay()->toDateString();
@@ -189,7 +187,7 @@ test('cobranca avulsa criada pelo tenant via Mercado Pago utiliza checkout segur
 
     // 3. O envio disparado via WhatsApp deve ter o link do checkout transparente e a data cadastrada do vencimento (em midia com legenda ou texto)
     Http::assertSent(function ($request) use ($invoice, $mockTicketUrl, $expectedFormattedDate) {
-        $text = (string) ($request['caption'] ?? $request['text'] ?? $request['message'] ?? '');
+        $text = (string) (data_get($request->data(), 'text.body') ?? data_get($request->data(), 'image.caption') ?? data_get($request->data(), 'document.caption') ?? data_get($request->data(), 'video.caption') ?? '');
         if ($text === '') {
             return false;
         }
@@ -225,9 +223,7 @@ test('cobranca criada para data futura seleciona template adequado e informa dat
                 ],
             ],
         ], 201),
-        'https://evo.test/*' => Http::response(['key' => ['id' => 'MSG-456']], 200),
-        '*/message/sendText*' => Http::response(['key' => ['id' => 'MSG-456']], 200),
-        '*/message/sendMedia*' => Http::response(['key' => ['id' => 'MEDIA-456']], 200),
+        'https://graph.facebook.com/*' => Http::response(['messages' => [['id' => 'MSG-456']]], 200),
     ]);
 
     $payload = [
@@ -248,7 +244,7 @@ test('cobranca criada para data futura seleciona template adequado e informa dat
     expect($invoice->due_date->toDateString())->toBe($futureDueDate);
 
     Http::assertSent(function ($request) use ($expectedFormattedDate) {
-        $text = (string) ($request['caption'] ?? $request['text'] ?? $request['message'] ?? '');
+        $text = (string) (data_get($request->data(), 'text.body') ?? data_get($request->data(), 'image.caption') ?? data_get($request->data(), 'document.caption') ?? data_get($request->data(), 'video.caption') ?? '');
         if ($text === '') {
             return false;
         }
