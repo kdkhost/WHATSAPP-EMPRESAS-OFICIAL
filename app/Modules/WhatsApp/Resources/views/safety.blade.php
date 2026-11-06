@@ -510,7 +510,9 @@
                                                         <label class="safety-field__label" for="safety-{{ $field['name'] }}">
                                                             <span class="safety-field__icon"><i class="bi {{ $help['icon'] }}"></i></span>
                                                             <span>{{ $field['label'] }}</span>
-                                                            <i class="bi bi-question-circle text-muted ms-auto" data-bs-toggle="tooltip" data-bs-title="{{ $help['when'] }}"></i>
+                                                            <a href="javascript:void(0)" class="js-meta-help-trigger text-info ms-auto" data-help-topic="safety-{{ $field['name'] }}" title="Ver instruções passo a passo de: {{ $field['label'] }}">
+                                                                <i class="bi bi-question-circle-fill"></i>
+                                                            </a>
                                                         </label>
                                                         @if($field['type'] === 'select')
                                                             <select id="safety-{{ $field['name'] }}" name="{{ $field['name'] }}" class="form-select bg-dark text-light border-secondary">
