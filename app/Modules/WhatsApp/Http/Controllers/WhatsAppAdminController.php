@@ -36,7 +36,6 @@ class WhatsAppAdminController extends Controller
     {
         $config = $this->whatsappRuntimeConfig($s);
         $persistentStatus = $this->mainInstanceStatusPayload($config);
-        $evolutionConfig = $this->mainEvolutionConfig($s);
 
         $instances = TenantInstance::with('tenant')
             ->orderByDesc('is_default')
@@ -51,7 +50,7 @@ class WhatsAppAdminController extends Controller
             'with_avatar' => $instances->filter(fn (TenantInstance $instance) => filled($instance->profile_avatar_url))->count(),
         ];
 
-        return view('whatsapp::instance', compact('config', 'persistentStatus', 'instances', 'instanceSummary', 'evolutionConfig'));
+        return view('whatsapp::instance', compact('config', 'persistentStatus', 'instances', 'instanceSummary'));
     }
 
     protected function whatsappRuntimeConfig(?SettingsManager $settings = null): array
@@ -90,124 +89,6 @@ class WhatsAppAdminController extends Controller
             'meta_waba_id'           => (string) ($this->firstFilled($settings->get('whatsapp.meta_waba_id'), config('whatsapp.meta_waba_id')) ?? ''),
             'instance'               => (string) ($this->firstFilled($settings->get('whatsapp.instance'), config('whatsapp.instance')) ?? 'meta_official'),
             'timeout'                => max(5, (int) ($this->firstFilled($settings->get('whatsapp.timeout'), config('whatsapp.timeout', 15)) ?? 15)),
-        ];
-    }
-
-    protected function mainEvolutionConfig(?SettingsManager $settings = null): array
-    {
-        $settings ??= app(SettingsManager::class);
-        $advanced = $settings->get('whatsapp.advanced_settings', []);
-        $events = $settings->get('whatsapp.webhook_events', []);
-        $producers = $settings->get('whatsapp.event_producers', []);
-
-        if (! is_array($advanced)) {
-            $advanced = [];
-        }
-
-        if (! is_array($events)) {
-            $events = [];
-        }
-
-        if (! is_array($producers)) {
-            $producers = [];
-        }
-
-        return [
-            'event_options' => $this->mainWebhookEventOptions(),
-            'recommended_events' => $this->mainRecommendedWebhookEvents(),
-            'disabled_events' => $this->mainDisabledWebhookEvents(),
-            'current_events' => $events ?: $this->mainRecommendedWebhookEvents(),
-            'webhook' => [
-                'enabled' => (bool) $settings->get('whatsapp.webhook_enabled', true),
-                'byEvents' => (bool) $settings->get('whatsapp.webhook_by_events', true),
-                'base64' => (bool) $settings->get('whatsapp.webhook_base64', false),
-                'url' => $this->buildMainEvolutionWebhookUrl($settings, $this->whatsappRuntimeConfig($settings)),
-                'token' => (string) $this->firstFilled($settings->get('whatsapp.webhook_token'), config('whatsapp.webhook_token')),
-                'producers' => $this->normalizeMainEventProducers($producers),
-            ],
-            'advanced' => array_merge($this->mainRecommendedAdvancedSettings(), $advanced),
-        ];
-    }
-
-    protected function mainRecommendedWebhookEvents(): array
-    {
-        return [
-            'QRCODE_UPDATED',
-            'CONNECTION_UPDATE',
-            'MESSAGES_UPSERT',
-            'MESSAGES_UPDATE',
-            'MESSAGES_DELETE',
-            'SEND_MESSAGE',
-            'CALL',
-        ];
-    }
-
-    protected function mainDisabledWebhookEvents(): array
-    {
-        return [
-            'APPLICATION_STARTUP',
-            'CONTACTS_UPSERT',
-            'CONTACTS_UPDATE',
-            'PRESENCE_UPDATE',
-            'CHATS_UPDATE',
-            'GROUPS_UPSERT',
-            'GROUP_UPDATE',
-            'GROUP_PARTICIPANTS_UPDATE',
-            'NEW_JWT_TOKEN',
-        ];
-    }
-
-    protected function mainWebhookEventOptions(): array
-    {
-        return [
-            'QRCODE_UPDATED' => ['label' => 'QR Code atualizado', 'description' => 'Mantem a tela de conexao com o QR Code mais recente.'],
-            'CONNECTION_UPDATE' => ['label' => 'Status de conexao', 'description' => 'Atualiza conectado, aguardando QR Code, erro ou desconectado.'],
-            'MESSAGES_UPSERT' => ['label' => 'Mensagens recebidas', 'description' => 'Registra novas mensagens para cobrancas, historico e automacoes.'],
-            'MESSAGES_UPDATE' => ['label' => 'Atualizacao de mensagens', 'description' => 'Recebe entrega, leitura e mudancas relevantes da mensagem.'],
-            'SEND_MESSAGE' => ['label' => 'Mensagens enviadas', 'description' => 'Audita envios feitos pela Evolution e pelo sistema.'],
-            'CALL' => ['label' => 'Chamadas recebidas', 'description' => 'Permite rejeitar chamadas e registrar tentativas de ligacao.'],
-            'APPLICATION_STARTUP' => ['label' => 'Inicializacao da aplicacao', 'description' => 'Evento tecnico do servidor Evolution, normalmente desnecessario.'],
-            'MESSAGES_DELETE' => ['label' => 'Exclusao de mensagens', 'description' => 'Permite registrar remocoes e manter o historico coerente com a Evolution.'],
-            'CONTACTS_UPSERT' => ['label' => 'Novos contatos', 'description' => 'Desligado para reduzir sincronizacao fora do fluxo de cobranca.'],
-            'CONTACTS_UPDATE' => ['label' => 'Atualizacao de contatos', 'description' => 'Desligado para evitar volume sem uso operacional direto.'],
-            'PRESENCE_UPDATE' => ['label' => 'Presenca online', 'description' => 'Desligado para reduzir eventos de digitando e online.'],
-            'CHATS_UPDATE' => ['label' => 'Atualizacao de conversas', 'description' => 'Desligado para nao sincronizar alteracoes de chat sem necessidade.'],
-            'GROUPS_UPSERT' => ['label' => 'Novos grupos', 'description' => 'Desligado porque o sistema trabalha com atendimento individual.'],
-            'GROUP_UPDATE' => ['label' => 'Atualizacao de grupos', 'description' => 'Desligado para evitar trafego de grupos.'],
-            'GROUP_PARTICIPANTS_UPDATE' => ['label' => 'Participantes de grupos', 'description' => 'Desligado por seguranca e volume de eventos.'],
-            'NEW_JWT_TOKEN' => ['label' => 'Novo token JWT', 'description' => 'Evento tecnico interno da Evolution, nao usado pelo sistema.'],
-        ];
-    }
-
-    protected function mainRecommendedAdvancedSettings(): array
-    {
-        return [
-            'rejectCalls' => true,
-            'rejectCallsMessage' => 'Atendimento somente por mensagem.',
-            'groupsIgnore' => true,
-            'alwaysOnline' => false,
-            'readMessages' => false,
-            'readStatus' => false,
-            'ignoreStatus' => true,
-            'syncFullHistory' => false,
-        ];
-    }
-
-    protected function mainRemoteAdvancedSettings(array $evolutionConfig): array
-    {
-        $advanced = array_merge(
-            $this->mainRecommendedAdvancedSettings(),
-            is_array($evolutionConfig['advanced'] ?? null) ? $evolutionConfig['advanced'] : []
-        );
-
-        return [
-            'rejectCalls' => (bool) ($advanced['rejectCalls'] ?? false),
-            'rejectCallsMessage' => trim((string) ($advanced['rejectCallsMessage'] ?? '')),
-            'groupsIgnore' => (bool) ($advanced['groupsIgnore'] ?? false),
-            'alwaysOnline' => (bool) ($advanced['alwaysOnline'] ?? false),
-            'readMessages' => (bool) ($advanced['readMessages'] ?? false),
-            'readStatus' => ! (bool) ($advanced['ignoreStatus'] ?? ! (bool) ($advanced['readStatus'] ?? false)),
-            'syncFullHistory' => (bool) ($advanced['syncFullHistory'] ?? false),
         ];
     }
 
@@ -424,30 +305,11 @@ class WhatsAppAdminController extends Controller
             $normalized = $client->getNormalizedInstanceStatus();
             $normalized['_source'] = $this->normalizeMainSourceLabel($normalized['_source'] ?? $normalized['source'] ?? '');
             $normalized['source'] = $normalized['_source'];
-            $directStatus = $client->status();
-            $directState = [];
-            if (($directStatus['ok'] ?? false) === true) {
-                $directState = $this->normalizeMainConnectionState(
-                    data_get($directStatus, 'data.state'),
-                    (array) data_get($directStatus, 'data.raw', [])
-                );
 
-                if (($directState['state'] ?? 'close') !== 'open') {
-                    $normalized = array_merge($normalized, [
-                        'state' => 'connecting',
-                        'status' => 'connecting',
-                        'status_label' => 'Aguardando QR Code',
-                        'connected' => false,
-                        '_source' => 'instance_status_direct',
-                        'source' => 'instance_status_direct',
-                    ]);
-                }
-            }
             $cachedPayload = $this->mainInstanceStatusPayload($config, $normalized['_api_error'] ?? null);
 
-            $allowConnectedPreserve = ! (($directStatus['ok'] ?? false) === true && (($directState['state'] ?? 'close') !== 'open'));
-            if ($allowConnectedPreserve && $this->shouldPreserveMainConnectedStatus($cachedPayload, $normalized)) {
-                $preserveMessage = $normalized['_api_error'] ?? 'Status remoto instavel; sessao conectada preservada.';
+            if ($this->shouldPreserveMainConnectedStatus($cachedPayload, $normalized)) {
+                $preserveMessage = $normalized['_api_error'] ?? 'Status remoto instável; sessão conectada preservada.';
                 $cachedPayload['source'] = 'local_cache';
                 $cachedPayload['_source'] = 'local_cache';
                 $cachedPayload['message'] = $preserveMessage;
@@ -606,423 +468,6 @@ class WhatsAppAdminController extends Controller
         ]);
     }
 
-    protected function normalizeMainAdvancedSettings(Request $request): array
-    {
-        $defaults = $this->mainRecommendedAdvancedSettings();
-        $ignoreStatus = $request->has('ignoreStatus')
-            ? $request->boolean('ignoreStatus')
-            : ! $request->boolean('readStatus', ! (bool) $defaults['ignoreStatus']);
-
-        return [
-            'rejectCalls' => $request->boolean('rejectCalls', (bool) $defaults['rejectCalls']),
-            'rejectCallsMessage' => trim((string) $request->input('rejectCallsMessage', $defaults['rejectCallsMessage'])),
-            'groupsIgnore' => $request->boolean('groupsIgnore', (bool) $defaults['groupsIgnore']),
-            'alwaysOnline' => $request->boolean('alwaysOnline', (bool) $defaults['alwaysOnline']),
-            'readMessages' => $request->boolean('readMessages', (bool) $defaults['readMessages']),
-            'ignoreStatus' => $ignoreStatus,
-            'readStatus' => ! $ignoreStatus,
-            'syncFullHistory' => $request->boolean('syncFullHistory', (bool) $defaults['syncFullHistory']),
-        ];
-    }
-
-    protected function normalizeMainWebhookEvents(array $events): array
-    {
-        $allowed = array_keys($this->mainWebhookEventOptions());
-        $normalized = [];
-
-        foreach ($events as $event) {
-            $event = strtoupper(str_replace(['.', '-'], '_', trim((string) $event)));
-
-            if (in_array($event, $allowed, true)) {
-                $normalized[] = $event;
-            }
-        }
-
-        return array_values(array_unique($normalized)) ?: $this->mainRecommendedWebhookEvents();
-    }
-
-    protected function normalizeMainEventProducers(array $data): array
-    {
-        $allowed = ['default', 'enabled', 'disabled'];
-        $source = [
-            'rabbitmq' => $data['event_producer_rabbitmq'] ?? data_get($data, 'rabbitmq', data_get($data, 'producers.rabbitmq', 'default')),
-            'websocket' => $data['event_producer_websocket'] ?? data_get($data, 'websocket', data_get($data, 'producers.websocket', 'default')),
-            'nats' => $data['event_producer_nats'] ?? data_get($data, 'nats', data_get($data, 'producers.nats', 'default')),
-        ];
-
-        return collect($source)
-            ->map(function ($value) use ($allowed) {
-                $value = strtolower(trim((string) $value));
-
-                return in_array($value, $allowed, true) ? $value : 'default';
-            })
-            ->all();
-    }
-
-    protected function mainEventProducerPayload(array $producers): array
-    {
-        $producers = $this->normalizeMainEventProducers($producers);
-
-        return [
-            'rabbitmqEnable' => ($producers['rabbitmq'] ?? 'default') === 'enabled' ? 'true' : 'false',
-            'websocketEnable' => ($producers['websocket'] ?? 'default') === 'enabled' ? 'true' : 'false',
-            'natsEnable' => ($producers['nats'] ?? 'default') === 'enabled' ? 'true' : 'false',
-        ];
-    }
-
-    protected function applyMainEvolutionConfig(
-        WhatsAppMetaClient $client,
-        SettingsManager $settings,
-        array $config,
-        array $webhookConfig,
-        array $advancedSettings
-    ): array {
-        $result = [
-            'settings' => ['ok' => true, 'message' => null],
-            'webhook' => ['ok' => true, 'message' => null],
-        ];
-
-        try {
-            $response = $client->updateAdvancedSettings($advancedSettings);
-            $result['settings'] = [
-                'ok' => (bool) ($response['success'] ?? $response['ok'] ?? true),
-                'message' => $response['error'] ?? null,
-                'data' => $response['data'] ?? null,
-            ];
-        } catch (\Throwable $e) {
-            $result['settings'] = ['ok' => false, 'message' => $e->getMessage()];
-        }
-
-        try {
-            $payload = $webhookConfig['enabled']
-                ? [
-                    'webhookUrl' => $this->buildMainEvolutionWebhookUrl($settings, $config),
-                    'subscribe' => $this->resolveMainWebhookSubscribe($webhookConfig),
-                ]
-                : ['webhookUrl' => '', 'subscribe' => []];
-            $payload = array_merge($payload, $this->mainEventProducerPayload($webhookConfig['producers'] ?? []));
-
-            $response = $client->connect('', $payload);
-            $result['webhook'] = [
-                'ok' => (bool) ($response['success'] ?? $response['ok'] ?? true),
-                'message' => $response['error'] ?? null,
-                'data' => $response['data'] ?? null,
-            ];
-        } catch (\Throwable $e) {
-            $result['webhook'] = ['ok' => false, 'message' => $e->getMessage()];
-        }
-
-        return $result;
-    }
-
-    protected function buildMainEvolutionWebhookUrl(SettingsManager $settings, array $config): string
-    {
-        $token = (string) $this->firstFilled($settings->get('whatsapp.webhook_token'), config('whatsapp.webhook_token'));
-
-        if ($token === '') {
-            $token = Str::random(48);
-            $settings->set('whatsapp.webhook_token', $token);
-        }
-
-        return url('/webhooks/whatsapp/messages').'?'.http_build_query(array_filter([
-            'token' => $token,
-            'instance' => $config['instance'] ?? '',
-            'scope' => 'admin',
-        ], fn ($value) => filled($value)));
-    }
-
-    protected function mainConnectPayload(SettingsManager $settings, array $config): array
-    {
-        $evolutionConfig = $this->mainEvolutionConfig($settings);
-        $producerPayload = $this->mainEventProducerPayload(data_get($evolutionConfig, 'webhook.producers', []));
-
-        if (! (bool) data_get($evolutionConfig, 'webhook.enabled', true)) {
-            return ['webhookUrl' => '', 'subscribe' => []] + $producerPayload;
-        }
-
-        return [
-            'webhookUrl' => $this->buildMainEvolutionWebhookUrl($settings, $config),
-            'subscribe' => $this->resolveMainWebhookSubscribe([
-                'enabled' => true,
-                'byEvents' => (bool) data_get($evolutionConfig, 'webhook.byEvents', true),
-                'events' => $evolutionConfig['current_events'] ?? $this->mainRecommendedWebhookEvents(),
-            ]),
-        ] + $producerPayload;
-    }
-
-    protected function resolveMainWebhookSubscribe(array $webhookConfig): array
-    {
-        if (! ($webhookConfig['enabled'] ?? true)) {
-            return [];
-        }
-
-        if (! ($webhookConfig['byEvents'] ?? true)) {
-            return ['ALL'];
-        }
-
-        return $this->evolutionSubscribeEvents($webhookConfig['events'] ?? $this->mainRecommendedWebhookEvents());
-    }
-
-    protected function ensureMainRemoteInstanceReady(SettingsManager $settings, array $config): array
-    {
-        $instanceName = trim((string) ($config['instance'] ?? ''));
-        $result = ['config' => $config, 'qrcode' => null, 'remote' => null];
-
-        $hasGlobalKey = filled($settings->get('whatsapp.global_api_key'))
-            || filled($settings->get('whatsapp.global_apikey'))
-            || filled(config('whatsapp.global_api_key'))
-            || filled(config('whatsapp.global_apikey'))
-            || filled(env('EVOLUTION_GLOBAL_API_KEY'))
-            || filled(env('EVOLUTION_GLOBAL_APIKEY'));
-
-        if ($instanceName === '' || ! $hasGlobalKey || empty($config['base_url'])) {
-            return $result;
-        }
-
-        app()->forgetInstance(WhatsAppMetaClient::class);
-        $client = app(WhatsAppMetaClient::class);
-        $remote = $client->listInstances();
-        $row = null;
-
-        if ($remote['success'] ?? false) {
-            foreach ($this->instanceRows($remote['data'] ?? []) as $remoteRow) {
-                $remoteName = (string) $this->firstPersistentValue(
-                    data_get($remoteRow, 'name'),
-                    data_get($remoteRow, 'instanceName'),
-                    data_get($remoteRow, 'instance_name')
-                );
-
-                if ($remoteName === $instanceName) {
-                    $row = $remoteRow;
-                    break;
-                }
-            }
-        }
-
-        if (! $row) {
-            $token = Str::random(48);
-            $created = $client->createInstance([
-                'name' => $instanceName,
-                'token' => $token,
-                'number' => '',
-                'qrcode' => true,
-                'advancedSettings' => $this->mainRemoteAdvancedSettings($this->mainEvolutionConfig($settings)),
-            ]);
-
-            if ($created['success'] ?? false) {
-                $row = $created['data'] ?? [];
-                $result['qrcode'] = $this->extractQrCode($row);
-                $this->storeMainInstanceApiKey($settings, $token);
-                $result['config'] = $this->whatsappRuntimeConfig($settings);
-                app()->forgetInstance(WhatsAppMetaClient::class);
-
-                return $result;
-            }
-
-            Log::warning('Falha ao recuperar/criar instancia principal Evolution.', [
-                'instance' => $instanceName,
-                'status' => $created['status'] ?? null,
-                'error' => $created['error'] ?? $created['message'] ?? null,
-            ]);
-
-            return $result;
-        }
-
-        if ($this->mainRemoteInstanceNeedsQrRecovery($row)) {
-            $recovered = $this->recoverMainRemoteInstanceQr($client, $settings, $config, $row);
-            if ($recovered['remote'] ?? null) {
-                return $recovered;
-            }
-        }
-
-        $remoteKey = $this->extractMainInstanceApiKey($row);
-        if ($remoteKey !== '' && $remoteKey !== ($config['api_key'] ?? '')) {
-            $this->storeMainInstanceApiKey($settings, $remoteKey);
-            $result['config'] = $this->whatsappRuntimeConfig($settings);
-            app()->forgetInstance(WhatsAppMetaClient::class);
-        }
-
-        $result['remote'] = $row;
-        $result['qrcode'] = $this->extractQrCode($row);
-
-        return $result;
-    }
-
-    protected function mainRemoteInstanceNeedsQrRecovery(array $row): bool
-    {
-        $connected = (bool) data_get($row, 'connected', false);
-        $qrCode = $this->extractQrCode($row);
-        $jid = (string) $this->firstPersistentValue(
-            data_get($row, 'jid'),
-            data_get($row, 'ownerJid'),
-            data_get($row, 'owner'),
-            data_get($row, 'instance.jid'),
-            data_get($row, 'instance.ownerJid')
-        );
-
-        return ! $connected && ! $qrCode && $jid !== '';
-    }
-
-    protected function recoverMainRemoteInstanceQr(WhatsAppMetaClient $client, SettingsManager $settings, array $config, array $row): array
-    {
-        $instanceName = trim((string) ($config['instance'] ?? ''));
-        $result = ['config' => $config, 'qrcode' => null, 'remote' => null];
-        $remoteId = $this->extractMainInstanceId($row);
-        $deleteTarget = $remoteId ?: $instanceName;
-
-        if ($deleteTarget === '') {
-            return $result;
-        }
-
-        $deleted = $client->deleteInstance($deleteTarget);
-        if (! ($deleted['success'] ?? false)) {
-            Log::warning('Falha ao resetar instancia principal Evolution para recuperar QR.', [
-                'instance' => $instanceName,
-                'has_uuid' => $remoteId !== '',
-                'status' => $deleted['status'] ?? null,
-                'error' => $deleted['error'] ?? null,
-            ]);
-
-            return $result;
-        }
-
-        $token = (string) ($config['api_key'] ?? '');
-        $row = null;
-
-        for ($attempt = 0; $attempt < 6; $attempt++) {
-            usleep(1000 * 1000);
-            $remote = $client->listInstances();
-
-            if ($remote['success'] ?? false) {
-                foreach ($this->instanceRows($remote['data'] ?? []) as $remoteRow) {
-                    $remoteName = (string) $this->firstPersistentValue(
-                        data_get($remoteRow, 'name'),
-                        data_get($remoteRow, 'instanceName'),
-                        data_get($remoteRow, 'instance_name')
-                    );
-
-                    if ($remoteName === $instanceName) {
-                        $row = $remoteRow;
-                        break 2;
-                    }
-                }
-            }
-        }
-
-        if (! $row) {
-            $token = $token !== '' ? $token : Str::random(48);
-            $created = $client->createInstance([
-                'name' => $instanceName,
-                'token' => $token,
-                'number' => '',
-                'qrcode' => true,
-                'advancedSettings' => $this->mainRemoteAdvancedSettings($this->mainEvolutionConfig($settings)),
-            ]);
-
-            if (! ($created['success'] ?? false)) {
-                Log::warning('Falha ao recriar instancia principal Evolution para recuperar QR.', [
-                    'instance' => $instanceName,
-                    'status' => $created['status'] ?? null,
-                    'error' => $created['error'] ?? null,
-                ]);
-
-                return $result;
-            }
-
-            $row = $created['data'] ?? [];
-        }
-
-        $remoteKey = $this->extractMainInstanceApiKey($row);
-        if ($remoteKey !== '') {
-            $this->storeMainInstanceApiKey($settings, $remoteKey);
-            $result['config'] = $this->whatsappRuntimeConfig($settings);
-            app()->forgetInstance(WhatsAppMetaClient::class);
-        } elseif ($token !== '') {
-            $this->storeMainInstanceApiKey($settings, $token);
-            $result['config'] = $this->whatsappRuntimeConfig($settings);
-            app()->forgetInstance(WhatsAppMetaClient::class);
-        }
-
-        $result['remote'] = $row;
-        $result['qrcode'] = $this->extractQrCode($row);
-
-        return $result;
-    }
-
-    protected function extractMainInstanceId(array $payload): string
-    {
-        return (string) $this->firstPersistentValue(
-            data_get($payload, 'id'),
-            data_get($payload, 'uuid'),
-            data_get($payload, '_id'),
-            data_get($payload, 'instanceId'),
-            data_get($payload, 'instance.id'),
-            data_get($payload, 'instance.uuid'),
-            data_get($payload, 'data.id'),
-            data_get($payload, 'data.uuid'),
-            data_get($payload, 'data.instance.id')
-        );
-    }
-
-    protected function extractMainInstanceApiKey(array $payload): string
-    {
-        return (string) $this->firstPersistentValue(
-            data_get($payload, 'token'),
-            data_get($payload, 'hash'),
-            data_get($payload, 'apikey'),
-            data_get($payload, 'apiKey'),
-            data_get($payload, 'api_key'),
-            data_get($payload, 'instance.token'),
-            data_get($payload, 'instance.hash'),
-            data_get($payload, 'data.token'),
-            data_get($payload, 'data.hash'),
-            data_get($payload, 'data.apikey'),
-            data_get($payload, 'data.apiKey')
-        );
-    }
-
-    protected function storeMainInstanceApiKey(SettingsManager $settings, string $apiKey): void
-    {
-        if ($apiKey === '') {
-            return;
-        }
-
-        $settings->set('whatsapp.instance_api_key', $apiKey);
-        $settings->set('whatsapp.apikey', $apiKey);
-        $settings->set('whatsapp.api_key', $apiKey);
-    }
-
-    protected function evolutionSubscribeEvents(array $events): array
-    {
-        $map = [
-            'QRCODE_UPDATED' => 'QRCODE',
-            'CONNECTION_UPDATE' => 'CONNECTION',
-            'MESSAGES_UPSERT' => 'MESSAGE',
-            'MESSAGES_UPDATE' => 'MESSAGE',
-            'MESSAGES_DELETE' => 'MESSAGE',
-            'SEND_MESSAGE' => 'SEND_MESSAGE',
-            'CALL' => 'CALL',
-            'CONTACTS_UPSERT' => 'CONTACT',
-            'CONTACTS_UPDATE' => 'CONTACT',
-            'PRESENCE_UPDATE' => 'PRESENCE',
-            'CHATS_UPDATE' => 'CHAT_PRESENCE',
-            'GROUPS_UPSERT' => 'GROUP',
-            'GROUP_UPDATE' => 'GROUP',
-            'GROUP_PARTICIPANTS_UPDATE' => 'GROUP',
-            'APPLICATION_STARTUP' => 'APPLICATION_STARTUP',
-            'NEW_JWT_TOKEN' => 'NEW_JWT_TOKEN',
-        ];
-
-        $subscribe = [];
-
-        foreach ($events as $event) {
-            $event = strtoupper(str_replace(['.', '-'], '_', (string) $event));
-            $subscribe[] = $map[$event] ?? $event;
-        }
-
-        return array_values(array_unique(array_filter($subscribe))) ?: ['MESSAGE'];
-    }
-
     public function diagnose(): JsonResponse
     {
         return response()->json([
@@ -1067,192 +512,7 @@ class WhatsAppAdminController extends Controller
 
     public function connect(): JsonResponse
     {
-        try {
-            $config = $this->whatsappRuntimeConfig();
-
-            if (! $config['api_key'] || ! $config['base_url']) {
-                return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, 'Token da instância não configurado.'),
-                    'Token da instância não configurado.',
-                    false
-                ), 422);
-            }
-
-            $settings = app(SettingsManager::class);
-            $prepared = $this->ensureMainRemoteInstanceReady($settings, $config);
-            $config = $prepared['config'];
-            $preparedQrCode = $prepared['qrcode'];
-
-            $client = app(WhatsAppMetaClient::class);
-            $before = $client->getNormalizedInstanceStatus();
-            $directStatusBefore = $client->status();
-            $directStateBefore = [];
-            if (($directStatusBefore['ok'] ?? false) === true) {
-                $directStateBefore = $this->normalizeMainConnectionState(
-                    data_get($directStatusBefore, 'data.state'),
-                    (array) data_get($directStatusBefore, 'data.raw', [])
-                );
-
-                if (($directStateBefore['state'] ?? 'close') !== 'open') {
-                    $before = array_merge($before, [
-                        'state' => 'connecting',
-                        'status' => 'connecting',
-                        'status_label' => 'Aguardando QR Code',
-                        'connected' => false,
-                        'source' => 'instance_status_direct',
-                        '_source' => 'instance_status_direct',
-                    ]);
-                }
-            }
-            $directConfirmsOpen = (($directStatusBefore['ok'] ?? false) === true)
-                && (($directStateBefore['state'] ?? 'close') === 'open');
-            if (! $directConfirmsOpen && ($before['connected'] ?? false)) {
-                $before = array_merge($before, [
-                    'state' => 'connecting',
-                    'status' => 'connecting',
-                    'status_label' => 'Aguardando QR Code',
-                    'connected' => false,
-                    'source' => 'instance_status_untrusted',
-                    '_source' => 'instance_status_untrusted',
-                ]);
-            }
-            $cachedBefore = $this->mainInstanceStatusPayload($config, $before['_api_error'] ?? null);
-
-            $allowConnectedPreserve = ! (($directStatusBefore['ok'] ?? false) === true && (($directStateBefore['state'] ?? 'close') !== 'open'));
-            if ($allowConnectedPreserve && $this->shouldPreserveMainConnectedStatus($cachedBefore, $before)) {
-                return response()->json($this->mainInstanceAjaxPayload(
-                    $cachedBefore,
-                    'Instancia ja conectada. Status remoto instavel foi ignorado.',
-                    true
-                ));
-            }
-
-            $this->persistMainInstanceStatus($config, $before, ['status_before_connect' => $before]);
-
-            if ($directConfirmsOpen && ($before['connected'] ?? false)) {
-                return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config),
-                    'Instância já conectada.',
-                    true
-                ));
-            }
-
-            $connectNumber = $this->mainInstanceConnectionNumber($config, $before);
-            $duplicate = $this->connectedNumberInAnotherInstance($client, $config, $connectNumber);
-
-            if ($duplicate !== null) {
-                $message = 'Este número já está conectado na instância '.$duplicate['instance'].'.';
-
-                return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, $message),
-                    $message,
-                    false
-                ), 422);
-            }
-
-            $connect = $client->connect($connectNumber, $this->mainConnectPayload(app(SettingsManager::class), $config));
-            $connectPayload = $connect['data'] ?? [];
-            $connectMessage = $connect['error'] ?? null;
-            $qrCode = $this->extractQrCode($connectPayload) ?: $preparedQrCode;
-
-            if (! ($connect['success'] ?? false)) {
-                $fallbackConnect = $client->connect($connectNumber);
-                $fallbackPayload = $fallbackConnect['data'] ?? [];
-                $fallbackQrCode = $this->extractQrCode($fallbackPayload);
-
-                if (($fallbackConnect['success'] ?? false) || $fallbackQrCode) {
-                    $connect = $fallbackConnect;
-                    $connectPayload = $fallbackPayload;
-                    $connectMessage = $fallbackConnect['error'] ?? $connectMessage;
-                    $qrCode = $fallbackQrCode ?: $qrCode;
-                }
-            }
-
-            $after = $client->getNormalizedInstanceStatus();
-            $directStatus = $client->status();
-            if (($directStatus['ok'] ?? false) === true) {
-                $directState = $this->normalizeMainConnectionState(
-                    data_get($directStatus, 'data.state'),
-                    (array) data_get($directStatus, 'data.raw', [])
-                );
-
-                // Pos-reinicio: o estado direto da instancia tem precedencia para decidir QR.
-                if (($directState['state'] ?? 'close') !== 'open') {
-                    $after = array_merge($after, [
-                        'state' => 'connecting',
-                        'status' => 'connecting',
-                        'status_label' => 'Aguardando QR Code',
-                        'connected' => false,
-                        'source' => 'instance_status_direct',
-                        '_source' => 'instance_status_direct',
-                    ]);
-                } else {
-                    $after = array_merge($after, [
-                        'state' => 'open',
-                        'status' => 'connected',
-                        'status_label' => 'Conectado',
-                        'connected' => true,
-                        'qrcode' => null,
-                    ]);
-                }
-            }
-            $persistPayload = $after;
-
-            if (! ($after['connected'] ?? false) && ! $qrCode) {
-                ['status' => $after, 'qrcode' => $qrCode] = $this->pollMainInstanceQrCode($client, $after, 8, 1000, true);
-                $persistPayload = $after;
-            }
-
-            if ($qrCode && ! ($after['connected'] ?? false)) {
-                $persistPayload['state'] = 'connecting';
-                $persistPayload['status'] = 'connecting';
-                $persistPayload['status_label'] = 'Aguardando QR Code';
-                $persistPayload['qrcode'] = $qrCode;
-                $persistPayload['source'] = 'instance_qr';
-                $persistPayload['_source'] = 'instance_qr';
-            }
-
-            $this->persistMainInstanceStatus($config, $persistPayload, [
-                'connect' => $connectPayload,
-                'status_after_connect' => $after,
-            ], (bool) $qrCode);
-
-            $responsePayload = $this->mainInstanceStatusPayload($config, $connectMessage);
-            $responsePayload['qrcode'] = ($after['connected'] ?? false) ? null : $qrCode;
-
-            if ($after['connected'] ?? false) {
-                return response()->json($this->mainInstanceAjaxPayload($responsePayload, 'Instância conectada com sucesso.', true));
-            }
-
-            if ($qrCode) {
-                return response()->json($this->mainInstanceAjaxPayload($responsePayload, 'QR Code gerado. Escaneie para conectar.', true));
-            }
-
-            if (($connect['success'] ?? false)) {
-                $responsePayload['state'] = 'connecting';
-                $responsePayload['status'] = 'connecting';
-                $responsePayload['status_label'] = 'Aguardando QR Code';
-                $responsePayload['connected'] = false;
-
-                return response()->json($this->mainInstanceAjaxPayload(
-                    $responsePayload,
-                    'Solicitação enviada. Aguarde alguns segundos.',
-                    true
-                ));
-            }
-
-            $message = $connectMessage ?: 'Não foi possível iniciar a conexão da instância.';
-
-            return response()->json($this->mainInstanceAjaxPayload($responsePayload, $message, false), 422);
-        } catch (\Throwable $e) {
-            $config ??= $this->whatsappRuntimeConfig();
-
-            return response()->json($this->mainInstanceAjaxPayload(
-                $this->mainInstanceStatusPayload($config, $e->getMessage()),
-                $e->getMessage(),
-                false
-            ), 422);
-        }
+        return $this->testConnection();
     }
 
     public function disconnect(): JsonResponse
@@ -1270,32 +530,26 @@ class WhatsAppAdminController extends Controller
 
             $client = app(WhatsAppMetaClient::class);
             $result = $client->disconnect();
-            $after = $client->getNormalizedInstanceStatus();
-
-            if (! ($result['success'] ?? false) && ! array_key_exists('state', $after)) {
-                $after['state'] = 'close';
-                $after['status'] = 'disconnected';
-                $after['status_label'] = 'Desconectado';
-            }
-
-            $effectiveSuccess = (bool) ($result['success'] ?? false);
-            if (! $effectiveSuccess && (($after['connected'] ?? false) === false)) {
-                $effectiveSuccess = true;
-            }
+            $after = [
+                'state' => 'close',
+                'status' => 'disconnected',
+                'status_label' => 'Desconectado',
+                'connected' => false,
+                'instance' => $config['instance'] ?: 'meta_official',
+                'source' => 'disconnect',
+                '_source' => 'disconnect',
+            ];
 
             $this->persistMainInstanceStatus($config, $after, [
                 'disconnect' => $result['data'] ?? [],
                 'status_after_disconnect' => $after,
             ]);
 
-            $message = $effectiveSuccess
-                ? (($result['success'] ?? false) ? 'Instância desconectada.' : 'Instância já estava desconectada.')
-                : ($result['error'] ?? 'Erro ao desconectar instância.');
-            $statusCode = $effectiveSuccess ? 200 : 422;
+            $message = 'Instância desconectada.';
 
             return response()->json(
-                $this->mainInstanceAjaxPayload($this->mainInstanceStatusPayload($config, $message), $message, $effectiveSuccess),
-                $statusCode
+                $this->mainInstanceAjaxPayload($this->mainInstanceStatusPayload($config, $message), $message, true),
+                200
             );
         } catch (\Throwable $e) {
             $config ??= $this->whatsappRuntimeConfig();
@@ -1359,128 +613,7 @@ class WhatsAppAdminController extends Controller
 
     public function restart(): JsonResponse
     {
-        try {
-            $config = $this->whatsappRuntimeConfig();
-
-            if (! $config['api_key'] || ! $config['base_url']) {
-                return response()->json($this->mainInstanceAjaxPayload(
-                    $this->mainInstanceStatusPayload($config, 'Meta WhatsApp Cloud API não configurada.'),
-                    'Meta WhatsApp Cloud API não configurada.',
-                    false
-                ), 422);
-            }
-
-            $settings = app(SettingsManager::class);
-            $prepared = $this->ensureMainRemoteInstanceReady($settings, $config);
-            $config = $prepared['config'];
-            $qrCode = $prepared['qrcode'];
-
-            $client = app(WhatsAppMetaClient::class);
-            $result = $client->reconnect();
-            $restartError = mb_strtolower((string) ($result['error'] ?? ''));
-            $softDisconnected = str_contains($restartError, 'client disconnected');
-            if (! ($result['success'] ?? false) && $softDisconnected) {
-                $result['success'] = true;
-            }
-            $after = $client->getNormalizedInstanceStatus();
-            $directStatus = $client->status();
-            if (($directStatus['ok'] ?? false) === true) {
-                $directState = $this->normalizeMainConnectionState(
-                    data_get($directStatus, 'data.state'),
-                    (array) data_get($directStatus, 'data.raw', [])
-                );
-
-                if (($directState['state'] ?? 'close') !== 'open') {
-                    $after = array_merge($after, [
-                        'state' => 'connecting',
-                        'status' => 'connecting',
-                        'status_label' => 'Aguardando QR Code',
-                        'connected' => false,
-                        'source' => 'instance_status_direct',
-                        '_source' => 'instance_status_direct',
-                    ]);
-                } else {
-                    $after = array_merge($after, [
-                        'state' => 'open',
-                        'status' => 'connected',
-                        'status_label' => 'Conectado',
-                        'connected' => true,
-                        'qrcode' => null,
-                    ]);
-                }
-            }
-
-            if (($result['success'] ?? false) && ! ($after['connected'] ?? false)) {
-                $after['state'] = 'connecting';
-                $after['status'] = 'connecting';
-                $after['status_label'] = 'Aguardando QR Code';
-
-                try {
-                    $connectNumber = $this->mainInstanceConnectionNumber($config, $after);
-                    $connectPayload = $this->mainConnectPayload($settings, $config);
-                    $connectResult = $client->connect($connectNumber, $connectPayload);
-                    $qrCode = $this->extractQrCode($connectResult['data'] ?? []) ?: $qrCode;
-
-                    if (! ($connectResult['success'] ?? false) && ! $qrCode) {
-                        $connectFallback = $client->connect($connectNumber);
-                        $qrCode = $this->extractQrCode($connectFallback['data'] ?? []) ?: $qrCode;
-                    }
-                } catch (\Throwable) {
-                    // polling continua abaixo
-                }
-
-                if (! $qrCode) {
-                    ['status' => $after, 'qrcode' => $qrCode] = $this->pollMainInstanceQrCode($client, $after, 10, 1200, true);
-                }
-
-                if (! $qrCode && ! ($after['connected'] ?? false)) {
-                    ['status' => $after, 'qrcode' => $qrCode] = $this->pollMainInstanceQrCode($client, $after, 4, 1200, false);
-                }
-
-                if ($qrCode && ! ($after['connected'] ?? false)) {
-                    $after['state'] = 'connecting';
-                    $after['status'] = 'connecting';
-                    $after['status_label'] = 'Aguardando QR Code';
-                    $after['qrcode'] = $qrCode;
-                    $after['source'] = 'instance_restart_qr';
-                    $after['_source'] = 'instance_restart_qr';
-                }
-            }
-
-            $effectiveSuccess = (bool) ($result['success'] ?? false);
-            if (! $effectiveSuccess && in_array(($after['state'] ?? ''), ['open', 'connecting'], true)) {
-                $effectiveSuccess = true;
-            }
-
-            $this->persistMainInstanceStatus($config, $after, [
-                'restart' => $result['data'] ?? [],
-                'status_after_restart' => $after,
-            ], (bool) ($qrCode ?? false));
-
-            $message = $effectiveSuccess
-                ? (($result['success'] ?? false) ? 'Instância reiniciada.' : 'Solicitação de reinício enviada.')
-                : ($result['error'] ?? 'Erro ao reiniciar instância.');
-            $statusCode = $effectiveSuccess ? 200 : 422;
-
-            $responsePayload = $this->mainInstanceStatusPayload($config, $message);
-            $responsePayload['qrcode'] = ($after['connected'] ?? false) ? null : ($qrCode ?: data_get($responsePayload, 'qrcode'));
-
-            if (($after['connected'] ?? false) === true) {
-                $message = 'InstÃ¢ncia conectada apÃ³s reinÃ­cio.';
-            } elseif ($responsePayload['qrcode']) {
-                $message = 'InstÃ¢ncia reiniciada. QR Code pronto para leitura.';
-            }
-
-            return response()->json($this->mainInstanceAjaxPayload($responsePayload, $message, $effectiveSuccess), $statusCode);
-        } catch (\Throwable $e) {
-            $config ??= $this->whatsappRuntimeConfig();
-
-            return response()->json($this->mainInstanceAjaxPayload(
-                $this->mainInstanceStatusPayload($config, $e->getMessage()),
-                $e->getMessage(),
-                false
-            ), 422);
-        }
+        return $this->testConnection();
     }
 
     public function sendTest(Request $request): JsonResponse
@@ -1573,7 +706,7 @@ class WhatsAppAdminController extends Controller
                 ], 422);
             }
 
-            // Seleciona instância ativa de preferência ou Evolution padrão
+            // Seleciona instância ativa do tenant ou cliente Meta Cloud padrão
             $instance = TenantInstance::where('status', 'connected')->orderByDesc('is_default')->first();
             if ($instance) {
                 $id = app(InstanceManager::class)->sendText($instance, $cleanTo, $data['message'], array_merge($context, $inspection, [
@@ -2002,8 +1135,6 @@ class WhatsAppAdminController extends Controller
             'human_delay_max_seconds' => 'required|integer|min:0|max:600',
             'send_delay_min_ms' => 'nullable|integer|min:0|max:20000',
             'send_delay_max_ms' => 'nullable|integer|min:0|max:30000',
-            'evolution_delay_min_ms' => 'nullable|integer|min:0|max:20000',
-            'evolution_delay_max_ms' => 'nullable|integer|min:0|max:30000',
             'release_when_limited_seconds' => 'required|integer|min:60|max:86400',
             'block_groups' => 'nullable|boolean',
             'minimum_message_chars' => 'required|integer|min:1|max:100',
@@ -2075,8 +1206,6 @@ class WhatsAppAdminController extends Controller
             'human_delay_max_seconds' => ['human_delay.max_seconds', 'int'],
             'send_delay_min_ms' => ['send_delay_ms.min', 'int'],
             'send_delay_max_ms' => ['send_delay_ms.max', 'int'],
-            'evolution_delay_min_ms' => ['evolution_delay_ms.min', 'int'],
-            'evolution_delay_max_ms' => ['evolution_delay_ms.max', 'int'],
             'release_when_limited_seconds' => ['release_when_limited_seconds', 'int'],
             'minimum_message_chars' => ['minimum_message_chars', 'int'],
             'risk_medium' => ['risk_thresholds.medium', 'int'],
@@ -2303,325 +1432,6 @@ class WhatsAppAdminController extends Controller
         ];
     }
 
-    protected function fetchMainInstanceSnapshot(array $config): array
-    {
-        $baseUrl = $config['base_url'];
-        $apiKey = $config['api_key'];
-        $globalKey = $config['global_api_key'];
-        $instance = $config['instance'];
-        $timeout = $config['timeout'];
-        $keys = array_values(array_unique(array_filter([$globalKey, $apiKey])));
-
-        $message = null;
-        $statusRaw = [];
-        $statusHttp = 0;
-        $infoRaw = [];
-        $allRaw = [];
-        $avatarRaw = [];
-
-        $statusOk = false;
-        try {
-            $statusResp = Http::baseUrl($baseUrl)->timeout($timeout)
-                ->acceptJson()
-                ->withHeaders(['apikey' => $apiKey])
-                ->get('/instance/status');
-
-            $statusHttp = $statusResp->status();
-            $statusRaw = $statusResp->json() ?? [];
-            $statusOk = $statusResp->successful();
-            if (! $statusOk) {
-                $message = $this->responseMessage($statusResp);
-            }
-        } catch (\Throwable $e) {
-            $message = $e->getMessage();
-        }
-
-        $infoBody = [];
-        foreach ($keys as $key) {
-            try {
-                $infoResp = Http::baseUrl($baseUrl)->timeout($timeout)
-                    ->acceptJson()
-                    ->withHeaders(['apikey' => $key])
-                    ->get("/instance/info/{$instance}");
-
-                if ($infoResp->successful()) {
-                    $infoRaw = $infoResp->json() ?? [];
-                    $infoBody = $this->instanceInfoBody($infoRaw);
-                    break;
-                }
-            } catch (\Throwable) {
-            }
-        }
-
-        $allRow = [];
-        foreach ($keys as $key) {
-            try {
-                $allResp = Http::baseUrl($baseUrl)->timeout($timeout)
-                    ->acceptJson()
-                    ->withHeaders(['apikey' => $key])
-                    ->get('/instance/all');
-
-                if ($allResp->successful()) {
-                    $allRaw = $allResp->json() ?? [];
-                    $allRow = $this->findInstanceRow($allRaw, $instance);
-                    if ($allRow) {
-                        break;
-                    }
-                }
-            } catch (\Throwable) {
-            }
-        }
-
-        $statusBody = $this->instanceInfoBody($statusRaw);
-        $stateRaw = $this->firstFilled(
-            data_get($statusRaw, 'instance.state'),
-            data_get($statusRaw, 'data.instance.state'),
-            data_get($statusRaw, 'data.state'),
-            data_get($statusRaw, 'state'),
-            data_get($statusRaw, 'status'),
-            data_get($infoBody, 'state'),
-            data_get($infoBody, 'status'),
-            data_get($allRow, 'state'),
-            data_get($allRow, 'status')
-        );
-        $stateInfo = ($statusOk || $stateRaw)
-            ? $this->normalizeMainConnectionState($stateRaw, $statusRaw)
-            : ['state' => null, 'status' => null, 'status_label' => null, 'connected' => false];
-
-        $jid = $this->firstFilled(
-            data_get($statusBody, 'jid'),
-            data_get($statusRaw, 'jid'),
-            data_get($infoBody, 'ownerJid'),
-            data_get($infoBody, 'ownerJID'),
-            data_get($infoBody, 'jid'),
-            data_get($infoBody, 'owner'),
-            data_get($allRow, 'ownerJid'),
-            data_get($allRow, 'ownerJID'),
-            data_get($allRow, 'jid'),
-            data_get($allRow, 'owner')
-        );
-
-        $number = $this->normalizeEvolutionNumber($this->firstFilled(
-            data_get($statusBody, 'phone.phoneNumber'),
-            data_get($statusBody, 'phone.number'),
-            data_get($statusBody, 'Number'),
-            data_get($statusBody, 'number'),
-            data_get($statusRaw, 'data.Number'),
-            data_get($statusRaw, 'data.number'),
-            data_get($infoBody, 'phone.phoneNumber'),
-            data_get($infoBody, 'phone.number'),
-            data_get($infoBody, 'number'),
-            data_get($infoBody, 'phone'),
-            data_get($allRow, 'number'),
-            data_get($allRow, 'phone'),
-            $jid
-        ));
-
-        $profileName = $this->firstProfileName($instance, $statusBody, $statusRaw, $infoBody, $allRow);
-        $clientName = $this->firstFilled(
-            data_get($infoBody, 'clientName'),
-            data_get($infoBody, 'client_name'),
-            data_get($infoBody, 'displayName'),
-            data_get($allRow, 'clientName'),
-            data_get($allRow, 'client_name'),
-            data_get($allRow, 'displayName'),
-            $profileName
-        );
-        $createdAt = $this->firstFilled(
-            data_get($infoBody, 'createdAt'),
-            data_get($infoBody, 'created_at'),
-            data_get($allRow, 'createdAt'),
-            data_get($allRow, 'created_at'),
-            data_get($statusBody, 'createdAt'),
-            data_get($statusBody, 'created_at')
-        );
-        $avatar = $this->firstFilled(
-            data_get($infoBody, 'profilePictureUrl'),
-            data_get($infoBody, 'profilePicUrl'),
-            data_get($allRow, 'profilePictureUrl'),
-            data_get($allRow, 'profilePicUrl')
-        );
-
-        if ($number && $stateInfo['state'] === 'open') {
-            try {
-                $cleanDigits = preg_replace('/\D+/', '', (string) $number);
-                if ($instance && $cleanDigits) {
-                    $avatarResp = Http::baseUrl($baseUrl)->timeout(min($timeout, 6))
-                        ->acceptJson()
-                        ->withHeaders(['apikey' => $apiKey, 'Content-Type' => 'application/json'])
-                        ->post('/chat/fetchProfilePictureUrl/' . $instance, ['number' => $cleanDigits]);
-                    if ($avatarResp->successful()) {
-                        $avatarRaw = $avatarResp->json() ?? [];
-                        $avatar = $this->firstFilled(
-                            data_get($avatarRaw, 'profilePictureUrl'),
-                            data_get($avatarRaw, 'data.profilePictureUrl'),
-                            data_get($avatarRaw, 'data.url'),
-                            data_get($avatarRaw, 'url'),
-                            $avatar
-                        );
-                    }
-                }
-
-                if (! $avatar) {
-                    $avatarResp = Http::baseUrl($baseUrl)->timeout(min($timeout, 8))
-                        ->acceptJson()
-                        ->withHeaders(['apikey' => $apiKey, 'Content-Type' => 'application/json'])
-                        ->post('/user/avatar', ['number' => $cleanDigits ?: $number, 'preview' => true]);
-                    if ($avatarResp->successful()) {
-                        $avatarRaw = $avatarResp->json() ?? [];
-                        $avatar = $this->firstFilled(
-                            data_get($avatarRaw, 'data.url'),
-                            data_get($avatarRaw, 'url'),
-                            data_get($avatarRaw, 'base64'),
-                            data_get($avatarRaw, 'data.base64'),
-                            data_get($avatarRaw, 'profilePictureUrl'),
-                            data_get($avatarRaw, 'data.profilePictureUrl'),
-                            $avatar
-                        );
-                    }
-                }
-            } catch (\Throwable) {
-            }
-        }
-
-        $hasRemoteData = $statusOk || $infoBody !== [] || $allRow !== [];
-        if (! $hasRemoteData) {
-            return [
-                'payload' => null,
-                'server_payload' => [
-                    'status_http' => $statusHttp,
-                    'status' => $statusRaw,
-                ],
-                'message' => $message,
-            ];
-        }
-
-        $sources = array_filter([
-            $statusOk ? 'status' : null,
-            $infoBody ? 'info' : null,
-            $allRow ? 'all' : null,
-            $avatar ? 'avatar' : null,
-        ]);
-
-        return [
-            'payload' => [
-                'state' => $stateInfo['state'],
-                'status' => $stateInfo['status'],
-                'status_label' => $stateInfo['status_label'],
-                'connected' => $stateInfo['connected'],
-                'raw_state' => $stateRaw ?: $stateInfo['state'],
-                'number' => $number,
-                'name' => $profileName,
-                'client_name' => $clientName,
-                'jid' => $jid,
-                'avatar' => $avatar,
-                'created_at' => $createdAt,
-                'instance' => $instance,
-                'last_check' => now()->toIso8601String(),
-                'persisted' => true,
-                '_source' => 'evolution_'.implode('_', $sources ?: ['api']),
-                '_api_error' => $message,
-            ],
-            'server_payload' => [
-                'status_http' => $statusHttp,
-                'status' => $statusRaw,
-                'info' => $infoRaw,
-                'all' => $allRaw,
-                'avatar' => $avatarRaw,
-            ],
-            'message' => $message,
-        ];
-    }
-
-    protected function instanceInfoBody(array $payload): array
-    {
-        $body = data_get($payload, 'instance')
-            ?: data_get($payload, 'data.instance')
-            ?: data_get($payload, 'data')
-            ?: $payload;
-
-        return is_array($body) && ! array_is_list($body) ? $body : [];
-    }
-
-    protected function findInstanceRow(array $payload, string $instance): array
-    {
-        foreach ($this->instanceRows($payload) as $row) {
-            $name = $this->firstFilled(
-                data_get($row, 'name'),
-                data_get($row, 'instanceName'),
-                data_get($row, 'instance_name'),
-                data_get($row, 'instance')
-            );
-
-            if ($name === $instance) {
-                return $row;
-            }
-        }
-
-        return [];
-    }
-
-    protected function firstProfileName(string $instance, array ...$payloads): ?string
-    {
-        foreach (['profileName', 'profile_name', 'pushName', 'PushName', 'businessName', 'BusinessName', 'verifiedName', 'VerifiedName', 'Name', 'name'] as $path) {
-            foreach ($payloads as $payload) {
-                $value = $this->firstFilled(data_get($payload, $path));
-                if ($value && $value !== $instance) {
-                    return $value;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    protected function normalizeEvolutionNumber(?string $value): ?string
-    {
-        if (! $value) {
-            return null;
-        }
-
-        $value = preg_replace('/[:@].*$/', '', $value) ?: $value;
-        $digits = preg_replace('/\D+/', '', $value) ?: '';
-
-        return $digits !== '' ? $digits : null;
-    }
-
-    protected function normalizeMainConnectionState(mixed $stateRaw, array $payload = []): array
-    {
-        if (is_array($stateRaw)) {
-            $stateRaw = data_get($stateRaw, 'state') ?: data_get($stateRaw, 'status') ?: 'close';
-        }
-
-        if (is_bool($stateRaw)) {
-            $stateRaw = $stateRaw ? 'open' : 'close';
-        }
-
-        if (is_numeric($stateRaw)) {
-            $stateRaw = (int) $stateRaw === 1 ? 'open' : 'close';
-        }
-
-        $raw = mb_strtolower(trim((string) ($stateRaw ?: '')));
-
-        if (in_array($raw, ['open', 'connected', 'connect', 'active', 'online', 'authenticated', 'logged', 'logged_in', 'ready', 'success', 'true', '1'], true)) {
-            return ['state' => 'open', 'status' => 'connected', 'status_label' => 'Conectado', 'connected' => true];
-        }
-
-        if (in_array($raw, ['connecting', 'syncing', 'init', 'initializing', 'loading', 'qr', 'qrcode', 'pairing', 'waiting_qr', 'scan_qr'], true)) {
-            return ['state' => 'connecting', 'status' => 'connecting', 'status_label' => 'Aguardando QR Code', 'connected' => false];
-        }
-
-        if (in_array($raw, ['error', 'failed', 'timeout', 'invalid', 'exception'], true)) {
-            return ['state' => 'error', 'status' => 'error', 'status_label' => 'Erro de comunicação', 'connected' => false];
-        }
-
-        if (! $raw && $this->payloadIsConnected($payload)) {
-            return ['state' => 'open', 'status' => 'connected', 'status_label' => 'Conectado', 'connected' => true];
-        }
-
-        return ['state' => 'close', 'status' => 'disconnected', 'status_label' => 'Desconectado', 'connected' => false];
-    }
-
     protected function mainInstanceStatusPayload(array $config, ?string $message = null): array
     {
         $row = $this->mainWhatsAppInstanceRow($config);
@@ -2731,10 +1541,7 @@ class WhatsAppAdminController extends Controller
     protected function normalizeMainSourceLabel(string $source): string
     {
         return match ($source) {
-            'instance_status' => 'evolution_status',
-            'instance_info' => 'evolution_status_info',
-            'instance_all' => 'evolution_status_all',
-            'instance_qr' => 'evolution_qr',
+            'meta_graph_api', 'meta_api', 'meta_cloud', 'instance_status', 'instance_info', 'instance_all' => 'meta_graph_api',
             '' => 'local_cache',
             default => $source,
         };
@@ -2762,49 +1569,26 @@ class WhatsAppAdminController extends Controller
         $source = (string) ($remotePayload['_source'] ?? $remotePayload['source'] ?? '');
 
         return in_array($source, [
-            'evolution_status_all',
-            'evolution_status',
-            'evolution_status_info',
-            'instance_all',
-            'instance_status',
-            'instance_info',
+            'meta_graph_api',
             'local_fallback',
             'error',
         ], true);
     }
 
-    protected function persistMainInstanceStatus(array $config, array $payload, array $serverPayload = [], bool $qrReturned = false): ?WhatsAppInstance
+    protected function persistMainInstanceStatus(array $config, array $payload, array $serverPayload = []): ?WhatsAppInstance
     {
-        $instanceName = $this->firstPersistentValue($payload['instance'] ?? null, $config['instance'] ?? null);
-        if (! $instanceName) {
-            return null;
-        }
+        $instanceName = $this->firstPersistentValue($payload['instance'] ?? null, $config['instance'] ?? null) ?: 'meta_official';
 
         $existing = $this->mainWhatsAppInstanceRow(['instance' => $instanceName]);
         $state = $this->firstPersistentValue($payload['state'] ?? null, $existing?->server_status) ?: 'nao_verificado';
-        $currentQrCode = $this->firstPersistentValue($payload['qrcode'] ?? null);
-        $existingQrCode = $this->firstPersistentValue(data_get($existing?->server_payload ?? [], 'display.qrcode'));
-        $hasIdentity = $this->payloadHasWhatsAppIdentity($payload);
-        $connected = ($state === 'open' || (bool) ($payload['connected'] ?? false)) && $hasIdentity;
+        $connected = ($state === 'open' || (bool) ($payload['connected'] ?? false));
         if ($connected) {
             $state = 'open';
-        } elseif ($state === 'open') {
-            $state = $currentQrCode || $existingQrCode ? 'connecting' : 'close';
+        } else {
+            $state = in_array($state, ['connecting', 'nao_verificado', 'nao_configurado', 'error'], true) ? $state : 'close';
             $payload['connected'] = false;
-            $payload['status'] = $state === 'connecting' ? 'connecting' : 'disconnected';
-            $payload['status_label'] = $state === 'connecting' ? 'Aguardando QR Code' : 'Desconectado';
-        }
-
-        if (! $currentQrCode && $state === 'connecting') {
-            $currentQrCode = $existingQrCode;
-        }
-
-        if (! $currentQrCode && $this->shouldPreserveExistingQrCode($existing, $state, $serverPayload)) {
-            $state = 'connecting';
-            $payload['status'] = 'connecting';
-            $payload['status_label'] = 'Aguardando QR Code';
-            $payload['connected'] = false;
-            $currentQrCode = $existingQrCode;
+            $payload['status'] = $state === 'connecting' ? 'connecting' : ($state === 'close' ? 'disconnected' : $state);
+            $payload['status_label'] = $this->statusLabel($state);
         }
 
         $display = [
@@ -2813,15 +1597,15 @@ class WhatsAppAdminController extends Controller
             'status_label' => $this->firstPersistentValue($payload['status_label'] ?? null, data_get($existing?->server_payload ?? [], 'display.status_label'), $this->statusLabel($state)),
             'connected' => (bool) ($payload['connected'] ?? $connected),
             'raw_state' => $this->firstPersistentValue($payload['raw_state'] ?? null, data_get($existing?->server_payload ?? [], 'display.raw_state'), $state),
-            'number' => $this->firstPersistentValue($payload['number'] ?? null, $existing?->phone),
-            'name' => $this->firstPersistentValue($payload['name'] ?? null, $existing?->profile_name),
+            'number' => $this->firstPersistentValue($payload['number'] ?? null, $payload['phone'] ?? null, $existing?->phone),
+            'name' => $this->firstPersistentValue($payload['name'] ?? null, $payload['profile_name'] ?? null, $existing?->profile_name),
             'client_name' => $this->firstPersistentValue($payload['client_name'] ?? null, $existing?->client_name),
             'jid' => $this->firstPersistentValue($payload['jid'] ?? null, $existing?->jid),
-            'avatar' => $this->firstPersistentValue($payload['avatar'] ?? null, $existing?->profile_picture),
+            'avatar' => $this->firstPersistentValue($payload['avatar'] ?? null, $payload['profile_picture'] ?? null, $existing?->profile_picture),
             'created_at' => $this->firstPersistentValue($payload['created_at'] ?? null, data_get($existing?->server_payload ?? [], 'display.created_at'), $existing?->created_at?->toIso8601String()),
             'instance' => $instanceName,
             'last_check' => $this->firstPersistentValue($payload['last_check'] ?? null, now()->toIso8601String()),
-            'qrcode' => $connected ? null : $currentQrCode,
+            'qrcode' => null,
             '_source' => $payload['_source'] ?? 'local',
             '_api_error' => $payload['_api_error'] ?? null,
         ];
@@ -2850,7 +1634,7 @@ class WhatsAppAdminController extends Controller
                 'logged_in' => $connected,
                 'server_status' => $state,
                 'last_sync_at' => now(),
-                'last_qr_at' => ($qrReturned || ($currentQrCode && $currentQrCode !== $existingQrCode)) ? now() : $existing?->last_qr_at,
+                'last_qr_at' => null,
                 'server_payload' => $snapshot,
                 'local_hash' => sha1(json_encode($display, JSON_UNESCAPED_UNICODE)),
                 'remote_hash' => $serverPayload ? sha1(json_encode($serverPayload, JSON_UNESCAPED_UNICODE)) : $existing?->remote_hash,
@@ -2858,28 +1642,6 @@ class WhatsAppAdminController extends Controller
                 'sync_error' => null,
             ]
         );
-    }
-
-    protected function shouldPreserveExistingQrCode(?WhatsAppInstance $existing, string $state, array $serverPayload = []): bool
-    {
-        if (! $existing || $existing->connected || $state === 'open') {
-            return false;
-        }
-
-        if (array_key_exists('disconnect', $serverPayload)) {
-            return false;
-        }
-
-        $existingQrCode = $this->firstPersistentValue(data_get($existing->server_payload ?? [], 'display.qrcode'));
-        if (! $existingQrCode) {
-            return false;
-        }
-
-        if (! in_array((string) ($existing->server_status ?: ''), ['connecting', 'qr', 'qrcode', 'pairing', 'close', 'disconnected'], true)) {
-            return false;
-        }
-
-        return ! $existing->last_qr_at || $existing->last_qr_at->greaterThanOrEqualTo(now()->subMinutes(5));
     }
 
     protected function mainWhatsAppInstanceRow(array $config): ?WhatsAppInstance
@@ -2914,8 +1676,8 @@ class WhatsAppAdminController extends Controller
     protected function statusLabel(string $state): string
     {
         return match ($state) {
-            'open' => 'Conectado',
-            'connecting' => 'Aguardando QR Code',
+            'open', 'connected', 'active' => 'Conectado',
+            'connecting' => 'Conectando',
             'error' => 'Erro de comunicação',
             'nao_configurado' => 'Não configurado',
             'nao_verificado' => 'Não verificado',
@@ -2926,7 +1688,7 @@ class WhatsAppAdminController extends Controller
     protected function statusBadgeClass(string $state): string
     {
         return match ($state) {
-            'open' => 'text-bg-success',
+            'open', 'connected', 'active' => 'text-bg-success',
             'connecting' => 'text-bg-warning',
             'error' => 'text-bg-secondary',
             'nao_configurado', 'nao_verificado' => 'text-bg-secondary',
@@ -2943,290 +1705,16 @@ class WhatsAppAdminController extends Controller
         }
     }
 
-    protected function payloadIsConnected(array $payload): bool
+    protected function normalizePhoneNumber(?string $value): ?string
     {
-        if (! $this->payloadHasWhatsAppIdentity($payload)) {
-            return false;
-        }
-
-        foreach ([
-            data_get($payload, 'data.LoggedIn'),
-            data_get($payload, 'data.Connected'),
-            data_get($payload, 'LoggedIn'),
-            data_get($payload, 'Connected'),
-            data_get($payload, 'connected'),
-            data_get($payload, 'instance.connected'),
-            data_get($payload, 'data.instance.connected'),
-            data_get($payload, 'data.connected'),
-            data_get($payload, 'data.data.connected'),
-            data_get($payload, 'data.data.LoggedIn'),
-            data_get($payload, 'data.data.Connected'),
-        ] as $value) {
-            if ($this->truthy($value)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function payloadHasWhatsAppIdentity(array $payload): bool
-    {
-        foreach ([
-            data_get($payload, 'jid'),
-            data_get($payload, 'ownerJid'),
-            data_get($payload, 'owner'),
-            data_get($payload, 'instance.jid'),
-            data_get($payload, 'instance.ownerJid'),
-            data_get($payload, 'data.jid'),
-            data_get($payload, 'data.ownerJid'),
-            data_get($payload, 'data.instance.jid'),
-            data_get($payload, 'number'),
-            data_get($payload, 'phone'),
-            data_get($payload, 'Number'),
-            data_get($payload, 'instance.number'),
-            data_get($payload, 'instance.phone.phoneNumber'),
-            data_get($payload, 'instance.phone.number'),
-            data_get($payload, 'data.number'),
-            data_get($payload, 'data.Number'),
-            data_get($payload, 'data.instance.number'),
-            data_get($payload, 'data.instance.phone.phoneNumber'),
-            data_get($payload, 'data.instance.phone.number'),
-        ] as $value) {
-            $value = trim((string) $value);
-            $digits = preg_replace('/\D+/', '', preg_replace('/[:@].*$/', '', $value) ?: $value) ?: '';
-
-            if ($digits !== '' || str_contains($value, '@s.whatsapp.net') || str_contains($value, '@lid')) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function extractQrCode(array $payload): ?string
-    {
-        $qr = $this->firstFilled(
-            data_get($payload, 'qrcode.Code'),
-            data_get($payload, 'qrcode.code'),
-            data_get($payload, 'qrcode.pairingCode'),
-            data_get($payload, 'data.qrcode.Code'),
-            data_get($payload, 'data.qrcode.code'),
-            data_get($payload, 'data.qrcode.pairingCode'),
-            data_get($payload, 'data.Code'),
-            data_get($payload, 'data.code'),
-            data_get($payload, 'data.pairingCode'),
-            data_get($payload, 'data.data.qrcode.Code'),
-            data_get($payload, 'data.data.qrcode.code'),
-            data_get($payload, 'data.data.qrcode.pairingCode'),
-            data_get($payload, 'data.data.Code'),
-            data_get($payload, 'data.data.code'),
-            data_get($payload, 'data.data.pairingCode'),
-            data_get($payload, 'Code'),
-            data_get($payload, 'code'),
-            data_get($payload, 'pairingCode'),
-            data_get($payload, 'qrcode.base64'),
-            data_get($payload, 'qrcode.qrcode'),
-            data_get($payload, 'qrcode.Qrcode'),
-            data_get($payload, 'data.qrcode.base64'),
-            data_get($payload, 'data.qrcode'),
-            data_get($payload, 'data.Qrcode'),
-            data_get($payload, 'data.data.qrcode.base64'),
-            data_get($payload, 'data.data.qrcode'),
-            data_get($payload, 'data.data.Qrcode'),
-            data_get($payload, 'data.base64'),
-            data_get($payload, 'data.data.base64'),
-            data_get($payload, 'base64'),
-            data_get($payload, 'Qrcode'),
-            is_string(data_get($payload, 'qrcode')) ? data_get($payload, 'qrcode') : null
-        );
-
-        if (! $qr) {
+        if (! $value) {
             return null;
         }
 
-        return $this->normalizeQrCodeValue($qr);
-    }
+        $value = preg_replace('/[:@].*$/', '', $value) ?: $value;
+        $digits = preg_replace('/\D+/', '', $value) ?: '';
 
-    protected function normalizeQrCodeValue(string $qr): string
-    {
-        $qr = trim($qr);
-
-        if (str_starts_with($qr, 'data:image')) {
-            return $qr;
-        }
-
-        $base64 = preg_replace('/\s+/', '', $qr) ?: $qr;
-
-        if (preg_match('/^[A-Za-z0-9+\/=]+$/', $base64) && $this->isImageBase64($base64)) {
-            return 'data:image/png;base64,'.$base64;
-        }
-
-        return $qr;
-    }
-
-    protected function isImageBase64(string $value): bool
-    {
-        $bytes = base64_decode(mb_substr($value, 0, 64), true);
-
-        if ($bytes === false) {
-            return false;
-        }
-
-        return str_starts_with($bytes, "\x89PNG")
-            || str_starts_with($bytes, "\xFF\xD8\xFF")
-            || str_starts_with($bytes, 'GIF8')
-            || str_starts_with($bytes, 'RIFF');
-    }
-
-    protected function mainInstanceConnectionNumber(array $config, array $statusPayload = []): string
-    {
-        $row = $this->mainWhatsAppInstanceRow($config);
-
-        return preg_replace('/\D+/', '', (string) $this->firstPersistentValue(
-            $statusPayload['number'] ?? null,
-            $row?->phone,
-            data_get($row?->server_payload ?? [], 'display.number')
-        )) ?: '';
-    }
-
-    protected function connectedNumberInAnotherInstance(WhatsAppMetaClient $client, array $config, string $number): ?array
-    {
-        if ($number === '') {
-            return null;
-        }
-
-        $remote = $client->listInstances();
-
-        if (! ($remote['success'] ?? false)) {
-            return null;
-        }
-
-        foreach ($this->instanceRows($remote['data'] ?? []) as $row) {
-            $instanceName = (string) $this->firstPersistentValue(
-                data_get($row, 'name'),
-                data_get($row, 'instanceName'),
-                data_get($row, 'instance_name')
-            );
-
-            if ($instanceName === '' || $instanceName === ($config['instance'] ?? '')) {
-                continue;
-            }
-
-            $rowNumber = $this->normalizeEvolutionNumber($this->firstPersistentValue(
-                data_get($row, 'number'),
-                data_get($row, 'phone'),
-                data_get($row, 'jid'),
-                data_get($row, 'owner'),
-                data_get($row, 'ownerJid')
-            ));
-
-            if ($rowNumber !== $number) {
-                continue;
-            }
-
-            $remoteState = $this->normalizeMainConnectionState(
-                data_get($row, 'state') ?: data_get($row, 'status') ?: data_get($row, 'connected'),
-                $row
-            );
-
-            if ($remoteState['connected'] ?? false) {
-                return [
-                    'instance' => $instanceName,
-                    'number' => $rowNumber,
-                ];
-            }
-        }
-
-        return null;
-    }
-
-    protected function pollMainInstanceConnectionState(WhatsAppMetaClient $client, array $statusPayload, int $attempts = 4, int $delayMs = 500): array
-    {
-        ['status' => $status, 'qrcode' => $qrCode] = $this->pollMainInstanceQrCode($client, $statusPayload, $attempts, $delayMs);
-
-        return ['status' => $status, 'qrcode' => $qrCode];
-    }
-
-    protected function pollMainInstanceQrCode(WhatsAppMetaClient $client, array $statusPayload, int $attempts, int $delayMs, bool $preferDirectStatus = false): array
-    {
-        $currentStatus = $statusPayload;
-        $qrCode = null;
-        $server = [];
-
-        for ($attempt = 0; $attempt < $attempts; $attempt++) {
-            if ($attempt > 0) {
-                usleep($delayMs * 1000);
-                if ($preferDirectStatus) {
-                    $direct = $client->status();
-                    if (($direct['ok'] ?? false) === true) {
-                        $normalizedDirect = $this->normalizeMainConnectionState(
-                            data_get($direct, 'data.state'),
-                            (array) data_get($direct, 'data.raw', [])
-                        );
-                        $currentStatus = array_merge($currentStatus, $normalizedDirect, [
-                            'connected' => (bool) ($normalizedDirect['connected'] ?? false),
-                            'source' => 'instance_status_direct',
-                            '_source' => 'instance_status_direct',
-                        ]);
-                    } else {
-                        $currentStatus = $client->getNormalizedInstanceStatus();
-                    }
-                } else {
-                    $currentStatus = $client->getNormalizedInstanceStatus();
-                }
-            }
-
-            if ($currentStatus['connected'] ?? false) {
-                return ['status' => $currentStatus, 'qrcode' => null];
-            }
-
-            $qrResponse = $client->getQrCode();
-            $server[] = [
-                'success' => (bool) ($qrResponse['success'] ?? false),
-                'status' => (int) ($qrResponse['status'] ?? 0),
-                'error' => $qrResponse['error'] ?? null,
-            ];
-            $qrCode = $this->extractQrCode($qrResponse['data'] ?? []);
-
-            if ($qrCode) {
-                $currentStatus['state'] = 'connecting';
-                $currentStatus['status'] = 'connecting';
-                $currentStatus['status_label'] = 'Aguardando QR Code';
-                $currentStatus['connected'] = false;
-
-                return ['status' => $currentStatus, 'qrcode' => $qrCode, 'server' => $server];
-            }
-        }
-
-        return ['status' => $currentStatus, 'qrcode' => null, 'server' => $server];
-    }
-
-    protected function instanceRows(array $payload): array
-    {
-        $data = data_get($payload, 'data', $payload);
-        $rows = data_get($payload, 'instances')
-            ?: data_get($data, 'instances')
-            ?: data_get($data, 'data.instances')
-            ?: data_get($data, 'data')
-            ?: data_get($data, 'response')
-            ?: $data;
-
-        if (is_array($rows) && array_is_list($rows)) {
-            return array_values(array_filter($rows, 'is_array'));
-        }
-
-        return is_array($rows) && $rows !== [] ? [$rows] : [];
-    }
-
-    protected function responseMessage(\Illuminate\Http\Client\Response $response): string
-    {
-        $data = $response->json() ?? [];
-
-        return (string) (data_get($data, 'message')
-            ?: data_get($data, 'error')
-            ?: data_get($data, 'response.message')
-            ?: "HTTP {$response->status()}");
+        return $digits !== '' ? $digits : null;
     }
 
     protected function firstFilled(mixed ...$values): ?string
@@ -3280,8 +1768,8 @@ class WhatsAppAdminController extends Controller
             'human_delay_enabled' => (bool) $s->get('whatsapp_anti_ban.human_delay.enabled', config('whatsapp_anti_ban.human_delay.enabled', true)),
             'human_delay_min_seconds' => (int) $s->get('whatsapp_anti_ban.human_delay.min_seconds', config('whatsapp_anti_ban.human_delay.min_seconds', 8)),
             'human_delay_max_seconds' => (int) $s->get('whatsapp_anti_ban.human_delay.max_seconds', config('whatsapp_anti_ban.human_delay.max_seconds', 28)),
-            'evolution_delay_min_ms' => (int) $s->get('whatsapp_anti_ban.evolution_delay_ms.min', config('whatsapp_anti_ban.evolution_delay_ms.min', 1500)),
-            'evolution_delay_max_ms' => (int) $s->get('whatsapp_anti_ban.evolution_delay_ms.max', config('whatsapp_anti_ban.evolution_delay_ms.max', 4500)),
+            'send_delay_min_ms' => (int) $s->get('whatsapp_anti_ban.send_delay_ms.min', config('whatsapp_anti_ban.send_delay_ms.min', 1500)),
+            'send_delay_max_ms' => (int) $s->get('whatsapp_anti_ban.send_delay_ms.max', config('whatsapp_anti_ban.send_delay_ms.max', 4500)),
             'release_when_limited_seconds' => (int) $s->get('whatsapp_anti_ban.release_when_limited_seconds', config('whatsapp_anti_ban.release_when_limited_seconds', 300)),
             'block_groups' => (bool) $s->get('whatsapp_anti_ban.block_groups', config('whatsapp_anti_ban.block_groups', true)),
             'minimum_message_chars' => (int) $s->get('whatsapp_anti_ban.minimum_message_chars', config('whatsapp_anti_ban.minimum_message_chars', 2)),
