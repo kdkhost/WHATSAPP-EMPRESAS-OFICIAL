@@ -501,6 +501,9 @@
             <p class="text-muted mb-0">Auditoria operacional em tempo real: todas as mensagens enviadas para seus clientes com simulação autêntica no WhatsApp.</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-info rounded-pill px-3 js-meta-help-trigger" data-help-topic="meta-templates">
+                <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Templates Meta
+            </button>
             <button class="btn btn-success rounded-pill px-3 shadow-sm" id="btn-manual-send" data-has-instance="{{ $hasConnectedInstance ? '1' : '0' }}">
                 <i class="bi bi-send-plus me-1"></i> Nova mensagem manual
             </button>

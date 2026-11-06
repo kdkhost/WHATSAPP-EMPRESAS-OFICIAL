@@ -416,6 +416,9 @@
         eyebrow="Operação WhatsApp">
         <x-slot:actions>
             <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <button type="button" class="btn btn-outline-primary js-meta-help-trigger" data-help-topic="meta-templates">
+                    <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Templates Meta
+                </button>
                 <button class="btn btn-success" id="btn-manual-send">
                     <i class="bi bi-send-fill me-1"></i> Nova mensagem manual
                 </button>

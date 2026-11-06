@@ -1265,6 +1265,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 </style>
 @include('admin.partials.upload-modal', ['uploadPrefix' => '/painel/uploads'])
+@include('partials.meta-help-drawer')
 @stack('scripts')
 </body>
 </html>

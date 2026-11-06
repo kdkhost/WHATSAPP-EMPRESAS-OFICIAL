@@ -69,6 +69,9 @@
                 </p>
             </div>
             <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-info btn-sm js-meta-help-trigger" data-help-topic="tenant-instance-setup" title="Instruções de Configuração Meta">
+                    <i class="bi bi-question-circle me-1"></i> Ajuda & Passo a Passo Meta
+                </button>
                 <button class="btn btn-outline-warning btn-sm" id="btn-open-safety-modal" onclick="openSafetyModal()">
                     <i class="bi bi-shield-check me-1"></i> Proteção Anti-Ban
                 </button>
@@ -340,7 +343,12 @@
                         <span id="config-sync-text">Sincronizado com WhatsApp Oficial</span>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary js-meta-help-trigger" data-help-topic="tenant-instance-setup" title="Instruções de Configuração da Instância Meta">
+                        <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Passo a Passo Meta
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
             </div>
             <div class="modal-body">
                 <form id="frm-instance-config">
@@ -361,25 +369,45 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Número de Telefone</label>
+                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                <span>Número de Telefone</span>
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-phone-id" title="Passo a passo sobre registro de número">
+                                    <i class="bi bi-question-circle-fill me-1"></i>Ajuda
+                                </a>
+                            </label>
                             <input type="text" class="form-control" name="phone" placeholder="Ex: 5511999999999" maxlength="30">
                             <div class="form-text">Número oficial do WhatsApp com DDI e DDD.</div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Phone Number ID da Meta</label>
+                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                <span>Phone Number ID da Meta</span>
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-phone-id" title="Como obter o Phone Number ID">
+                                    <i class="bi bi-question-circle-fill me-1"></i>Como obter?
+                                </a>
+                            </label>
                             <input type="text" class="form-control font-monospace" name="meta_phone_number_id" placeholder="Ex: 109283746592817" maxlength="64">
                             <div class="form-text">Obtido no Meta for Developers > WhatsApp > API Setup.</div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">WABA ID (Conta Comercial)</label>
+                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                <span>WABA ID (Conta Comercial)</span>
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-waba-id" title="Como obter o WABA ID">
+                                    <i class="bi bi-question-circle-fill me-1"></i>Como obter?
+                                </a>
+                            </label>
                             <input type="text" class="form-control font-monospace" name="meta_waba_id" placeholder="Ex: 192837465019283" maxlength="64">
                             <div class="form-text">WhatsApp Business Account ID.</div>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-bold">Token de Acesso Permanente (System User Token)</label>
+                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                <span>Token de Acesso Permanente (System User Token)</span>
+                                <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-system-user-token" title="Como gerar token permanente sem expiração de 24h">
+                                    <i class="bi bi-question-circle-fill me-1"></i>Como gerar token permanente?
+                                </a>
+                            </label>
                             <input type="password" class="form-control font-monospace" name="meta_access_token" autocomplete="new-password" placeholder="EAAG... (deixe em branco para manter o token atual)">
                             <div class="form-text" id="token-status">
                                 <i class="bi bi-shield-lock me-1"></i> Armazenado com criptografia AES-256 no banco de dados.
@@ -388,7 +416,12 @@
 
                         <div class="col-12">
                             <div class="border rounded p-3 bg-body-tertiary">
-                                <h6 class="fw-bold mb-2"><i class="bi bi-arrow-repeat me-1"></i> Webhook Oficial da Meta</h6>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0"><i class="bi bi-arrow-repeat me-1"></i> Webhook Oficial da Meta</h6>
+                                    <button type="button" class="btn btn-xs btn-outline-info js-meta-help-trigger" data-help-topic="meta-webhook">
+                                        <i class="bi bi-question-circle me-1"></i>Passo a passo Webhook
+                                    </button>
+                                </div>
                                 <p class="small text-muted mb-2">Cadastre este webhook no Meta Developer Portal para receber status de entrega e mensagens:</p>
                                 
                                 <div class="mb-2">

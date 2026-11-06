@@ -11,10 +11,13 @@
     <div class="tenant-premium-metric">
         <span class="tenant-premium-kicker">Status de Envio</span>
         @if($hasConnectedInstance)
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center justify-content-between gap-2">
                 <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
                     <i class="bi bi-check-circle-fill me-1"></i> WhatsApp Conectado
                 </span>
+                <button type="button" class="btn btn-outline-info btn-sm js-meta-help-trigger" data-help-topic="meta-templates" title="Regras de Mensagens & Templates da Meta">
+                    <i class="bi bi-question-circle me-1"></i> Ajuda & Templates
+                </button>
             </div>
             <div class="small text-muted mt-2">
                 Instância: <strong>{{ $connectedInstance->name ?? $connectedInstance->instance_name ?? 'Padrão' }}</strong>
@@ -94,7 +97,12 @@
 
                     {{-- 2. Seleção de Template --}}
                     <div class="mb-3">
-                        <label class="form-label fw-bold">2. Modelo de Mensagem (Template) <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                            <span>2. Modelo de Mensagem (Template) <span class="text-danger">*</span></span>
+                            <a href="javascript:void(0)" class="js-meta-help-trigger text-primary small text-decoration-none" data-help-topic="meta-templates" title="Ver regras oficiais de Templates da Meta">
+                                <i class="bi bi-question-circle-fill me-1"></i>Regras da Meta
+                            </a>
+                        </label>
                         <select class="form-select" id="template-select" name="template_id" required>
                             <option value="">Selecione um template obrigatório...</option>
                             @foreach($templates as $tpl)

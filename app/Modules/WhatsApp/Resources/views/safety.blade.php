@@ -336,6 +336,11 @@
         title="Painel Anti-Ban WhatsApp"
         subtitle="Central de risco, limites, cooldowns, warmup e segurança operacional dos envios."
         eyebrow="WhatsApp Safety">
+        <x-slot:actions>
+            <button type="button" class="btn btn-outline-primary js-meta-help-trigger" data-help-topic="meta-anti-ban">
+                <i class="bi bi-question-circle-fill me-1"></i> Ajuda & Políticas Meta Anti-Ban
+            </button>
+        </x-slot:actions>
         <x-slot:aside>
             <div class="dashboard-note">
                 <span class="dashboard-note__label">Instâncias</span>

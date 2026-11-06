@@ -1578,5 +1578,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 </script>
+@include('partials.meta-help-drawer')
 </body>
 </html>
